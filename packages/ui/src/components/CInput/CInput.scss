@@ -1,0 +1,153 @@
+@use "../../styles/modules/global-vars" as *;
+
+$self: '.c-input';
+$input-field-height: 40px;
+$input-hints-height: 24px;
+$input-label-line-height: 20px;
+$input-field-border-color: #e5e5e5;
+$input-details-height: 24px;
+$input-label-left: 5px;
+
+.c-input {
+  --input-field-height: #{$input-field-height};
+  --input-hints-height: #{$input-hints-height};
+  --input-field-border-radius: var(--global-border-radius);
+  --input-field-border-color: #{$input-field-border-color};
+  --input-field-text-color: var(--global-text-color);
+  --input-details-height: #{$input-details-height};
+  --input-error-color: var(--global-error-color);
+  --input-primary-color: var(--global-primary-color);
+  --input-prepend-width: #{$input-field-height};
+  --input-append-width: #{$input-field-height};
+  --input-background-color: var(--global-base-color);
+  --input-label-padding-x: 4px;
+  --input-label-left: #{$input-label-left};
+  --input-label-font-size: 16px;
+
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  transition: .2s color $primary-transition;
+  color: currentColor;
+  position: relative;
+  border-radius: var(--global-border-radius);
+  background-color: var(--input-background-color);
+
+  &--focused,
+  &--has-value,
+  &--focused#{$self}--has-prepend,
+  &--has-value#{$self}--has-prepend {
+    #{$self}__label > .c-label {
+      transform: translate(0, calc(-50%)) scale(.9);
+      background-color: inherit;
+    }
+  }
+
+  &--focused {
+    #{$self}__field {
+      border: thin solid currentColor;
+    }
+
+    .c-autocomplete + #{$self}__append {
+      transform: rotate(180deg);
+    }
+
+    .c-select + #{$self}__append {
+      transform: rotate(180deg);
+    }
+  }
+
+  &--has-error {
+    color: var(--input-error-color);
+  }
+
+  &--default {
+    color: var(--input-primary-color);
+  }
+
+  $prepended-translate-x: calc(#{var(--input-prepend-width)} - #{var(--input-label-padding-x)} * 2);
+  $translate-y-down: calc(#{var(--input-field-height)} / 2 - (#{var(--input-label-font-size)} / 2));
+
+  &--has-prepend {
+    #{$self}__label > .c-label {
+      transform: translate($prepended-translate-x, $translate-y-down);
+    }
+
+    #{$self}__field > * > input {
+      padding-left: var(--input-prepend-width);
+    }
+  }
+
+  &--has-append {
+    #{$self}__field > * > input {
+      padding-right: var(--input-append-width);
+    }
+  }
+
+  &__prepend {
+    height:var(--input-field-height);
+    width: var(--input-prepend-width);
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__append {
+    height: var(--input-field-height);
+    width: var(--input-append-width);
+    transition: transform .1s linear;
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__label {
+    position: absolute;
+    height: 0;
+    top: 0;
+    border-radius: var(--input-field-border-radius);
+    background-color: inherit;
+
+    .c-label {
+      transition: background-color, transform, .1s linear;
+      position: absolute;
+      left: var(--input-label-left);
+      font-size: var(--input-label-font-size);
+      line-height: .9;
+      pointer-events: none;
+      transform: translateY($translate-y-down) scale(1);
+      background-color: transparent;
+      padding: 0 var(--input-label-padding-x);
+    }
+  }
+
+  &__field {
+    display: flex;
+    height: var(--input-field-height);
+    border: thin solid var(--input-field-border-color);
+    border-radius: var(--input-field-border-radius);
+    transition: .4s $primary-transition;
+    transition-property: color, border-color;
+    position: relative;
+    overflow: hidden;
+
+    & > * > input,
+    & > * > textarea {
+      color: var(--input-field-text-color)
+    }
+  }
+
+  &__details {
+    height: var(--input-details-height);
+    background-color: transparent;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+  }
+}

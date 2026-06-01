@@ -1,0 +1,24 @@
+$flex-grow-step: 4;
+$flex-shrink-step: 4;
+
+$justify: (
+  'center': center,
+  'start': flex-start,
+  'end': flex-end,
+  'space-between': space-between,
+  'space-around': space-around,
+  'space-evenly': space-evenly,
+  'stretch': stretch
+);
+
+$align: (
+  'center': center,
+  'start': flex-start,
+  'end': flex-end,
+  'baseline': baseline,
+  'stretch': stretch,
+  'end-safe': safe flex-end,
+  'center-safe': safe center,
+  'start-safe': safe flex-start,
+  'baseline-last': safe flex-start,
+);

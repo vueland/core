@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "target": "ES2018",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "declaration": true,
+    "emitDeclarationOnly": false,
+    "declarationMap": true,
+    "outDir": "dist/temp-types",
+  },
+  "include": [
+    "src",
+    "env.d.ts"
+  ]
+}

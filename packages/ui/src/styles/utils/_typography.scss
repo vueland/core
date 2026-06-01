@@ -1,0 +1,42 @@
+@use "../maps/grids" as *;
+@use "sass:map";
+
+$font-sizes: (
+  xs: 12px,
+  sm: 14px,
+  base: 16px,
+  lg: 18px,
+  xl: 20px,
+  2xl: 24px,
+  3xl: 32px
+);
+
+$font-weights: (
+  regular: 400,
+  semi-bold: 600,
+  bold: 700,
+);
+
+@each $name, $size in $font-sizes {
+  .fs-#{$name} {
+    font-size: $size !important;
+  }
+}
+
+@each $name, $weight in $font-weights {
+  .fw-#{$name} {
+    font-weight: $weight !important;
+  }
+}
+
+@each $bp, $breakpoint in $grid-breakpoints {
+  @if $breakpoint != 0 {
+    @media (min-width: $breakpoint) {
+      @each $name, $size in $font-sizes {
+        .#{$bp}\:fs-#{$name} {
+          font-size: $size !important;
+        }
+      }
+    }
+  }
+}

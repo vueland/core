@@ -1,0 +1,35 @@
+@use "sass:map";
+@use "../../styles/maps/elevations-map" as *;
+
+$self: '.c-menu';
+
+.c-menu {
+  --menu-bg-color: var(--global-base-color);
+  --menu-text-color: var(--global-text-color);
+  --menu-border-radius: var(--global-border-radius);
+  --menu-max-height: 300px;
+
+  position: absolute;
+  width: auto;
+  opacity: 0;
+  background-color: var(--menu-bg-color);
+  border-radius: var(--menu-border-radius);
+  overflow: hidden;
+  color: var(--menu-text-color);
+  max-height: var(--menu-max-height);
+  box-shadow: map.get($shadow-key-umbra, 3), map.get($shadow-key-penumbra, 3), map.get($shadow-key-ambient, 3);
+  transition: .1s opacity linear;
+
+  &__content {
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: inherit;
+    height: inherit;
+    max-height: inherit;
+    max-width: inherit;
+  }
+
+  &--visible {
+    opacity: 1;
+  }
+}

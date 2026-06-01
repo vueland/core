@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowJs": true, // разрешить JS файлы
+    "checkJs": false, // не проверять JS файлы
+    "resolveJsonModule": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "noEmit": true,
+    "types": ["vitepress"]
+  },
+  "include": [
+    ".vitepress/**/*.ts",      // проверять ts файлы в конфиге
+    ".vitepress/**/*.d.ts",    // и декларации
+    "**/*.md"                  // но Markdown файлы
+  ],
+  "exclude": ["node_modules"]
+}

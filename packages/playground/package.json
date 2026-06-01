@@ -1,0 +1,25 @@
+{
+  "name": "playground",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:play": "vite",
+    "build-play": "vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "vue": "^3.5.27",
+    "@vueland/ui": "workspace:*",
+    "@vueland/utils-jit": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1",
+    "@vitejs/plugin-vue": "^6.0.3",
+    "typescript": "^5.9.3",
+    "vue-tsc": "^2.2.0",
+    "sass": "^1.97.3"
+  }
+}

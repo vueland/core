@@ -1,0 +1,37 @@
+$card-width: 100%;
+$card-header-padding: 16px;
+$card-body-padding: 16px;
+$card-footer-padding: 16px;
+$card-border-radius: 8px;
+
+.c-card {
+  --card-width: #{$card-width};
+  --card-header-padding: #{$card-header-padding};
+  --card-body-padding: #{$card-body-padding};
+  --card-footer-padding: #{$card-footer-padding};
+  --card-border-radius: #{$card-border-radius};
+  --card-background-color: var(--global-base-color);
+  --card-text-color: var(--global-text-color);
+
+  width: var(--card-width);
+  border-radius: var(--card-border-radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card-background-color);
+  color: var( --card-text-color);
+
+  &-header {
+    padding: var(--card-header-padding);
+    flex-grow: 0;
+  }
+
+  &-body {
+    padding: var(--card-body-padding);
+  }
+
+  &-footer {
+    flex-grow: 0;
+    padding: var(--card-footer-padding);
+  }
+}

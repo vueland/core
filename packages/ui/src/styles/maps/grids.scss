@@ -1,0 +1,23 @@
+@use "sass:math";
+
+$columns: 12;
+$grid-gutter: 10px;
+$gutter-column: math.div($grid-gutter, 2);
+
+$grid-gutters: (
+  'xs': math.div($grid-gutter, 24),
+  'sm': math.div($grid-gutter, 12),
+  'md': math.div($grid-gutter, 6),
+  'lg': math.div($grid-gutter, 3),
+  'xl': math.div($grid-gutter * 2, 3),
+  'xxl': $grid-gutter
+);
+
+$grid-breakpoints: (
+  'xs': 0,
+  'sm': 576px,
+  'md': 768px,
+  'lg': 992px,
+  'xl': 1200px,
+  'xxl': 1920px
+);

@@ -1,0 +1,140 @@
+.cursor {
+  &-default {
+    cursor: default;
+  }
+
+  &-pointer {
+    cursor: pointer;
+  }
+
+  &-wait {
+    cursor: wait;
+  }
+
+  &-text {
+    cursor: text;
+  }
+
+  &-move {
+    cursor: move;
+  }
+
+  &-help {
+    cursor: help;
+  }
+
+  &-not-allowed {
+    cursor: not-allowed;
+  }
+
+  /* Selection cursors */
+  &-cell {
+    cursor: cell;
+  }
+
+  &-crosshair {
+    cursor: crosshair;
+  }
+
+  &-vertical-text {
+    cursor: vertical-text;
+  }
+
+  &-alias {
+    cursor: alias;
+  }
+
+  &-copy {
+    cursor: copy;
+  }
+
+  &-no-drop {
+    cursor: no-drop;
+  }
+
+  &-grab {
+    cursor: grab;
+  }
+
+  &-grabbing {
+    cursor: grabbing;
+  }
+
+  /* Resize cursors - edges */
+  &-n-resize {
+    cursor: n-resize;
+  }
+
+  &-e-resize {
+    cursor: e-resize;
+  }
+
+  &-s-resize {
+    cursor: s-resize;
+  }
+
+  &-w-resize {
+    cursor: w-resize;
+  }
+
+  &-ne-resize {
+    cursor: ne-resize;
+  }
+
+  &-nw-resize {
+    cursor: nw-resize;
+  }
+
+  &-se-resize {
+    cursor: se-resize;
+  }
+
+  &-sw-resize {
+    cursor: sw-resize;
+  }
+
+  /* Resize cursors - directions (more specific) */
+  &-ew-resize {
+    cursor: ew-resize;
+  }
+
+  &-ns-resize {
+    cursor: ns-resize;
+  }
+
+  &-nesw-resize {
+    cursor: nesw-resize;
+  }
+
+  &-nwse-resize {
+    cursor: nwse-resize;
+  }
+
+  /* Zoom cursors */
+  &-zoom-in {
+    cursor: zoom-in;
+  }
+
+  &-zoom-out {
+    cursor: zoom-out;
+  }
+
+  /* Context menus */
+  &-context-menu {
+    cursor: context-menu;
+  }
+
+  /* Progress indicator */
+  &-progress {
+    cursor: progress;
+  }
+
+  /* Col-resize (for table columns) */
+  &-col-resize {
+    cursor: col-resize;
+  }
+
+  &-row-resize {
+    cursor: row-resize;
+  }
+}

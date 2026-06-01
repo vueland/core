@@ -1,0 +1,36 @@
+@import './utils-jit.css';
+:root {
+  --vp-c-brand-1: #5fb234;
+  --vp-c-brand-2: #8ce75f;
+  --vp-c-bg: #1b1b1f;
+  //--vp-code-bg: red;
+  --vp-c-bg-soft: #1b1b1f;
+  --vp-code-block-bg: #181818;
+  --vp-nav-bg-color: #1b1b1f;
+}
+
+.VPSwitchAppearance,
+.dark .VPSwitchAppearance,
+.appearance-action,
+.vitepress-dark-mode-switch {
+  display: none !important;
+}
+
+/* Также скрываем кнопку в мобильном меню */
+.VPNavBarAppearance,
+.VPNavScreenAppearance {
+  display: none !important;
+}
+
+.VPHome {
+  margin: 0 !important;
+  height: 100%;
+}
+
+.dark .VPNavBar {
+  background-color: var(--vp-nav-bg-color) !important;
+}
+
+.vp-doc tr {
+  //background-color: var(--vp-c-bg-soft) !important;
+}

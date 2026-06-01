@@ -1,0 +1,38 @@
+{
+  "name": "@vueland/utils-jit",
+  "version": "0.0.1",
+  "description": "Vite JIT plugin for arbitrary utility classes used with core-ui",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.сts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build:deploy": "tsdown",
+    "build-jit": "tsdown",
+    "dev": "tsdown --watch",
+    "clean": "rm -rf dist",
+    "test:deploy": "vitest run -c vitest.config.ts",
+    "test:jit": "vitest run -c vitest.config.ts",
+    "lint:jit": "eslint ."
+  },
+  "peerDependencies": {
+    "vite": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.4.0",
+    "tsdown": "^0.21.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.2.4"
+  }
+}

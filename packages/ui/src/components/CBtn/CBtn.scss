@@ -1,0 +1,67 @@
+@use "sass:map";
+@use "../../styles/maps/colors-map" as *;
+
+.c-btn {
+  --btn-text-color: #ffffff;
+  --btn-border-radius: var(--global-border-radius);
+  --btn-bg-color: var(--global-primary-color);
+  --btn-paddings: 8px 12px;
+  --btn-min-width: 80px;
+  --btn-width: auto;
+  --btn-min-height: 24px;
+  --btn-height: auto;
+  --btn-font-size: 16px;
+
+  padding: var(--btn-paddings);
+  border-radius: var(--btn-border-radius);
+  color: var(--btn-text-color);
+  min-width: var(--btn-min-width);
+  width: var(--btn-width);
+  height: var(--btn-height);
+  min-height: var(--btn-min-height);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  //line-height: 1;
+  font-size: var(--btn-font-size);
+  user-select: none;
+  vertical-align: middle;
+  text-decoration: none;
+
+  &__label {
+    white-space: nowrap;
+  }
+
+  &:disabled {
+    background-color: map.get($grey, "lighten-1") !important;
+    color: map.get($grey, "lighten-3") !important;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  &--flat {
+    background-color: var(--btn-bg-color);
+    color: currentColor;
+  }
+
+  &--outlined {
+    background-color: transparent;
+    border: 1px solid currentColor;
+    color: currentColor;
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      pointer-events: none;
+    }
+  }
+
+  &--block {
+    width: 100%;
+  }
+}

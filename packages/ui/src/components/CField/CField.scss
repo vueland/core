@@ -1,0 +1,26 @@
+$field-padding: 4px 8px;
+
+.c-field {
+  --field-padding: #{$field-padding};
+
+  width: 100%;
+  height: 100%;
+  padding: var(--field-padding);
+  color: currentColor;
+
+  &::placeholder {
+    opacity: 0;
+  }
+
+  &--focused {
+    &::placeholder {
+      opacity: 1;
+    }
+  }
+
+  &--filled {
+    &::placeholder {
+      opacity: 0;
+    }
+  }
+}

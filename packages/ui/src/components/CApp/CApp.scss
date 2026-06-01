@@ -1,0 +1,25 @@
+.c-app {
+  --app-background-color: var(--global-base-color);
+  display: flex;
+
+  &__wrapper {
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    max-width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    position: relative;
+    background-color: var(--app-background-color);
+  }
+
+  &--block-scroll {
+    width: 100%;
+    position: fixed;
+    top: var(--scroll-top);
+    left: var(--scroll-left);
+    bottom: 0;
+    pointer-events: none;
+  }
+}

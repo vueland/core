@@ -1,0 +1,41 @@
+$radius-scale: (
+  0: 0,
+  2: 2px,
+  4: 4px,
+  6: 6px,
+  8: 8px,
+  12: 12px,
+  16: 16px,
+  24: 24px,
+  32: 32px
+);
+
+@each $key, $value in $radius-scale {
+  .radius-#{$key} {
+    border-radius: #{$value} !important;
+  }
+
+  .radius-top-left-#{$key} {
+    border-top-left-radius: #{$value} !important;
+  }
+
+  .radius-top-right-#{$key} {
+    border-top-right-radius: #{$value} !important;
+  }
+
+  .radius-bottom-left-#{$key} {
+    border-bottom-left-radius: #{$value} !important;
+  }
+
+  .radius-bottom-right-#{$key} {
+    border-bottom-right-radius: #{$value} !important;
+  }
+}
+
+.radius-pill {
+  border-radius: 9999px !important;
+}
+
+.radius-circle {
+  border-radius: 50% !important;
+}

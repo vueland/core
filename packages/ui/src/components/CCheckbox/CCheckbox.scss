@@ -1,0 +1,20 @@
+.c-checkbox {
+  display: flex;
+  cursor: pointer;
+  user-select: none;
+
+  &__icon {
+    margin-right: 4px;
+    border-radius: 4px;
+    border: thin solid currentColor;
+    color: currentColor;
+  }
+
+  &__label {
+    color: currentColor;
+  }
+
+  &--error {
+    color: var(--global-error-color)
+  }
+}

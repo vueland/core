@@ -1,0 +1,164 @@
+@use "../maps/grids" as *;
+@use "sass:map";
+
+$step: 4;
+$max: 10;
+
+@for $r from 0 through $max {
+  $z: $r * $step;
+
+  .ma-#{$r} {
+    margin: #{$z}px !important;
+  }
+
+  .ml-#{$r} {
+    margin-left: #{$z}px !important;
+  }
+
+  .mr-#{$r} {
+    margin-right: #{$z}px !important;
+  }
+
+  .mb-#{$r} {
+    margin-bottom: #{$z}px !important;
+  }
+
+  .mt-#{$r} {
+    margin-top: #{$z}px !important;
+  }
+
+  .mx-#{$r} {
+    margin-left: #{$z}px !important;
+    margin-right: #{$z}px !important;
+  }
+
+  .my-#{$r} {
+    margin-top: #{$z}px !important;
+    margin-bottom: #{$z}px !important;
+  }
+
+  .pl-#{$r} {
+    padding-left: #{$z}px !important;
+  }
+
+  .pr-#{$r} {
+    padding-right: #{$z}px !important;
+  }
+
+  .pb-#{$r} {
+    padding-bottom: #{$z}px !important;
+  }
+
+  .pt-#{$r} {
+    padding-top: #{$z}px !important;
+  }
+
+  .pa-#{$r} {
+    padding: #{$z}px !important;
+  }
+
+  .px-#{$r} {
+    padding-left: #{$z}px !important;
+    padding-right: #{$z}px !important;
+  }
+
+  .py-#{$r} {
+    padding-top: #{$z}px !important;
+    padding-bottom: #{$z}px !important;
+  }
+
+  .gap-#{$r} {
+    gap: #{$z}px !important;
+  }
+
+  .gap-x-#{$r} {
+    column-gap: #{$z}px !important;
+  }
+
+  .gap-y-#{$r} {
+    row-gap: #{$z}px !important;
+  }
+}
+
+// responsive
+@each $size, $breakpoint in $grid-breakpoints {
+  @if $breakpoint != 0 {
+    @media (min-width: $breakpoint) {
+      @for $r from 0 through $max {
+        $z: $r * $step;
+
+        .#{$size}\:pa-#{$r} {
+          padding: #{$z}px !important;
+        }
+
+        .#{$size}\:pl-#{$r} {
+          padding-left: #{$z}px !important;
+        }
+
+        .#{$size}\:pr-#{$r} {
+          padding-right: #{$z}px !important;
+        }
+
+        .#{$size}\:pb-#{$r} {
+          padding-bottom: #{$z}px !important;
+        }
+
+        .#{$size}\:pt-#{$r} {
+          padding-top: #{$z}px !important;
+        }
+
+        .#{$size}\:px-#{$r} {
+          padding-left: #{$z}px !important;
+          padding-right: #{$z}px !important;
+        }
+
+        .#{$size}\:py-#{$r} {
+          padding-top: #{$z}px !important;
+          padding-bottom: #{$z}px !important;
+        }
+
+        .#{$size}\:ma-#{$r} {
+          margin: #{$z}px !important;
+        }
+
+        .#{$size}\:ml-#{$r} {
+          margin-left: #{$z}px !important;
+        }
+
+        .#{$size}\:mr-#{$r} {
+          margin-right: #{$z}px !important;
+        }
+
+        .#{$size}\:mb-#{$r} {
+          margin-bottom: #{$z}px !important;
+        }
+
+        .#{$size}\:mt-#{$r} {
+          margin-top: #{$z}px !important;
+        }
+
+        .#{$size}\:mx-#{$r} {
+          margin-left: #{$z}px !important;
+          margin-right: #{$z}px !important;
+        }
+
+        .#{$size}\:my-#{$r} {
+          margin-top: #{$z}px !important;
+          margin-bottom: #{$z}px !important;
+        }
+
+        .#{$size}\:gap-#{$r} {
+          gap: #{$z}px !important;
+        }
+
+        .#{$size}\:gap-x-#{$r} {
+          column-gap: #{$z}px !important;
+        }
+
+        .#{$size}\:gap-y-#{$r} {
+          row-gap: #{$z}px !important;
+        }
+      }
+    }
+  }
+}

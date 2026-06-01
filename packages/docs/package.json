@@ -1,0 +1,19 @@
+{
+  "name": "@vvueland/docs",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:docs": "vitepress dev .",
+    "build:docs": "vitepress build .",
+    "preview:docs": "vitepress preview .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.27",
+    "@vueland/ui": "workspace:*",
+    "@vueland/utils-jit": "workspace:*"
+  }
+}

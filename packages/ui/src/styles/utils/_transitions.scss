@@ -1,0 +1,92 @@
+@use "../modules/global-vars" as *;
+
+@mixin transition-default() {
+  &-enter-active,
+  &-leave-active {
+    transition: .4s all $primary-transition;
+  }
+
+  &-move {
+    transition: transform .4s;
+  }
+}
+
+.fade {
+  @include transition-default();
+
+  &-enter-from, &-leave-to {
+    opacity: 0;
+  }
+}
+
+.scale-in {
+  @include transition-default();
+
+  &-enter-from, &-leave-to {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+.scale-in-out {
+  &-enter-from, &-leave-to {
+    opacity: 0;
+    transform: scale(.9);
+  }
+
+  &-enter-active {
+    transition: .2s all $primary-transition;
+  }
+
+  &-leave-active {
+    transform: scale(1.1);
+    transition: .2s all $primary-transition;
+  }
+}
+
+.fade-in-down {
+  &-enter-from, &-leave-to {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+
+  &-enter-active {
+    transition: .2s all $primary-transition;
+  }
+
+  &-leave-active {
+    transform: translateY(15px);
+    transition: .2s all $primary-transition;
+  }
+}
+
+.fade-in-up {
+  &-enter-from, &-leave-to {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  &-enter-active {
+    transition: .2s all $primary-transition;
+  }
+
+  &-leave-active {
+    transform: translateY(-15px);
+    transition: .2s all $primary-transition;
+  }
+}
+
+.slide-in-left {
+  &-enter-from, &-leave-to {
+    transform: translateX(-100%);
+  }
+
+  &-enter-active {
+    transition: .2s all $primary-transition;
+  }
+
+  &-leave-active {
+    transform: translateX(100%);
+    transition: .2s all $primary-transition;
+  }
+}

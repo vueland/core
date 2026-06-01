@@ -1,0 +1,137 @@
+@use "../maps/grids" as *;
+@use "../maps/flexes-map" as *;
+@use "sass:map";
+
+.d-flex {
+  display: flex !important;
+}
+
+.d-inline-flex {
+  display: inline-flex !important;
+}
+
+.flex-row {
+  flex-direction: row !important;
+}
+
+.flex-col {
+  flex-direction: column !important;
+}
+
+.flex-wrap {
+  flex-wrap: wrap !important;
+}
+
+.flex-nowrap {
+  flex-wrap: nowrap !important;
+}
+
+.flex-wrap-reverse{
+  flex-wrap: wrap-reverse !important;
+}
+
+@each $key in map.keys($justify) {
+  .justify-#{$key} {
+    justify-content: map.get($justify, $key) !important;
+  }
+
+  .content-#{$key} {
+    align-content: map.get($justify, $key) !important;
+  }
+}
+
+@each $key in map.keys($align) {
+  .items-#{$key} {
+    align-items: map.get($align, $key) !important;
+  }
+
+  .self-#{$key} {
+    align-self: map.get($align, $key) !important;
+  }
+}
+
+@for $i from 1 through $columns {
+  .order-#{$i} {
+    order: $i !important;
+  }
+}
+
+@for $i from 0 through $flex-grow-step {
+  .grow-#{$i} {
+    flex-grow: $i !important;
+  }
+}
+
+@for $i from 0 through $flex-shrink-step {
+  .shrink-#{$i} {
+    flex-shrink: $i !important;
+  }
+}
+
+@each $size, $breakpoint in $grid-breakpoints {
+  @if $breakpoint != 0 {
+    @media (min-width: $breakpoint) {
+      .#{$size}\:d-flex {
+        display: flex !important;
+      }
+
+      .#{$size}\:d-inline-flex {
+        display: inline-flex !important;
+      }
+
+      .#{$size}\:flex-row {
+        flex-direction: row !important;
+      }
+
+      .#{$size}\:flex-col {
+        flex-direction: column !important;
+      }
+
+      .#{$size}\:flex-wrap {
+        flex-wrap: wrap !important;
+      }
+
+      .#{$size}\:flex-nowrap {
+        flex-wrap: nowrap !important;
+      }
+
+      @each $key in map.keys($justify) {
+        .#{$size}\:justify-#{$key} {
+          justify-content: map.get($justify, $key) !important;
+        }
+
+        .#{$size}\:content-#{$key} {
+          align-content: map.get($justify, $key) !important;
+        }
+      }
+
+      @each $key in map.keys($align) {
+        .#{$size}\:items-#{$key} {
+          align-items: map.get($align, $key) !important;
+        }
+
+        .#{$size}\:self-#{$key} {
+          align-self: map.get($align, $key) !important;
+        }
+      }
+
+      @for $i from 1 through $columns {
+        .#{$size}\:order-#{$i} {
+          order: $i !important;
+        }
+      }
+
+      @for $i from 0 through $flex-grow-step {
+        .#{$size}\:grow-#{$i} {
+          flex-grow: $i !important;
+        }
+      }
+
+      @for $i from 0 through $flex-shrink-step {
+        .#{$size}\:shrink-#{$i} {
+          flex-shrink: $i !important;
+        }
+      }
+    }
+  }
+}

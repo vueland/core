@@ -1,0 +1,10 @@
+@use "variables" as *;
+
+.c-list {
+  --list-bg-color: #{$list-bg-color};
+  //background-color: var(--list-bg-color);
+
+  &--readonly {
+    pointer-events: none;
+  }
+}

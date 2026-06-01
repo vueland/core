@@ -1,0 +1,13 @@
+@use "sass:math";
+
+$max: 10;
+
+@for $i from 0 through $max {
+  .op-#{$i} {
+    opacity: math.div($i, $max) !important;
+  }
+
+  .hover\:op-#{$i}:hover {
+    opacity: math.div($i, $max) !important;
+  }
+}
