@@ -11,14 +11,12 @@ $self: '.c-menu';
 
   position: absolute;
   width: auto;
-  opacity: 0;
   background-color: var(--menu-bg-color);
   border-radius: var(--menu-border-radius);
   overflow: hidden;
   color: var(--menu-text-color);
   max-height: var(--menu-max-height);
   box-shadow: map.get($shadow-key-umbra, 3), map.get($shadow-key-penumbra, 3), map.get($shadow-key-ambient, 3);
-  transition: .1s opacity linear;
 
   &__content {
     overflow-x: hidden;

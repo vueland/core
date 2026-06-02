@@ -23,6 +23,7 @@ export type CMenuProps =
     closeOnClickOutside?: boolean
     closeOnContentClick?: boolean
     ssr?: boolean
+    transition?: string
 }
 
 export type CMenuSlots = {

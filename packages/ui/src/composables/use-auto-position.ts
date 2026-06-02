@@ -259,16 +259,7 @@ export function useAutoPosition(
         })
     }
 
-    const update = (activatorEl: HTMLElement | ComponentPublicInstance) => {
-        setActivatorSizes(activatorEl)
-        setContentSizes(contentRef.value!)
-
-        scheduleUpdate()
-    }
-
-    const updateAfterRender = async (
-        activatorEl: HTMLElement | ComponentPublicInstance
-    ) => {
+    const update = async (activatorEl: HTMLElement | ComponentPublicInstance) => {
         if (unref(activatorEl)) {
             setActivatorSizes(activatorEl)
             await nextTick()
@@ -330,6 +321,5 @@ export function useAutoPosition(
         content,
         contentRef,
         update,
-        updateAfterRender,
     }
 }

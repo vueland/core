@@ -6,6 +6,7 @@
     "packages/*"
   ],
   "scripts": {
+    "build:all": "npm run build:jit && npm run build:lib && npm run build:docs",
     "build:lib": "pnpm run -r build-lib",
     "build:jit": "pnpm run -r build-jit",
     "build:docs": "pnpm run -r build:docs",

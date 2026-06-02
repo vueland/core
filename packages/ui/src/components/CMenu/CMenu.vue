@@ -15,8 +15,8 @@
 
     const emit = defineEmits<CMenuEvents>()
     const props = defineProps<CMenuProps>()
+    const { transition = 'fade' } = props
 
-    const TRANSITION_DURATION = 100
     const THROTTLE_DELAY = 50
 
     const {
@@ -30,7 +30,7 @@
         activator,
         content,
         contentRef,
-        updateAfterRender,
+        update,
     } = useAutoPosition(props)
 
     const presets = useMenuPresets({ props })
@@ -39,7 +39,6 @@
 
     const model = defineModel<boolean>({ default: false })
 
-    const visible = shallowRef(false)
     const mounted = shallowRef(props.ssr || props.modelValue)
 
     const detached = computed(() => isDef(props.positionX) || isDef(props.positionY))
@@ -60,7 +59,6 @@
     }))
 
     const classes = computed(() => ([
-        { 'c-menu--visible': unref(visible) },
         ...unref(presets).root
     ]))
 
@@ -72,25 +70,21 @@
         }
 
         openDelay(async () => {
-            await updateAfterRender(getActivator<HTMLElement>())
-            visible.value = true
+            await update(getActivator<HTMLElement>())
             emit('open')
         })
     }
 
     const close = () => {
         closeDelay(() => {
-            visible.value = false
             emit('close')
 
-            setTimeout(() => {
-                mounted.value = props.ssr ?? false
-                model.value = false
-            }, TRANSITION_DURATION)
+            mounted.value = props.ssr ?? false
+            model.value = false
         })
     }
 
-    const toggle = () => unref(visible) ? close() : open()
+    const toggle = () => unref(model) ? close() : open()
 
     const onClickOutside = (e: Event) => {
         const { closeOnClickOutside } = props
@@ -116,8 +110,8 @@
         toggle
     })
 
-    const update = throttle(() => {
-        updateAfterRender(getActivator<HTMLElement>())
+    const handler = throttle(() => {
+        update(getActivator<HTMLElement>())
     }, THROTTLE_DELAY)
 
     defineExpose({
@@ -133,13 +127,13 @@
     })
 
     if (IN_BROWSER) {
-        watch(visible, (value) => {
+        watch(model, (value) => {
             if (value) {
-                window.addEventListener('resize', update, { passive: true })
-                window.addEventListener('scroll', update, { passive: true })
+                window.addEventListener('resize', handler, { passive: true })
+                window.addEventListener('scroll', handler, { passive: true })
             } else {
-                window.removeEventListener('resize', update)
-                window.removeEventListener('scroll', update)
+                window.removeEventListener('resize', handler)
+                window.removeEventListener('scroll', handler)
             }
         }, { immediate: true })
 
@@ -155,8 +149,8 @@
     }
 
     onBeforeUnmount(() => {
-        window.removeEventListener('resize', update)
-        window.removeEventListener('scroll', update)
+        window.removeEventListener('resize', handler)
+        window.removeEventListener('scroll', handler)
     })
 </script>
 <template>
@@ -169,8 +163,9 @@
         v-slot="{zIndex}"
         v-model="model"
     >
-        <template v-if="mounted">
+        <transition :name="transition">
             <div
+                v-if="mounted"
                 v-show="model"
                 ref="contentRef"
                 v-click-outside="onClickOutside"
@@ -184,6 +179,6 @@
                     <slot />
                 </div>
             </div>
-        </template>
+        </transition>
     </c-overlay>
 </template>

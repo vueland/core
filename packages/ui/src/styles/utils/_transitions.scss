@@ -12,19 +12,25 @@
 }
 
 .fade {
-  @include transition-default();
-
   &-enter-from, &-leave-to {
     opacity: 0;
+  }
+
+  &-enter-active,
+  &-leave-active {
+    transition: .2s opacity $primary-transition;
   }
 }
 
 .scale-in {
-  @include transition-default();
-
   &-enter-from, &-leave-to {
     opacity: 0;
     transform: scale(0);
+  }
+
+  &-enter-active,
+  &-leave-active {
+    transition: .2s opacity $primary-transition, transform .2s $primary-transition;
   }
 }
 
@@ -34,13 +40,13 @@
     transform: scale(.9);
   }
 
-  &-enter-active {
-    transition: .2s all $primary-transition;
+  &-enter-active,
+  &-leave-active {
+    transition: .2s opacity $primary-transition, transform .2s $primary-transition;
   }
 
   &-leave-active {
     transform: scale(1.1);
-    transition: .2s all $primary-transition;
   }
 }
 
@@ -50,13 +56,13 @@
     transform: translateY(-15px);
   }
 
-  &-enter-active {
-    transition: .2s all $primary-transition;
+  &-enter-active,
+  &-leave-active {
+    transition: .2s opacity $primary-transition, transform .2s $primary-transition;
   }
 
   &-leave-active {
     transform: translateY(15px);
-    transition: .2s all $primary-transition;
   }
 }
 
@@ -66,13 +72,13 @@
     transform: translateY(15px);
   }
 
-  &-enter-active {
-    transition: .2s all $primary-transition;
+  &-enter-active,
+  &-leave-active {
+    transition: .2s opacity $primary-transition, transform .2s $primary-transition;
   }
 
   &-leave-active {
     transform: translateY(-15px);
-    transition: .2s all $primary-transition;
   }
 }
 
@@ -81,12 +87,12 @@
     transform: translateX(-100%);
   }
 
-  &-enter-active {
-    transition: .2s all $primary-transition;
+  &-enter-active,
+  &-leave-active {
+    transition: .2s opacity $primary-transition, transform .2s $primary-transition;
   }
 
   &-leave-active {
     transform: translateX(100%);
-    transition: .2s all $primary-transition;
   }
 }
