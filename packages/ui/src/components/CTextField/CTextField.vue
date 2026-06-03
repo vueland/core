@@ -1,13 +1,11 @@
 <script setup lang="ts">
     import { CInput } from '../CInput'
     import { CField } from '../CField'
-    import { useFieldAttrs } from '../../composables'
 
     defineOptions({
         name: 'CTextField',
     })
 
-    const fieldAttrs = useFieldAttrs()
     const model = defineModel<string | number>()
 </script>
 
@@ -16,7 +14,7 @@
         v-model="model"
         v-bind="$attrs"
     >
-        <template #field="{onFocus, onInput, onBlur, focused, presets}">
+        <template #field="{onFocus, onInput, onBlur, focused, presets, attrs}">
             <div
                 class="c-text-field"
                 :class="presets"
@@ -24,8 +22,8 @@
                 <c-field
                     v-model="model"
                     class="c-text-field__input"
-                    v-bind="fieldAttrs"
                     :focused
+                    v-bind="attrs"
                     @focus="onFocus"
                     @input="onInput"
                     @blur="onBlur"

@@ -100,6 +100,7 @@
                     placeholder="введите текст"
                     min="3"
                     max="5"
+                    type="number"
                 />
                 <c-select
                     v-model="form.radius"
@@ -123,6 +124,7 @@
                     name="profession"
                     :items="professions"
                     :rules="professionRules"
+                    readonly
                     multiple
                     :options="{
                         extKey: 'title',

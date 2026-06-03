@@ -15,17 +15,21 @@ export type CInputSlots = {
     prepend?(): VNode | string
     append?(): VNode | string
     details?(props: {
-        errorMessage: ValidateState['errorMessage'],
-        hasError: ValidateState['hasError'],
+        errorMessage: ValidateState['errorMessage']
+        hasError: ValidateState['hasError']
     }): VNode | string
     field?(props: {
-        onInput(): void,
-        onFocus(): void,
-        onBlur(): void,
-        focused: boolean,
+        onInput(): void
+        onFocus(): void
+        onBlur(): void
+        label?: string
+        readonly?: boolean
+        focused?: boolean
+        disabled?: boolean
         presets?: string[] | string[][]
-        errorMessage: ValidateState['errorMessage'],
-        hasError: ValidateState['hasError'],
+        errorMessage: ValidateState['errorMessage']
+        hasError: ValidateState['hasError']
+        attrs: Record<string, any>
         validate(): boolean
     }): VNode
 }

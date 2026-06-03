@@ -271,7 +271,7 @@ describe('useAutoPosition', () => {
             height: 70,
         })
 
-        const promise = api.updateAfterRender(activator)
+        const promise = api.update(activator)
 
         api.contentRef.value = content as any
 

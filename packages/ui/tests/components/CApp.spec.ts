@@ -144,8 +144,8 @@ describe('CApp', () => {
         expect(wrapper.classes()).toContain('c-app--block-scroll')
 
         // Проверяем что позиция записалась в CSS переменные
-        expect(wrapper.element.style.getPropertyValue('--scroll-top')).toBe('-240px')
-        expect(wrapper.element.style.getPropertyValue('--scroll-left')).toBe('-15px')
+        expect(wrapper.element.style.getPropertyValue('--c-scroll-top')).toBe('-240px')
+        expect(wrapper.element.style.getPropertyValue('--c-scroll-left')).toBe('-15px')
     })
 
     it('unblockScroll снимает блокировку и восстанавливает scroll', async () => {
@@ -195,8 +195,8 @@ describe('CApp', () => {
         expect(wrapper.classes()).not.toContain('c-app--block-scroll')
 
         // CSS переменные должны быть очищены
-        expect(wrapper.element.style.getPropertyValue('--scroll-top')).toBe('')
-        expect(wrapper.element.style.getPropertyValue('--scroll-left')).toBe('')
+        expect(wrapper.element.style.getPropertyValue('--c-scroll-top')).toBe('')
+        expect(wrapper.element.style.getPropertyValue('--c-scroll-left')).toBe('')
 
         // Проверяем восстановление позиции
         expect(scrollToMock).toHaveBeenCalledWith({

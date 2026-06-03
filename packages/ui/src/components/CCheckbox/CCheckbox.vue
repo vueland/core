@@ -16,13 +16,13 @@
     const props = defineProps<CCheckboxProps<T>>()
     const model = defineModel<T>()
 
-    const { validate, errors } = useValidate(props)
+    const { validate, state } = useValidate(props)
     const form = useForm()
 
     const { CHECKBOX_ON, CHECKBOX_OFF } = IconAliases
 
     const classes = computed(() => ({
-        'c-checkbox--error': errors.hasError
+        'c-checkbox--error': state.hasError
     }))
 
     onMounted(() => {

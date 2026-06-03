@@ -56,8 +56,7 @@ describe('useActivator', () => {
             toggle,
         })
 
-        // если genListeners у тебя пока возвращает computed
-        const value = 'value' in listeners ? listeners.value : listeners
+        const { value } =  listeners
 
         expect(value.click).toBeTypeOf('function')
 

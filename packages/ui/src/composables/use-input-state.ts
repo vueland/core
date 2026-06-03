@@ -19,8 +19,11 @@ export function useInputState(props: Record<string, any> = {}) {
     }
 
     function onFocus() {
+        if (props.readonly || props.disabled) return
+
         focused.value = true
         instance?.emit('focus', unref(focused))
+
         if (!unref(isDirty)) {
             dirty()
         }

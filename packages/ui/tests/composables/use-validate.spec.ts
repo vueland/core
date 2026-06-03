@@ -34,11 +34,11 @@ describe('useValidate', () => {
         })
 
         expect(wrapper.vm.hasRules).toBe(false)
-        expect(wrapper.vm.errors.hasError).toBe(false)
-        expect(wrapper.vm.errors.errorMessage).toBeUndefined()
+        expect(wrapper.vm.state.hasError).toBe(false)
+        expect(wrapper.vm.state.errorMessage).toBeUndefined()
         expect(wrapper.vm.validate()).toBe(true)
-        expect(wrapper.vm.errors.hasError).toBe(false)
-        expect(wrapper.vm.errors.errorMessage).toBeUndefined()
+        expect(wrapper.vm.state.hasError).toBe(false)
+        expect(wrapper.vm.state.errorMessage).toBeUndefined()
     })
 
     it('с пустым rules: hasRules=false, validate возвращает true', () => {
@@ -49,8 +49,8 @@ describe('useValidate', () => {
 
         expect(wrapper.vm.hasRules).toBe(false)
         expect(wrapper.vm.validate()).toBe(true)
-        expect(wrapper.vm.errors.hasError).toBe(false)
-        expect(wrapper.vm.errors.errorMessage).toBeUndefined()
+        expect(wrapper.vm.state.hasError).toBe(false)
+        expect(wrapper.vm.state.errorMessage).toBeUndefined()
     })
 
     it('hasRules=true если rules переданы', () => {
@@ -86,8 +86,8 @@ describe('useValidate', () => {
         expect(wrapper.vm.validate()).toBe(true)
         expect(rule1).toHaveBeenCalledWith('hello')
         expect(rule2).toHaveBeenCalledWith('hello')
-        expect(wrapper.vm.errors.hasError).toBe(false)
-        expect(wrapper.vm.errors.errorMessage).toBeUndefined()
+        expect(wrapper.vm.state.hasError).toBe(false)
+        expect(wrapper.vm.state.errorMessage).toBeUndefined()
     })
 
     it('validate останавливается на первой невалидной rule', () => {
@@ -109,8 +109,8 @@ describe('useValidate', () => {
         expect(wrapper.vm.validate()).toBe(false)
         expect(rule1).toHaveBeenCalledWith('')
         expect(rule2).not.toHaveBeenCalled()
-        expect(wrapper.vm.errors.hasError).toBe(true)
-        expect(wrapper.vm.errors.errorMessage).toBe('Required')
+        expect(wrapper.vm.state.hasError).toBe(true)
+        expect(wrapper.vm.state.errorMessage).toBe('Required')
     })
 
     it('после успешной validate ошибки очищаются', () => {
@@ -130,12 +130,12 @@ describe('useValidate', () => {
         })
 
         expect(wrapper.vm.validate()).toBe(false)
-        expect(wrapper.vm.errors.hasError).toBe(true)
-        expect(wrapper.vm.errors.errorMessage).toBe('Error')
+        expect(wrapper.vm.state.hasError).toBe(true)
+        expect(wrapper.vm.state.errorMessage).toBe('Error')
 
         expect(wrapper.vm.validate()).toBe(true)
-        expect(wrapper.vm.errors.hasError).toBe(false)
-        expect(wrapper.vm.errors.errorMessage).toBeUndefined()
+        expect(wrapper.vm.state.hasError).toBe(false)
+        expect(wrapper.vm.state.errorMessage).toBeUndefined()
     })
 
     it('watch modelValue валидирует при изменении значения, если modelValue !== null', async () => {
@@ -157,8 +157,8 @@ describe('useValidate', () => {
         await nextTick()
 
         expect(rule).toHaveBeenCalledWith('ab')
-        expect(wrapper.vm.errors.hasError).toBe(true)
-        expect(wrapper.vm.errors.errorMessage).toBe('Too short')
+        expect(wrapper.vm.state.hasError).toBe(true)
+        expect(wrapper.vm.state.errorMessage).toBe('Too short')
     })
 
     it('при modelValue=null и validateOn=blur не валидирует сразу, а ждет blur', async () => {
@@ -181,16 +181,16 @@ describe('useValidate', () => {
         await nextTick()
 
         expect(rule).not.toHaveBeenCalled()
-        expect(wrapper.vm.errors.hasError).toBe(false)
-        expect(wrapper.vm.errors.errorMessage).toBeUndefined()
+        expect(wrapper.vm.state.hasError).toBe(false)
+        expect(wrapper.vm.state.errorMessage).toBeUndefined()
 
         wrapper.vm.onFocus()
         wrapper.vm.onBlur()
         await nextTick()
 
         expect(rule).toHaveBeenCalledWith(null)
-        expect(wrapper.vm.errors.hasError).toBe(true)
-        expect(wrapper.vm.errors.errorMessage).toBe('Required')
+        expect(wrapper.vm.state.hasError).toBe(true)
+        expect(wrapper.vm.state.errorMessage).toBe('Required')
     })
 
     it('валидирует на blur', async () => {
@@ -212,7 +212,7 @@ describe('useValidate', () => {
         await nextTick()
 
         expect(rule).toHaveBeenCalledWith('abc')
-        expect(wrapper.vm.errors.hasError).toBe(true)
-        expect(wrapper.vm.errors.errorMessage).toBe('Blur error')
+        expect(wrapper.vm.state.hasError).toBe(true)
+        expect(wrapper.vm.state.errorMessage).toBe('Blur error')
     })
 })

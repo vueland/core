@@ -36,7 +36,7 @@ export function useValidate(props: ValidateProps & { modelValue: any }) {
         onInput
     } = useInputState(props)
 
-    const errors = reactive<ValidateState>({
+    const state = reactive<ValidateState>({
         errorMessage: undefined,
         hasError: false,
     })
@@ -45,8 +45,8 @@ export function useValidate(props: ValidateProps & { modelValue: any }) {
     const isOnBlur = computed(() => unref(validateOn) === InputEvents.BLUR)
 
     function update(result: ReturnType<ValidateFn>) {
-        errors.hasError = !result.valid
-        errors.errorMessage = !result.valid ? result.message : undefined
+        state.hasError = !result.valid
+        state.errorMessage = !result.valid ? result.message : undefined
     }
 
     function validate() {
@@ -90,7 +90,7 @@ export function useValidate(props: ValidateProps & { modelValue: any }) {
         focused,
         isDirty,
         hasValue,
-        errors,
+        state,
         hasRules,
         onFocus,
         onBlur,

@@ -4,7 +4,7 @@
     import { CMenu } from '../CMenu'
     import { CItems } from '../CItems'
     import { CField } from '../CField'
-    import { useFieldAttrs, useInputValue } from '../../composables'
+    import { useInputValue } from '../../composables'
     import { IconAliases } from '../../enums'
     import type { CSelectProps, CSelectSlots } from './types'
 
@@ -15,7 +15,6 @@
     defineSlots<CSelectSlots<T>>()
     const props = defineProps<CSelectProps<T>>()
 
-    const fieldAttrs = useFieldAttrs()
     const inputRef = shallowRef()
 
     const model = defineModel<T | T[]>({
@@ -45,7 +44,7 @@
         v-model="model"
         validate-on="blur"
     >
-        <template #field="{onFocus, focused, presets}">
+        <template #field="{onFocus, focused, presets, attrs}">
             <c-menu
                 bottom
                 open-on-focus
@@ -63,7 +62,7 @@
                     >
                         <c-field
                             class="c-select__field"
-                            v-bind="fieldAttrs"
+                            v-bind="attrs"
                             :model-value="inputValue"
                             :focused
                             readonly

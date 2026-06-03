@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T">
     import { computed, onBeforeMount, onBeforeUnmount, toRefs, unref, useAttrs } from 'vue'
     import { CLabel } from '../CLabel'
-    import { useForm, useInputPresets, useValidate } from '../../composables'
+    import { useFieldAttrs, useForm, useInputPresets, useValidate } from '../../composables'
     import type { CInputProps, CInputSlots } from './types'
 
     defineOptions({
@@ -13,7 +13,7 @@
     const slots = defineSlots<CInputSlots>()
 
     const {
-        errors,
+        state,
         focused,
         hasValue,
         onFocus,
@@ -22,14 +22,16 @@
         validate
     } = useValidate(props)
 
-    const attrs = useAttrs()
     const formApi = useForm()
 
     const preset = useInputPresets({
         props,
         focused,
-        ...toRefs(errors),
+        ...toRefs(state),
     })
+
+    const attrs = useAttrs()
+    const fieldAttrs = useFieldAttrs({ props, attrs, state })
 
     const hasLabel = computed(() => !!slots.label || !!props.label)
     const hasPrepend = computed(() => !!slots?.prepend)
@@ -38,8 +40,8 @@
 
     const classes = computed(() => [
         {
-            'c-input--has-error': errors.hasError,
-            'c-input--default': !errors.hasError,
+            'c-input--has-error': state.hasError,
+            'c-input--default': !state.hasError,
             'c-input--focused': unref(focused),
             'c-input--disabled': props.disabled,
             'c-input--readonly': props.readonly,
@@ -79,23 +81,27 @@
                 v-if="$slots.prepend"
                 class="c-input__prepend"
             >
-                <slot name="prepend" />
+                <slot name="prepend"/>
             </div>
             <slot
                 name="field"
-                v-bind="errors"
+                v-bind="state"
                 :validate
                 :focused
+                :label
+                :disabled
+                :readonly
                 :presets="preset.field"
                 :on-focus
                 :on-blur
                 :on-input
+                :attrs="fieldAttrs"
             />
             <div
                 v-if="$slots.append"
                 class="c-input__append"
             >
-                <slot name="append" />
+                <slot name="append"/>
             </div>
         </div>
         <div
@@ -119,7 +125,7 @@
         >
             <slot
                 name="details"
-                v-bind="errors"
+                v-bind="state"
             >
                 {{ details }}
             </slot>

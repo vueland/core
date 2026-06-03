@@ -1,8 +1,11 @@
-import { computed, useAttrs } from 'vue'
+import { computed, type ComputedRef } from 'vue'
+import type { CInputProps } from '../components'
+import type { ValidateState } from './use-validate'
 
 const FIELD_ATTRS = new Set([
     'type',
     'name',
+    'id',
     'placeholder',
     'autocomplete',
     'autofocus',
@@ -20,12 +23,26 @@ const FIELD_ATTRS = new Set([
     'enterkeyhint',
 ])
 
-export function useFieldAttrs() {
-    return computed(() => Object.entries(useAttrs()).reduce((acc, [k, v]) => {
-        if (FIELD_ATTRS.has(k) || k.startsWith('aria-')) {
-            acc[k] = v
-        }
+export function useFieldAttrs({ props, attrs, state }: {
+    props: CInputProps
+    attrs: Record<string, any>
+    state: ValidateState
+}): ComputedRef<Record<string, any>> {
+    return computed(() => {
+        const map = Object.entries(attrs).reduce((acc, [k, v]) => {
+            if (!props[k] && FIELD_ATTRS.has(k) || k.startsWith('aria-') || k.startsWith('data-')) {
+                acc[k] = v
+            }
 
-        return acc
-    }, {}))
+            return acc
+        }, {})
+
+        return {
+            'aria-label': props.label,
+            'aria-describedby': attrs.placeholder ?? props.label,
+            'aria-invalid': state.hasError,
+            'aria-errormessage': state.errorMessage,
+            ...map
+        }
+    })
 }

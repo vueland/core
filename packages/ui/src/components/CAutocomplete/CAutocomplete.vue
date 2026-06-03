@@ -1,10 +1,10 @@
 <script setup lang="ts" generic="T">
-    import { shallowRef, unref, watch } from 'vue'
+    import { computed, shallowRef, unref, watch } from 'vue'
     import { CInput } from '../CInput'
     import { CMenu } from '../CMenu'
     import { CField } from '../CField'
     import { CItems } from '../CItems'
-    import { useAutocomplete, useFieldAttrs } from '../../composables'
+    import { useAutocomplete } from '../../composables'
     import type { CAutocompleteProps, CAutocompleteSlots } from './types'
     import { IconAliases } from '../../enums'
 
@@ -21,13 +21,20 @@
     defineSlots<CAutocompleteSlots<T>>()
 
     const { input, searchItems, rollbackValue } = useAutocomplete(props)
-    const fieldAttrs = useFieldAttrs()
     const inputRef = shallowRef()
 
     const model = defineModel<T | T[]>({
         get: () => props.modelValue,
         set: val => val
     })
+
+    // aria-invalid
+    // aria-describedby
+    // aria-labelledby
+    // aria-label
+    // aria-required
+    // aria-disabled
+    // aria-readonly
 
     function onCloseMenu() {
         unref(inputRef).onBlur()
@@ -58,7 +65,7 @@
         v-bind="$attrs"
         validate-on="blur"
     >
-        <template #field="{onInput, onFocus, focused, presets}">
+        <template #field="{onInput, onFocus, focused, presets, readonly, attrs}">
             <c-menu
                 bottom
                 open-on-focus
@@ -81,7 +88,8 @@
                             class="c-autocomplete__field"
                             type="text"
                             :focused
-                            v-bind="fieldAttrs"
+                            v-bind="attrs"
+                            :readonly
                             v-on="on"
                             @focus="onFocus"
                             @input="onInput"

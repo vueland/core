@@ -12,7 +12,7 @@ const onInputMock = vi.fn()
 const focusedRef = ref(false)
 const hasValueRef = ref(false)
 
-const errorsState = reactive({
+const state = reactive({
     hasError: false,
     errorMessage: undefined as string | undefined,
 })
@@ -23,7 +23,7 @@ vi.mock('../../src/composables', async () => {
     return {
         ...actual,
         useValidate: vi.fn(() => ({
-            errors: errorsState,
+            state: state,
             focused: focusedRef,
             hasValue: hasValueRef,
             onFocus: onFocusMock,
@@ -73,8 +73,8 @@ describe('CInput', () => {
         focusedRef.value = false
         hasValueRef.value = false
 
-        errorsState.hasError = false
-        errorsState.errorMessage = undefined
+        state.hasError = false
+        state.errorMessage = undefined
     })
 
     it('рендерит корневой элемент и базовые классы', () => {
@@ -98,8 +98,8 @@ describe('CInput', () => {
     })
 
     it('ставит error-классы если есть ошибка', () => {
-        errorsState.hasError = true
-        errorsState.errorMessage = 'Required'
+        state.hasError = true
+        state.errorMessage = 'Required'
 
         const wrapper = mountComponent()
 
@@ -153,8 +153,8 @@ describe('CInput', () => {
     })
 
     it('передает актуальные errors в field slot', () => {
-        errorsState.hasError = true
-        errorsState.errorMessage = 'Invalid value'
+        state.hasError = true
+        state.errorMessage = 'Invalid value'
 
         let slotProps: any
 
@@ -250,8 +250,8 @@ describe('CInput', () => {
     })
 
     it('рендерит details slot и пробрасывает errors', () => {
-        errorsState.hasError = true
-        errorsState.errorMessage = 'Some error'
+        state.hasError = true
+        state.errorMessage = 'Some error'
 
         let slotProps: any
 
