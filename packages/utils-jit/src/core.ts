@@ -1,5 +1,5 @@
 import type { CssBody, ParsedToken, RuleMatch, UtilityRule } from './types'
-import { isMarginValue, isPaddingValue, isPositionValue, isRadiusValue, isSizeValue, isZIndexValue } from './validators'
+import * as rules from './rules'
 
 export const DEFAULT_INCLUDE = [/\.(vue|js|ts|html)$/]
 
@@ -226,50 +226,7 @@ export function createMultiDeclRule(
     )
 }
 
-export const RULES: UtilityRule[] = [
-    // sizing
-    createMultiDeclRule('width', /^w-\[(.+)\]$/, ['width'], isSizeValue),
-    createMultiDeclRule('height', /^h-\[(.+)\]$/, ['height'], isSizeValue),
-    createMultiDeclRule('min-width', /^min-w-\[(.+)\]$/, ['min-width'], isSizeValue),
-    createMultiDeclRule('min-height', /^min-h-\[(.+)\]$/, ['min-height'], isSizeValue),
-    createMultiDeclRule('max-width', /^max-w-\[(.+)\]$/, ['max-width'], isSizeValue),
-    createMultiDeclRule('max-height', /^max-h-\[(.+)\]$/, ['max-height'], isSizeValue),
-
-    // margin
-    createMultiDeclRule('margin', /^ma-\[(.+)\]$/, ['margin'], isMarginValue),
-    createMultiDeclRule('margin-x', /^mx-\[(.+)\]$/, ['margin-left', 'margin-right'], isMarginValue),
-    createMultiDeclRule('margin-y', /^my-\[(.+)\]$/, ['margin-top', 'margin-bottom'], isMarginValue),
-    createMultiDeclRule('margin-top', /^mt-\[(.+)\]$/, ['margin-top'], isMarginValue),
-    createMultiDeclRule('margin-right', /^mr-\[(.+)\]$/, ['margin-right'], isMarginValue),
-    createMultiDeclRule('margin-bottom', /^mb-\[(.+)\]$/, ['margin-bottom'], isMarginValue),
-    createMultiDeclRule('margin-left', /^ml-\[(.+)\]$/, ['margin-left'], isMarginValue),
-
-    // padding
-    createMultiDeclRule('padding', /^pa-\[(.+)\]$/, ['padding'], isPaddingValue),
-    createMultiDeclRule('padding-x', /^px-\[(.+)\]$/, ['padding-left', 'padding-right'], isPaddingValue),
-    createMultiDeclRule('padding-y', /^py-\[(.+)\]$/, ['padding-top', 'padding-bottom'], isPaddingValue),
-    createMultiDeclRule('padding-top', /^pt-\[(.+)\]$/, ['padding-top'], isPaddingValue),
-    createMultiDeclRule('padding-right', /^pr-\[(.+)\]$/, ['padding-right'], isPaddingValue),
-    createMultiDeclRule('padding-bottom', /^pb-\[(.+)\]$/, ['padding-bottom'], isPaddingValue),
-    createMultiDeclRule('padding-left', /^pl-\[(.+)\]$/, ['padding-left'], isPaddingValue),
-
-    // positions
-    createMultiDeclRule('left', /^left-\[(.+)\]$/, ['left'], isPositionValue),
-    createMultiDeclRule('right', /^right-\[(.+)\]$/, ['right'], isPositionValue),
-    createMultiDeclRule('top', /^top-\[(.+)\]$/, ['top'], isPositionValue),
-    createMultiDeclRule('bottom', /^bottom-\[(.+)\]$/, ['bottom'], isPositionValue),
-    createMultiDeclRule('inset', /^inset-\[(.+)\]$/, ['inset'], isPositionValue),
-
-    // radius
-    createMultiDeclRule('radius', /^r-\[(.+)\]$/, ['border-radius'], isRadiusValue),
-    createMultiDeclRule('radius-top-left', /^rtl-\[(.+)\]$/, ['border-top-left-radius'], isRadiusValue),
-    createMultiDeclRule('radius-top-right', /^rtr-\[(.+)\]$/, ['border-top-right-radius'], isRadiusValue),
-    createMultiDeclRule('radius-bottom-left', /^rbl-\[(.+)\]$/, ['border-bottom-left-radius'], isRadiusValue),
-    createMultiDeclRule('radius-bottom-right', /^rbr-\[(.+)\]$/, ['border-bottom-right-radius'], isRadiusValue),
-
-    // z-index
-    createMultiDeclRule('z-index', /^z-\[(.+)\]$/, ['z-index'], isZIndexValue),
-]
+export const RULES: UtilityRule[] = Object.values(rules)
 
 export function resolveRule(utility: string): CssBody | null {
     for (const rule of RULES) {

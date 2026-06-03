@@ -1,5 +1,7 @@
 .idea
+.DS_Store
+
 node_modules
 dist
 packages/docs/docs/.vitepress/cache/
-temp.md
+

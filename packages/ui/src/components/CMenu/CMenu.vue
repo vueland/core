@@ -15,8 +15,8 @@
 
     const emit = defineEmits<CMenuEvents>()
     const props = defineProps<CMenuProps>()
-    const { transition = 'fade' } = props
 
+    const { transition = 'fade' } = props
     const THROTTLE_DELAY = 50
 
     const {

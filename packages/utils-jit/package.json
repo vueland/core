@@ -1,8 +1,9 @@
 {
   "name": "@vueland/utils-jit",
+  "description": "Vite JIT utility engine for Vueland",
   "version": "0.0.1",
-  "description": "Vite JIT plugin for arbitrary utility classes used with core-ui",
   "type": "module",
+  "private": false,
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
