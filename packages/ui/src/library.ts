@@ -1,7 +1,7 @@
 import { type App, type ComponentInstance, type Directive, type FunctionalComponent } from 'vue'
 import { createDialogsStack, useDisplay } from './composables'
 import { IN_BROWSER } from './utils'
-import { $BREAKPOINTS_KEY, $CORE_UI_KEY, $DIALOGS_STACK_API_KEY } from './constants'
+import { $BREAKPOINTS_KEY, $VUELAND_UI_KEY, $DIALOGS_STACK_API_KEY } from './constants'
 import type { IconAliases } from './enums'
 
 export type IconsOptions = {
@@ -18,7 +18,7 @@ export interface LibOptions {
     ssr?: boolean
 }
 
-export class CoreUI {
+export class VuelandUI {
     themes: LibOptions['themes'] = {}
     icons: IconsOptions = {}
     presets: Record<string, Record<string, any>> = {}
@@ -51,7 +51,7 @@ export class CoreUI {
         const display = createDisplay(options.ssr)
         const dialogsStack = createDialogsStack()
 
-        app.provide($CORE_UI_KEY, this)
+        app.provide($VUELAND_UI_KEY, this)
         app.provide($BREAKPOINTS_KEY, display)
         app.provide($DIALOGS_STACK_API_KEY, dialogsStack)
 

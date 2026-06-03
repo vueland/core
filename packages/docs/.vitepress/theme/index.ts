@@ -1,6 +1,6 @@
 import DefaultTheme from 'vitepress/theme'
 import type { Theme } from 'vitepress'
-import { createCoreUi } from '@vueland/ui'
+import { createUI } from '@vueland/ui'
 import * as components from '@vueland/ui/components'
 import AppWrapper from './AppWrapper.vue'
 
@@ -18,7 +18,7 @@ export default {
     extends: DefaultTheme,
     Layout: AppWrapper,
     enhanceApp({ app }) {
-        const coreUI = createCoreUi({
+        const coreUI = createUI({
             components,
             ssr: true,
             icons: {

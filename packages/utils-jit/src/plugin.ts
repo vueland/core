@@ -53,7 +53,7 @@ function collectProjectFiles(
     return files
 }
 
-export function coreUiJit(options?: CoreUiJitOptions): Plugin {
+export function utilsJIT(options?: CoreUiJitOptions): Plugin {
     const include = options?.include ?? DEFAULT_INCLUDE
     const breakpoints = options?.breakpoints ?? DEFAULT_BREAKPOINTS
 

@@ -387,7 +387,7 @@
                 <article
                     v-for="tone in group.tones"
                     :key="`${group.name}-${tone.key}`"
-                    class="palette__card d-flex flex-col justify-space-between r-12 pa-3"
+                    class="palette__card d-flex flex-col justify-space-between radius-12 pa-3"
                     :class="tone.className"
                 >
                     <div class="palette__name">

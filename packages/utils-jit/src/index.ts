@@ -1,4 +1,4 @@
-export { coreUiJit } from './plugin'
+export { utilsJIT } from './plugin'
 export type {
     CoreUiJitOptions,
     ParsedToken,

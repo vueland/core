@@ -1,7 +1,7 @@
 import { inject } from 'vue'
-import { $CORE_UI_KEY } from '../constants'
-import type { CoreUI } from '../library'
+import { $VUELAND_UI_KEY } from '../constants'
+import type { VuelandUI } from '../library'
 
-export function useCore(): CoreUI {
-    return inject($CORE_UI_KEY, null)
+export function useCore(): VuelandUI {
+    return inject($VUELAND_UI_KEY, null)
 }

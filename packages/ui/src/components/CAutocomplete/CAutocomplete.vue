@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T">
-    import { computed, shallowRef, unref, watch } from 'vue'
+    import { shallowRef, unref, watch } from 'vue'
     import { CInput } from '../CInput'
     import { CMenu } from '../CMenu'
     import { CField } from '../CField'
@@ -27,14 +27,6 @@
         get: () => props.modelValue,
         set: val => val
     })
-
-    // aria-invalid
-    // aria-describedby
-    // aria-labelledby
-    // aria-label
-    // aria-required
-    // aria-disabled
-    // aria-readonly
 
     function onCloseMenu() {
         unref(inputRef).onBlur()

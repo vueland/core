@@ -1,14 +1,14 @@
 import { defineConfig, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'node:path'
-import { coreUiJit } from '@vueland/utils-jit'
+import { utilsJIT } from '@vueland/utils-jit'
 
 // Для максимально комфортной разработки компонентов:
-// алиасим на исходники core-ui, чтобы не ждать сборку и ловить HMR.
+// алиасим на исходники ui, чтобы не ждать сборку и ловить HMR.
 export default defineConfig({
     plugins: [
         vue(),
-        coreUiJit({
+        utilsJIT({
             breakpoints: {
                 sm: 375,
                 md: 768,
@@ -20,9 +20,6 @@ export default defineConfig({
     resolve: {
         alias: {
             '@vueland/ui': path.resolve(__dirname, '../ui/src/'),
-            // '@vueland/ui/styles.css': path.resolve(__dirname, '../core-ui/dist/style.css'),
-            // '@vueland/ui/themes/default-theme.css': path.resolve(__dirname, '../core-ui/dist/themes/default-theme.css'),
-            // '@vueland/ui/examples/': path.resolve(__dirname, '../core-ui/dist/examples'),
         }
     },
     css: {

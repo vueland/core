@@ -3,6 +3,7 @@
     import { CLabel } from '../CLabel'
     import { useFieldAttrs, useForm, useInputPresets, useValidate } from '../../composables'
     import type { CInputProps, CInputSlots } from './types'
+    import { unique } from '../../helpers'
 
     defineOptions({
         name: 'CInput',
@@ -32,6 +33,8 @@
 
     const attrs = useAttrs()
     const fieldAttrs = useFieldAttrs({ props, attrs, state })
+
+    const KEY = unique(props.label ?? '')
 
     const hasLabel = computed(() => !!slots.label || !!props.label)
     const hasPrepend = computed(() => !!slots?.prepend)
@@ -111,6 +114,7 @@
         >
             <slot name="label">
                 <c-label
+                    :id="KEY"
                     v-memo="[label]"
                     tag="label"
                 >

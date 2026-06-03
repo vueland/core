@@ -1,4 +1,4 @@
-import { createCoreUi } from '@vueland/ui'
+import { createUI } from '@vueland/ui'
 import * as components from '@vueland/ui/components'
 import '@vueland/ui/styles/styles.scss'
 import '@vueland/ui/styles/themes/default-theme.scss'
@@ -8,7 +8,7 @@ import * as buttonPresets from './presets/button-presets'
 import * as inputPresets from './presets/input-presets'
 import * as menuPresets from './presets/menu-presets'
 
-export const coreUi = createCoreUi({
+export const ui = createUI({
     components,
     ssr: true,
     themes: {},

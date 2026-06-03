@@ -1,20 +1,20 @@
 import { type App, type Plugin } from 'vue'
-import { CoreUI, type LibOptions } from './library'
+import { VuelandUI, type LibOptions } from './library'
 import './styles/styles.scss'
 
 export * from './types'
 
-export function createCoreUi(options: LibOptions): Plugin {
+export function createUI(options: LibOptions): Plugin {
     return {
         install(app: App, args: any) {
-            const library = new CoreUI()
+            const library = new VuelandUI()
 
             library.install(app, {
                 ...options,
                 ...args,
             })
 
-            app.config.globalProperties.$coreUi = library
+            app.config.globalProperties.$ui = library
         },
     }
 }

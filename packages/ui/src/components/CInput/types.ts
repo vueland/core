@@ -1,14 +1,15 @@
 import type { InputStateProps, PresetProps, ValidateProps, ValidateState } from '../../composables'
 import type { VNode } from 'vue'
 
-export type CInputProps<T = any> = ValidateProps &
+export type CInputProps<T = any> =
+    ValidateProps &
     InputStateProps &
     PresetProps & {
-    modelValue: T
-    label?: string
-    details?: string
-    noDetails?: boolean
-}
+        modelValue: T
+        label?: string
+        details?: string
+        noDetails?: boolean
+    }
 
 export type CInputSlots = {
     label?(): VNode | string

@@ -100,7 +100,6 @@
                     placeholder="введите текст"
                     min="3"
                     max="5"
-                    type="number"
                 />
                 <c-select
                     v-model="form.radius"

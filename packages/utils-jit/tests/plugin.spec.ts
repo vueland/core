@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { coreUiJit } from '../src'
+import { utilsJIT } from '../src'
 
-describe('coreUiJit plugin', () => {
+describe('utilsJIT plugin', () => {
     it('creates vite plugin with expected name', () => {
-        const plugin = coreUiJit()
+        const plugin = utilsJIT()
 
         expect(plugin.name).toBe('utils-jit')
         expect(typeof plugin.configResolved).toBe('function')
@@ -12,7 +12,7 @@ describe('coreUiJit plugin', () => {
     })
 
     it('accepts custom numeric breakpoints', () => {
-        const plugin = coreUiJit({
+        const plugin = utilsJIT({
             breakpoints: {
                 xs: 480,
                 xl: 1440,
