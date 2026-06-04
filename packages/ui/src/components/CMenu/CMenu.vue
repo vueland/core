@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { computed, nextTick, onBeforeUnmount, onMounted, provide, shallowRef, unref, watch } from 'vue'
+    import { computed, onBeforeUnmount, onMounted, provide, shallowRef, unref, watch } from 'vue'
     import { useActivator, useAutoPosition, useDelayedActions, useMenuPresets, } from '../../composables'
     import { COverlay } from '../COverlay'
     import { vClickOutside } from '../../directives'

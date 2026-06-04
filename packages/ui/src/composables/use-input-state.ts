@@ -1,4 +1,4 @@
-import { getCurrentInstance, shallowRef, unref, watch } from 'vue'
+import { getCurrentInstance, shallowReactive, watch } from 'vue'
 import { isNotEmpty } from '../helpers'
 
 export type InputStateProps = {
@@ -7,31 +7,39 @@ export type InputStateProps = {
     readonly?: boolean
 }
 
+export interface InputState {
+    focused: boolean
+    isDirty: boolean
+    hasValue: boolean
+}
+
 export function useInputState(props: Record<string, any> = {}) {
     const instance = getCurrentInstance()
 
-    const focused = shallowRef(props.focused ?? false)
-    const isDirty = shallowRef(false)
-    const hasValue = shallowRef(false)
+    const state = shallowReactive<InputState>({
+        focused: props.focused ?? false,
+        isDirty: false,
+        hasValue: false,
+    })
 
     function dirty() {
-        isDirty.value = true
+        state.isDirty = true
     }
 
     function onFocus() {
         if (props.readonly || props.disabled) return
 
-        focused.value = true
-        instance?.emit('focus', unref(focused))
+        state.focused = true
+        instance?.emit('focus', state.focused)
 
-        if (!unref(isDirty)) {
+        if (!state.isDirty) {
             dirty()
         }
     }
 
     function onBlur() {
-        focused.value = false
-        instance?.emit('blur', unref(focused))
+        state.focused = false
+        instance?.emit('blur', state.focused)
     }
 
     function onInput() {
@@ -39,13 +47,11 @@ export function useInputState(props: Record<string, any> = {}) {
 
     watch(() => props.modelValue, (value) => {
         const isArray = Array.isArray(value)
-        hasValue.value = isArray ? !!value.length : isNotEmpty(value)
+        state.hasValue = isArray ? !!value.length : isNotEmpty(value)
     }, { immediate: true })
 
     return {
-        isDirty,
-        focused,
-        hasValue,
+        state,
         onFocus,
         onBlur,
         onInput,

@@ -1,4 +1,4 @@
-import { computed, type ComputedRef, unref, type Ref } from 'vue'
+import { computed, type ComputedRef } from 'vue'
 import type { CInputProps } from '../components'
 import type { ValidateState } from './use-validate'
 
@@ -23,10 +23,10 @@ const FIELD_ATTRS = new Set([
     'enterkeyhint',
 ])
 
-export function useFieldAttrs({ props, attrs, state, uid }: {
+export function useFieldAttrs({ props, attrs, errors, uid }: {
     props: CInputProps
     attrs: Record<string, any>
-    state: ValidateState
+    errors: ValidateState
     uid: string
 }): ComputedRef<Record<string, any>> {
 
@@ -46,8 +46,8 @@ export function useFieldAttrs({ props, attrs, state, uid }: {
         return {
             'aria-labelledby': `${uid}-label`,
             ...(!props.noDetails ? { 'aria-describedby': `${uid}-details` } : {}),
-            ...(state.hasError ? { 'aria-invalid': state.hasError } : {}),
-            ...(state.errorMessage ? { 'aria-errormessage': state.errorMessage } : {}),
+            ...(errors.hasError ? { 'aria-invalid': errors.hasError } : {}),
+            ...(errors.errorMessage ? { 'aria-errormessage': errors.errorMessage } : {}),
             ...(props.readonly ? { 'aria-readonly': props.readonly } : {}),
             ...(props.disabled ? { 'aria-disabled': props.disabled } : {}),
             ...map

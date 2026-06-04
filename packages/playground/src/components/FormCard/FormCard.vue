@@ -56,15 +56,15 @@
 
 
     const radiusItems = [
-        {name: '2px', value: 'r-[2px]'},
-        {name: '4px', value: 'r-[4px]'},
-        {name: '6px', value: 'r-[6px]'},
-        {name: '8px', value: 'r-[8px]'},
-        {name: '10px', value: 'r-[10px]'},
-        {name: '12px', value: 'r-[12px]'},
-        {name: '14px', value: 'r-[14px]'},
-        {name: '16px', value: 'r-[16px]'},
-        {name: '18px', value: 'r-[18px]'},
+        {name: '2px', value: 'radius-[2px]'},
+        {name: '4px', value: 'radius-[4px]'},
+        {name: '6px', value: 'radius-[6px]'},
+        {name: '8px', value: 'radius-[8px]'},
+        {name: '10px', value: 'radius-[10px]'},
+        {name: '12px', value: 'radius-[12px]'},
+        {name: '14px', value: 'radius-[14px]'},
+        {name: '16px', value: 'radius-[16px]'},
+        {name: '18px', value: 'radius-[18px]'},
     ]
 
     const currentPreset = shallowRef('input.A')

@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T">
-    import { computed, onBeforeMount, onBeforeUnmount, toRefs, unref, useAttrs } from 'vue'
+    import { computed, onBeforeMount, onBeforeUnmount, unref, useAttrs } from 'vue'
     import { CLabel } from '../CLabel'
-    import { useFieldAttrs, useForm, useInputPresets, useValidate } from '../../composables'
+    import { useFieldAttrs, useForm, useInputPresets, useInputState, useValidate } from '../../composables'
     import type { CInputProps, CInputSlots } from './types'
     import { unique } from '../../helpers'
 
@@ -15,25 +15,27 @@
 
     const {
         state,
-        focused,
-        hasValue,
-        onFocus,
         onBlur,
         onInput,
+        onFocus
+    } = useInputState(props)
+
+    const {
+        errors,
         validate
-    } = useValidate(props)
+    } = useValidate(props, state)
 
     const formApi = useForm()
 
     const preset = useInputPresets({
         props,
-        focused,
-        ...toRefs(state),
+        state,
+        errors
     })
 
     const uid = `input-${props.id ?? unique(6)}`
     const attrs = useAttrs()
-    const fieldAttrs = useFieldAttrs({ props, attrs, state, uid })
+    const fieldAttrs = useFieldAttrs({ props, attrs, errors, uid })
 
     const hasLabel = computed(() => !!slots.label || !!props.label)
     const hasPrepend = computed(() => !!slots?.prepend)
@@ -42,12 +44,12 @@
 
     const classes = computed(() => [
         {
-            'c-input--has-error': state.hasError,
-            'c-input--default': !state.hasError,
-            'c-input--focused': unref(focused),
+            'c-input--has-error': errors.hasError,
+            'c-input--default': !errors.hasError,
+            'c-input--focused': state.focused,
             'c-input--disabled': props.disabled,
             'c-input--readonly': props.readonly,
-            'c-input--has-value': unref(hasValue),
+            'c-input--has-value': state.hasValue,
             'c-input--has-prepend': unref(hasPrepend),
             'c-input--has-append': unref(hasAppend),
             [attrs.class as string]: !!attrs.class,
@@ -87,9 +89,9 @@
             </div>
             <slot
                 name="field"
-                v-bind="state"
+                v-bind="errors"
                 :validate
-                :focused
+                :focused="state.focused"
                 :label
                 :disabled
                 :readonly
@@ -134,7 +136,7 @@
         >
             <slot
                 name="details"
-                v-bind="state"
+                v-bind="errors"
                 :uid
             >
                 {{ details }}

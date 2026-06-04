@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h, nextTick, reactive, ref } from 'vue'
+import { defineComponent, h, nextTick, reactive, ref, shallowReactive } from 'vue'
 import { mount } from '@vue/test-utils'
 import { CForm, CInput } from '../../src/components'
 import { $FORM_API_KEY } from '../../src/constants'
@@ -12,9 +12,15 @@ const onInputMock = vi.fn()
 const focusedRef = ref(false)
 const hasValueRef = ref(false)
 
-const state = reactive({
+const errors = shallowReactive({
     hasError: false,
     errorMessage: undefined as string | undefined,
+})
+
+const state = shallowReactive({
+    focused: false,
+    hasValue: false,
+    isDirty: false,
 })
 
 vi.mock('../../src/composables', async () => {
@@ -23,14 +29,15 @@ vi.mock('../../src/composables', async () => {
     return {
         ...actual,
         useValidate: vi.fn(() => ({
-            state: state,
-            focused: focusedRef,
-            hasValue: hasValueRef,
-            onFocus: onFocusMock,
-            onBlur: onBlurMock,
-            onInput: onInputMock,
+            errors,
             validate: validateMock,
         })),
+        useInputState: vi.fn(() => ({
+            state,
+            onFocus: onFocusMock,
+            onBlur: onBlurMock,
+            onInput: onInputMock
+        }))
     }
 })
 
@@ -73,8 +80,8 @@ describe('CInput', () => {
         focusedRef.value = false
         hasValueRef.value = false
 
-        state.hasError = false
-        state.errorMessage = undefined
+        errors.hasError = false
+        errors.errorMessage = undefined
     })
 
     it('рендерит корневой элемент и базовые классы', () => {
@@ -98,8 +105,8 @@ describe('CInput', () => {
     })
 
     it('ставит error-классы если есть ошибка', () => {
-        state.hasError = true
-        state.errorMessage = 'Required'
+        errors.hasError = true
+        errors.errorMessage = 'Required'
 
         const wrapper = mountComponent()
 
@@ -108,7 +115,7 @@ describe('CInput', () => {
     })
 
     it('ставит focused-класс из useValidate', () => {
-        focusedRef.value = true
+        state.focused = true
 
         const wrapper = mountComponent()
 
@@ -116,7 +123,7 @@ describe('CInput', () => {
     })
 
     it('ставит disabled/readonly/hasValue классы', () => {
-        hasValueRef.value = true
+        state.hasValue = true
 
         const wrapper = mountComponent({
             disabled: true,
@@ -147,14 +154,14 @@ describe('CInput', () => {
         expect(slotProps.onFocus).toBe(onFocusMock)
         expect(slotProps.onBlur).toBe(onBlurMock)
         expect(slotProps.onInput).toBe(onInputMock)
-        expect(slotProps.focused).toBe(focusedRef.value)
+        expect(slotProps.focused).toBe(state.focused)
         expect(slotProps.hasError).toBe(false)
         expect(slotProps.errorMessage).toBeUndefined()
     })
 
     it('передает актуальные errors в field slot', () => {
-        state.hasError = true
-        state.errorMessage = 'Invalid value'
+        errors.hasError = true
+        errors.errorMessage = 'Invalid value'
 
         let slotProps: any
 
@@ -250,8 +257,8 @@ describe('CInput', () => {
     })
 
     it('рендерит details slot и пробрасывает errors', () => {
-        state.hasError = true
-        state.errorMessage = 'Some error'
+        errors.hasError = true
+        errors.errorMessage = 'Some error'
 
         let slotProps: any
 

@@ -10,6 +10,7 @@ export type CInputProps<T = any> =
     label?: string
     details?: string
     noDetails?: boolean
+    clearable?: boolean
 }
 
 export type CInputSlots = {

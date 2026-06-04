@@ -1,32 +1,32 @@
-import { computed, type Ref, unref } from 'vue'
+import { computed, type ShallowReactive, unref } from 'vue'
 import { usePresets } from './use-presets'
 import type { InputPreset } from '../types'
 import type { CInputProps } from '../components'
 
-export function useInputPresets({ props, hasError }: {
+export function useInputPresets({ props, errors }: {
     props: CInputProps
-    hasError: Ref<boolean>
-    focused: Ref<boolean>
+    errors: ShallowReactive<any>
+    state: ShallowReactive<any>
 }) {
     const presets = usePresets<InputPreset>(props)
 
     return computed(() => ({
         root: props.preset ? [
-            ...(!unref(hasError) ? unref(presets)?.root ?? [] : []),
-            ...(unref(hasError) ? unref(presets)?.error?.root ?? [] : [])
+            ...(!errors.hasError ? unref(presets)?.root ?? [] : []),
+            ...(errors.hasError ? unref(presets)?.error?.root ?? [] : [])
         ] : [],
         label: props.preset ? [
             ...(props.disabled ? unref(presets)?.disabled?.label ?? [] : []),
-            ...(!unref(hasError) && !props.disabled ? unref(presets)?.label ?? [] : []),
-            ...(unref(hasError) && !props.disabled ? unref(presets)?.error?.label ?? [] : []),
+            ...(!errors.hasError && !props.disabled ? unref(presets)?.label ?? [] : []),
+            ...(errors.hasError && !props.disabled ? unref(presets)?.error?.label ?? [] : []),
         ] : [],
         field: props.preset ? [
             ...(unref(presets)?.field ?? []),
-            ...(unref(hasError) ? unref(presets)?.error?.field ?? [] : []),
+            ...(errors.hasError ? unref(presets)?.error?.field ?? [] : []),
         ] : [],
         details: props.preset ? [
             ...(unref(presets)?.details ?? []),
-            ...(unref(hasError) ? unref(presets)?.error?.details ?? [] : []),
+            ...(errors.hasError ? unref(presets)?.error?.details ?? [] : []),
         ] : []
     }))
 }

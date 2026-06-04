@@ -1,6 +1,6 @@
 import { computed, onBeforeMount, reactive, toRefs, unref, watch } from 'vue'
 import type { Maybe } from '../types'
-import { useInputState } from './use-input-state'
+import { type InputState } from './use-input-state'
 
 export type ValidateFn = (value: any) => ({
     valid: boolean,
@@ -24,19 +24,10 @@ export enum InputEvents {
     BLUR = 'blur'
 }
 
-export function useValidate(props: ValidateProps & { modelValue: any }) {
+export function useValidate(props: ValidateProps & { modelValue: any }, state: InputState) {
     const { validateOn = InputEvents.INPUT, modelValue } = toRefs(props)
 
-    const {
-        focused,
-        isDirty,
-        hasValue,
-        onFocus,
-        onBlur,
-        onInput
-    } = useInputState(props)
-
-    const state = reactive<ValidateState>({
+    const errors = reactive<ValidateState>({
         errorMessage: undefined,
         hasError: false,
     })
@@ -45,8 +36,8 @@ export function useValidate(props: ValidateProps & { modelValue: any }) {
     const isOnBlur = computed(() => unref(validateOn) === InputEvents.BLUR)
 
     function update(result: ReturnType<ValidateFn>) {
-        state.hasError = !result.valid
-        state.errorMessage = !result.valid ? result.message : undefined
+        errors.hasError = !result.valid
+        errors.errorMessage = !result.valid ? result.message : undefined
     }
 
     function validate() {
@@ -74,27 +65,21 @@ export function useValidate(props: ValidateProps & { modelValue: any }) {
             if (value !== null) validate()
 
             else if (unref(isOnBlur)) {
-                const unwatch = watch(focused, (val) => {
+                const unwatch = watch(() => state.focused, (val) => {
                     if (!val) validate()
                     unwatch()
                 })
             }
         })
 
-        watch(focused, (val) => {
+        watch(() => state.focused, (val) => {
             if (!val) validate()
         })
     })
 
     return {
-        focused,
-        isDirty,
-        hasValue,
-        state,
+        errors,
         hasRules,
-        onFocus,
-        onBlur,
-        onInput,
         validate
     }
 }
