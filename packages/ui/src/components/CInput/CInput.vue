@@ -13,6 +13,8 @@
     const props = defineProps<CInputProps<T>>()
     const slots = defineSlots<CInputSlots>()
 
+    const uid = `input-${props.id ?? unique(6)}`
+
     const {
         state,
         onBlur,
@@ -33,7 +35,6 @@
         errors
     })
 
-    const uid = `input-${props.id ?? unique(6)}`
     const attrs = useAttrs()
     const fieldAttrs = useFieldAttrs({ props, attrs, errors, uid })
 

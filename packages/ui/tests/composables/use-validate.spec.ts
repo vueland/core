@@ -18,7 +18,7 @@ const mountUseValidate = (initialProps: {
         setup(props, { expose }) {
             const { state, onBlur, onInput, onFocus } = useInputState(props)
             const api = useValidate(props as any, state)
-            expose({ ...api, state, onFocus, onBlur, onInput })
+            expose({ ...api, onFocus, onBlur, onInput })
             return () => h('div')
         },
     })
@@ -148,6 +148,7 @@ describe('useValidate', () => {
         const wrapper = mountUseValidate({
             modelValue: 'a',
             rules: [rule],
+            validateOn: 'input'
         })
 
         rule.mockClear()
@@ -155,6 +156,7 @@ describe('useValidate', () => {
         await wrapper.setProps({
             modelValue: 'ab',
         })
+
         await nextTick()
 
         expect(rule).toHaveBeenCalledWith('ab')
@@ -179,6 +181,7 @@ describe('useValidate', () => {
         await wrapper.setProps({
             modelValue: null,
         })
+
         await nextTick()
 
         expect(rule).not.toHaveBeenCalled()
@@ -187,6 +190,7 @@ describe('useValidate', () => {
 
         wrapper.vm.onFocus()
         wrapper.vm.onBlur()
+
         await nextTick()
 
         expect(rule).toHaveBeenCalledWith(null)
@@ -203,7 +207,7 @@ describe('useValidate', () => {
         const wrapper = mountUseValidate({
             modelValue: 'abc',
             rules: [rule],
-            validateOn: InputEvents.INPUT,
+            validateOn: InputEvents.BLUR,
         })
 
         rule.mockClear()

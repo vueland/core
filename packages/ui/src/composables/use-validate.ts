@@ -1,6 +1,7 @@
 import { computed, onBeforeMount, reactive, toRefs, unref, watch } from 'vue'
 import type { Maybe } from '../types'
 import { type InputState } from './use-input-state'
+import { isDef } from '../helpers'
 
 export type ValidateFn = (value: any) => ({
     valid: boolean,
@@ -62,14 +63,14 @@ export function useValidate(props: ValidateProps & { modelValue: any }, state: I
         }
 
         watch(modelValue!, (value) => {
-            if (value !== null) validate()
-
-            else if (unref(isOnBlur)) {
-                const unwatch = watch(() => state.focused, (val) => {
-                    if (!val) validate()
-                    unwatch()
-                })
-            }
+            if (isDef(value) && !unref(isOnBlur)) validate()
+            //
+            // else if (unref(isOnBlur)) {
+            //     const unwatch = watch(() => state.focused, (val) => {
+            //         if (!val) validate()
+            //         unwatch()
+            //     })
+            // }
         })
 
         watch(() => state.focused, (val) => {

@@ -123,7 +123,6 @@
                     name="profession"
                     :items="professions"
                     :rules="professionRules"
-                    readonly
                     multiple
                     :options="{
                         extKey: 'title',
