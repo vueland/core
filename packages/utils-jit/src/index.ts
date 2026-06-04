@@ -1,6 +1,6 @@
 export { utilsJIT } from './plugin'
 export type {
-    CoreUiJitOptions,
+    JitOptions,
     ParsedToken,
     CssBody,
     RuleMatch,

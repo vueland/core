@@ -10,7 +10,7 @@
 w-[200px]
 h-[100px]
 px-[16px]
-r-[12px]
+radius-[12px]
 z-[999]
 left-[12px]
 top-[12px]
@@ -23,7 +23,7 @@ hover:w-[200px]
 md:px-[24px]
 hover:md:w-[300px]
 focus:px-[20px]
-active:r-[10px]
+active:radius-[10px]
 ```
 
 ---
@@ -55,12 +55,12 @@ yarn add -D @vueland/utils-jit
 ```ts
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { coreUiJit } from '@vueland/utils-jit'
+import { utilsJIT } from '@vueland/utils-jit'
 
 export default defineConfig({
   plugins: [
     vue(),
-    coreUiJit()
+    utilsJIT()
   ]
 })
 ```
@@ -90,7 +90,7 @@ import './.generated/utils-jit.css'
 ```html
 
 <template>
-  <div class="absolute z-[10] w-[300px] h-[200px] px-[16px] r-[12px]">
+  <div class="absolute z-[10] w-[300px] h-[200px] px-[16px] radius-[12px]">
     Hello
   </div>
 </template>
@@ -116,7 +116,7 @@ JIT автоматически сгенерирует:
   padding-right: 16px !important;
 }
 
-.r-\[12px\]{
+.radius-\[12px\]{
   border-radius: 12px !important;
 }
 ```
@@ -189,7 +189,7 @@ active
 Плагин принимает объект настроек.
 
 ```ts
-coreUiJit({
+utilsJIT({
   outFile: './src/.generated/utils.css', // путь до генерируемого файла стилей
   include: [], // по умолчанию [/\.(vue|js|ts|html)$/]
   breakpoints: {
@@ -206,39 +206,39 @@ coreUiJit({
 
 ## Все доступные utilities
 
-| Utility          | CSS свойства                    | Пример           |
-|------------------|---------------------------------|------------------|
-| `w-[value]`      | `width`                         | `w-[300px]`      |
-| `h-[value]`      | `height`                        | `h-[100px]`      |
-| `min-w-[value]`  | `min-width`                     | `min-w-[200px]`  |
-| `min-h-[value]`  | `min-height`                    | `min-h-[100px]`  |
-| `max-w-[value]`  | `max-width`                     | `max-w-[1200px]` |
-| `max-h-[value]`  | `max-height`                    | `max-h-[500px]`  |
-| `ma-[value]`     | `margin`                        | `ma-[16px]`      |
-| `mx-[value]`     | `margin-left`, `margin-right`   | `mx-[auto]`      |
-| `my-[value]`     | `margin-top`, `margin-bottom`   | `my-[32px]`      |
-| `mt-[value]`     | `margin-top`                    | `mt-[16px]`      |
-| `mr-[value]`     | `margin-right`                  | `mr-[8px]`       |
-| `mb-[value]`     | `margin-bottom`                 | `mb-[24px]`      |
-| `ml-[value]`     | `margin-left`                   | `ml-[12px]`      |
-| `pa-[value]`     | `padding`                       | `pa-[20px]`      |
-| `px-[value]`     | `padding-left`, `padding-right` | `px-[16px]`      |
-| `py-[value]`     | `padding-top`, `padding-bottom` | `py-[12px]`      |
-| `pt-[value]`     | `padding-top`                   | `pt-[10px]`      |
-| `pr-[value]`     | `padding-right`                 | `pr-[8px]`       |
-| `pb-[value]`     | `padding-bottom`                | `pb-[20px]`      |
-| `pl-[value]`     | `padding-left`                  | `pl-[16px]`      |
-| `r-[value]`      | `border-radius`                 | `r-[8px]`        |
-| `rtl-[value]`    | `border-top-left-radius`        | `rtl-[8px]`      |
-| `rtr-[value]`    | `border-top-right-radius`       | `rtr-[8px]`      |
-| `rbl-[value]`    | `border-bottom-left-radius`     | `rbl-[8px]`      |
-| `rbr-[value]`    | `border-bottom-right-radius`    | `rbr-[8px]`      |
-| `left-[value]`   | `left`                          | `left-[8px]`     |
-| `right-[value]`  | `right`                         | `right-[8px]`    |
-| `top-[value]`    | `top`                           | `top-[8px]`      |
-| `bottom-[value]` | `bottom`                        | `bottom-[8px]`   |
-| `inset-[value]`  | `inset`                         | `inset-[8px]`    |
-| `z-[value]`      | `z-index`                       | `z-[1]`          |
+| Utility             | CSS свойства                    | Пример            |
+|---------------------|---------------------------------|-------------------|
+| `w-[value]`         | `width`                         | `w-[300px]`       |
+| `h-[value]`         | `height`                        | `h-[100px]`       |
+| `min-w-[value]`     | `min-width`                     | `min-w-[200px]`   |
+| `min-h-[value]`     | `min-height`                    | `min-h-[100px]`   |
+| `max-w-[value]`     | `max-width`                     | `max-w-[1200px]`  |
+| `max-h-[value]`     | `max-height`                    | `max-h-[500px]`   |
+| `ma-[value]`        | `margin`                        | `ma-[16px]`       |
+| `mx-[value]`        | `margin-left`, `margin-right`   | `mx-[auto]`       |
+| `my-[value]`        | `margin-top`, `margin-bottom`   | `my-[32px]`       |
+| `mt-[value]`        | `margin-top`                    | `mt-[16px]`       |
+| `mr-[value]`        | `margin-right`                  | `mr-[8px]`        |
+| `mb-[value]`        | `margin-bottom`                 | `mb-[24px]`       |
+| `ml-[value]`        | `margin-left`                   | `ml-[12px]`       |
+| `pa-[value]`        | `padding`                       | `pa-[20px]`       |
+| `px-[value]`        | `padding-left`, `padding-right` | `px-[16px]`       |
+| `py-[value]`        | `padding-top`, `padding-bottom` | `py-[12px]`       |
+| `pt-[value]`        | `padding-top`                   | `pt-[10px]`       |
+| `pr-[value]`        | `padding-right`                 | `pr-[8px]`        |
+| `pb-[value]`        | `padding-bottom`                | `pb-[20px]`       |
+| `pl-[value]`        | `padding-left`                  | `pl-[16px]`       |
+| `radius-[value]`    | `border-radius`                 | `radius-[8px]`    |
+| `radius-tl-[value]` | `border-top-left-radius`        | `radius-tl-[8px]` |
+| `radius-tr-[value]` | `border-top-right-radius`       | `radius-tr-[8px]` |
+| `radius-bl-[value]` | `border-bottom-left-radius`     | `radius-bl-[8px]` |
+| `radius-br-[value]` | `border-bottom-right-radius`    | `radius-br-[8px]` |
+| `left-[value]`      | `left`                          | `left-[8px]`      |
+| `right-[value]`     | `right`                         | `right-[8px]`     |
+| `top-[value]`       | `top`                           | `top-[8px]`       |
+| `bottom-[value]`    | `bottom`                        | `bottom-[8px]`    |
+| `inset-[value]`     | `inset`                         | `inset-[8px]`     |
+| `z-[value]`         | `z-index`                       | `z-[1]`           |
 
 ---
 
@@ -334,11 +334,11 @@ var()
 Примеры:
 
 ```
-r-[12px]
-rtl-[8px]
-rtr-[16px]
-rbl-[20px]
-rbr-[50%]
+radius-[12px]
+radius-tl-[8px]
+radius-tr-[16px]
+radius-bl-[20px]
+radius-br-[50%]
 ```
 
 ---
@@ -386,7 +386,7 @@ z-[var(--z-modal)]
 Следующие значения игнорируются:
 
 ```
-r-[.]
+radius-[.]
 px-[auto]
 z-[10px]
 w-[;]
@@ -414,11 +414,11 @@ max value length = 120
 ```
 md:w-[400px]
 lg:px-[32px]
-xl:r-[16px]
+xl:radius-[16px]
 
 hover:w-[320px]
 focus:px-[20px]
-active:r-[10px]
+active:radius-[10px]
 ```
 
 ---
@@ -468,7 +468,7 @@ class="..."
 
 ```vue
 <div :class="['w-[200px]', active && 'px-[16px]']"></div>
-<div :class="{ 'r-[12px]': true }"></div>
+<div :class="{ 'radius-[12px]': true }"></div>
 ```
 
 ---

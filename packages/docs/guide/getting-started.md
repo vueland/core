@@ -1,6 +1,6 @@
 # Быстрый старт
 
-Этот раздел описывает базовую установку и подключение **Core UI** в приложение на Vue 3.
+Этот раздел описывает базовую установку и подключение **Vueland UI** в приложение на Vue 3.
 
 ---
 
@@ -28,12 +28,12 @@ yarn add @vueland/ui
 
 ```ts
 import * as components from '@vueland/ui/components'
-import { createCoreUi } from '@vueland/ui'
+import { createVuelandUI } from '@vueland/ui'
 
 import '@vueland/ui/styles/styles.scss'
 import '@vueland/ui/styles/themes/default-theme.scss'
 
-export const coreUi = createCoreUi({
+export const vueland = createVuelandUI({
   components,
   ssr: false,
   themes: {},
@@ -51,13 +51,13 @@ export const coreUi = createCoreUi({
 import { createApp } from 'vue'
 import App from './App.vue'
 
-import { coreUi } from './plugin'
+import { vueland } from './plugin'
 
 import './styles/index.scss'
 
 const app = createApp(App)
 
-app.use(coreUi)
+app.use(vueland)
 
 app.mount('#app')
 ```
@@ -77,9 +77,9 @@ src
 
 ---
 
-# Что делает `createCoreUi`
+# Что делает `createVuelandUI`
 
-Функция `createCoreUi` создает Vue-плагин, который:
+Функция `vueland` создает Vue-плагин, который:
 
 - регистрирует компоненты библиотеки
 - подключает инфраструктурные зависимости
@@ -98,4 +98,4 @@ src
 
 ---
 
-После подключения библиотеки компоненты **Core UI** становятся доступными во всем приложении.
+После подключения библиотеки компоненты **Vueland UI** становятся доступными во всем приложении.

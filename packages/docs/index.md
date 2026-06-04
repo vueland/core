@@ -1,6 +1,6 @@
 ---
 layout: home
-title: Core UI
+title: Vueland
 ---
 
 <script>

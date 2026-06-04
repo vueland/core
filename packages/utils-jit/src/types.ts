@@ -1,4 +1,4 @@
-export type CoreUiJitOptions = {
+export type JitOptions = {
     include?: RegExp[]
     outFile?: string,
     breakpoints?: Record<string, number>

@@ -18,7 +18,7 @@ import type {
     CSelectProps,
     CSelectSlots
 } from './index'
-import type { VNode } from 'vue'
+import type { Component, VNode } from 'vue'
 
 export {}
 declare module 'vue' {
@@ -49,6 +49,7 @@ declare module 'vue' {
             $props: CDialogProps
             $slots: CDialogSlots
         }
+        CDialogsStack: new () => Component
         COverlay: typeof import('./COverlay').COverlay
         CField: typeof import('./CField').CField
         CForm: typeof import('./CForm').CForm

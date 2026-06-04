@@ -4,7 +4,7 @@ import './styles/styles.scss'
 
 export * from './types'
 
-export function createUI(options: LibOptions): Plugin {
+export function createVuelandUI(options: LibOptions): Plugin {
     return {
         install(app: App, args: any) {
             const library = new VuelandUI()

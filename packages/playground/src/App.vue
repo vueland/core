@@ -2,7 +2,6 @@
     import { computed, shallowRef, unref, watch } from 'vue'
     import FormCard from './components/FormCard/FormCard.vue'
     import ContentCard from './components/ContentCard/ContentCard.vue'
-    import { CDialogsStack } from '@vueland/ui/components'
     import { useDialogsStack, useEffect } from '@vueland/ui/composables'
 
     const isLightMode = shallowRef(true)
@@ -86,7 +85,7 @@
         >
             <c-toolbar-logo class="text-blue-darken-3">
                 <h2 @click="show = !show">
-                    Core UI {{ effect }}
+                    Vueland UI {{ effect }}
                 </h2>
             </c-toolbar-logo>
         </c-toolbar>
