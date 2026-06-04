@@ -271,6 +271,7 @@ describe('CInput', () => {
         expect(slotProps).toEqual({
             hasError: true,
             errorMessage: 'Some error',
+            uid: slotProps.uid
         })
     })
 

@@ -5,19 +5,21 @@ export type CInputProps<T = any> =
     ValidateProps &
     InputStateProps &
     PresetProps & {
-        modelValue: T
-        label?: string
-        details?: string
-        noDetails?: boolean
-    }
+    id?: string
+    modelValue: T
+    label?: string
+    details?: string
+    noDetails?: boolean
+}
 
 export type CInputSlots = {
-    label?(): VNode | string
+    label?(props: { uid: string }): VNode | string
     prepend?(): VNode | string
     append?(): VNode | string
     details?(props: {
         errorMessage: ValidateState['errorMessage']
         hasError: ValidateState['hasError']
+        uid: string
     }): VNode | string
     field?(props: {
         onInput(): void

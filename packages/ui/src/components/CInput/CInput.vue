@@ -31,9 +31,9 @@
         ...toRefs(state),
     })
 
+    const uid = `input-${props.id ?? unique(6)}`
     const attrs = useAttrs()
-    const fieldAttrs = useFieldAttrs({ props, attrs, state })
-    const uid = `input-${unique(props.label ?? '')}`
+    const fieldAttrs = useFieldAttrs({ props, attrs, state, uid })
 
     const hasLabel = computed(() => !!slots.label || !!props.label)
     const hasPrepend = computed(() => !!slots?.prepend)
@@ -83,7 +83,7 @@
                 v-if="$slots.prepend"
                 class="c-input__prepend"
             >
-                <slot name="prepend"/>
+                <slot name="prepend" />
             </div>
             <slot
                 name="field"
@@ -104,7 +104,7 @@
                 v-if="$slots.append"
                 class="c-input__append"
             >
-                <slot name="append"/>
+                <slot name="append" />
             </div>
         </div>
         <div
@@ -112,7 +112,10 @@
             class="c-input__label"
             :class="preset.label"
         >
-            <slot name="label">
+            <slot
+                name="label"
+                :uid
+            >
                 <c-label
                     :id="`${uid}-label`"
                     v-memo="[label]"
@@ -132,6 +135,7 @@
             <slot
                 name="details"
                 v-bind="state"
+                :uid
             >
                 {{ details }}
             </slot>

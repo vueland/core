@@ -27,7 +27,10 @@ $self: '.c-menu';
     max-width: inherit;
   }
 
+  &--not-active {
+    //pointer-events: none;
+  }
+
   &--visible {
-    opacity: 1;
   }
 }

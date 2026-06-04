@@ -82,6 +82,7 @@
             fixed
             class="bg-white elevation-2"
             @click="toggleMode"
+            @contextmenu.prevent="onContextMenu"
         >
             <c-toolbar-logo class="text-blue-darken-3">
                 <h2 @click="show = !show">

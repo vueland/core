@@ -2,6 +2,7 @@ import { reactive } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 import { useFieldAttrs, type ValidateState } from '../../src/composables'
 import type { CInputProps } from '../../src/components'
+import { unique } from '../../src/helpers'
 
 function createProps(props: Partial<CInputProps> = {}): CInputProps {
     return {
@@ -20,6 +21,7 @@ function createState(state: Partial<ValidateState> = {}): ValidateState {
 
 describe('useFieldAttrs', () => {
     it('добавляет базовые aria-атрибуты из props и state', () => {
+        const uid = unique(6)
         const fieldAttrs = useFieldAttrs({
             props: createProps({
                 label: 'Email',
@@ -29,31 +31,12 @@ describe('useFieldAttrs', () => {
                 hasError: false,
                 errorMessage: undefined,
             }),
+            uid
         })
 
         expect(fieldAttrs.value).toEqual({
-            'aria-label': 'Email',
-            'aria-describedby': 'Email',
-            'aria-invalid': false,
-            'aria-errormessage': undefined,
-        })
-    })
-
-    it('использует placeholder из attrs как aria-describedby', () => {
-        const fieldAttrs = useFieldAttrs({
-            props: createProps({
-                label: 'Email',
-            }),
-            attrs: {
-                placeholder: 'Введите email',
-            },
-            state: createState(),
-        })
-
-        expect(fieldAttrs.value).toMatchObject({
-            placeholder: 'Введите email',
-            'aria-label': 'Email',
-            'aria-describedby': 'Введите email',
+            'aria-labelledby': `${uid}-label`,
+            'aria-describedby': `${uid}-details`,
         })
     })
 
@@ -69,6 +52,7 @@ describe('useFieldAttrs', () => {
                 maxlength: 100,
             },
             state: createState(),
+            uid: unique(6)
         })
 
         expect(fieldAttrs.value).toMatchObject({
@@ -87,7 +71,7 @@ describe('useFieldAttrs', () => {
                 type: 'text',
                 name: 'userEmail',
                 disabled: true,
-            }),
+            } as any),
             attrs: {
                 type: 'email',
                 name: 'email',
@@ -95,6 +79,7 @@ describe('useFieldAttrs', () => {
                 placeholder: 'Введите email',
             },
             state: createState(),
+            uid: unique(6)
         })
 
         expect(fieldAttrs.value).not.toHaveProperty('type')
@@ -114,6 +99,7 @@ describe('useFieldAttrs', () => {
                 'aria-haspopup': 'listbox',
             },
             state: createState(),
+            uid: unique(6)
         })
 
         expect(fieldAttrs.value).toMatchObject({
@@ -131,6 +117,7 @@ describe('useFieldAttrs', () => {
                 'data-size': 'lg',
             },
             state: createState(),
+            uid: unique(6)
         })
 
         expect(fieldAttrs.value).toMatchObject({
@@ -150,6 +137,7 @@ describe('useFieldAttrs', () => {
                 unknown: 'value',
             },
             state: createState(),
+            uid: unique(6)
         })
 
         expect(fieldAttrs.value).not.toHaveProperty('class')
@@ -167,6 +155,7 @@ describe('useFieldAttrs', () => {
                 hasError: true,
                 errorMessage: 'Поле обязательно для заполнения',
             }),
+            uid: unique(6)
         })
 
         expect(fieldAttrs.value).toMatchObject({
@@ -190,6 +179,7 @@ describe('useFieldAttrs', () => {
                 hasError: false,
                 errorMessage: undefined,
             }),
+            uid: unique(6)
         })
 
         expect(fieldAttrs.value).toMatchObject({
@@ -215,17 +205,20 @@ describe('useFieldAttrs', () => {
             errorMessage: undefined,
         }))
 
+        const uid = unique(6)
+
         const fieldAttrs = useFieldAttrs({
             props,
             attrs,
             state,
+            uid
         })
 
         expect(fieldAttrs.value).toMatchObject({
-            'aria-label': 'Email',
-            'aria-describedby': 'Введите email',
-            'aria-invalid': false,
+            'aria-describedby': `${uid}-details`,
+            'aria-labelledby': `${uid}-label`,
             required: true,
+            placeholder: 'Введите email',
         })
 
         props.label = 'Новый email'
@@ -233,11 +226,14 @@ describe('useFieldAttrs', () => {
         state.hasError = true
         state.errorMessage = 'Некорректный email'
 
+        console.log(fieldAttrs.value)
+
         expect(fieldAttrs.value).toMatchObject({
-            'aria-label': 'Новый email',
-            'aria-describedby': 'Введите новый email',
+            'aria-labelledby': `${uid}-label`,
+            'aria-describedby': `${uid}-details`,
             'aria-invalid': true,
             'aria-errormessage': 'Некорректный email',
+            placeholder: 'Введите новый email',
             required: true,
         })
     })

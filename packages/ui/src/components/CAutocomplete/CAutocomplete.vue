@@ -59,6 +59,7 @@
     >
         <template #field="{onInput, onFocus, focused, presets, readonly, attrs, uid}">
             <c-menu
+                :id="`${uid}-menu`"
                 bottom
                 open-on-focus
                 close-on-click-outside
@@ -83,6 +84,8 @@
                             :focused
                             v-bind="attrs"
                             :readonly
+                            :aria-controls="`${uid}-menu`"
+                            :aria-expanded="focused"
                             v-on="on"
                             @focus="onFocus"
                             @input="onInput"

@@ -12,6 +12,7 @@ import { type PositionProps } from './use-position-classes'
 import { useApplication } from './use-application'
 import type { DimensionsProps } from '../types'
 import { IN_BROWSER } from '../utils'
+import { isDef } from '../helpers'
 
 export interface Dimensions {
     top: number
@@ -309,6 +310,10 @@ export function useAutoPosition(
                 resizeObserver.observe(nextEl as Element)
             }
         })
+
+        if (isDef(props.positionX) || isDef(props.positionY)) {
+            watch(() => [props.positionX, props.positionY], scheduleUpdate)
+        }
 
         onBeforeUnmount(() => {
             cancelScheduledUpdate()

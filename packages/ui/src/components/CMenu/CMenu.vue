@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { computed, onBeforeUnmount, onMounted, provide, shallowRef, unref, watch } from 'vue'
+    import { computed, nextTick, onBeforeUnmount, onMounted, provide, shallowRef, unref, watch } from 'vue'
     import { useActivator, useAutoPosition, useDelayedActions, useMenuPresets, } from '../../composables'
     import { COverlay } from '../COverlay'
     import { vClickOutside } from '../../directives'
@@ -59,18 +59,20 @@
     }))
 
     const classes = computed(() => ([
+        { 'c-menu--visible': unref(model) },
         ...unref(presets).root
     ]))
 
     const open = async () => {
         mounted.value = true
 
-        if (!unref(detached)) {
-            model.value = true
-        }
-
         openDelay(async () => {
+            if (!unref(detached)) {
+                model.value = true
+            }
+
             await update(getActivator<HTMLElement>())
+
             emit('open')
         })
     }
