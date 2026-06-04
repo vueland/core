@@ -33,8 +33,7 @@
 
     const attrs = useAttrs()
     const fieldAttrs = useFieldAttrs({ props, attrs, state })
-
-    const KEY = unique(props.label ?? '')
+    const uid = `input-${unique(props.label ?? '')}`
 
     const hasLabel = computed(() => !!slots.label || !!props.label)
     const hasPrepend = computed(() => !!slots?.prepend)
@@ -94,6 +93,7 @@
                 :label
                 :disabled
                 :readonly
+                :uid
                 :presets="preset.field"
                 :on-focus
                 :on-blur
@@ -114,9 +114,10 @@
         >
             <slot name="label">
                 <c-label
-                    :id="KEY"
+                    :id="`${uid}-label`"
                     v-memo="[label]"
                     tag="label"
+                    :for="uid"
                 >
                     {{ label }}
                 </c-label>
@@ -124,6 +125,7 @@
         </div>
         <div
             v-if="hasDetails"
+            :id="`${uid}-details`"
             class="c-input__details"
             :class="preset.details"
         >

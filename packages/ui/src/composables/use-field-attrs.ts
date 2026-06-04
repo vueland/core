@@ -29,6 +29,7 @@ export function useFieldAttrs({ props, attrs, state }: {
     attrs: Record<string, any>
     state: ValidateState
 }): ComputedRef<Record<string, any>> {
+    console.log(props)
     return computed(() => {
         const map = Object.entries(attrs).reduce((acc, [k, v]) => {
             if (
@@ -43,13 +44,13 @@ export function useFieldAttrs({ props, attrs, state }: {
         }, {})
 
         return {
-            'aria-label': props.label,
-            'aria-labelledby': unique(props.label ?? ''),
-            'aria-describedby': attrs.placeholder ?? props.label,
+            'aria-labelledby': `input-${unique(props.label ?? '')}-label`,
+            'aria-describedby': `input-${unique(props.label ?? '')}-details`,
             'aria-invalid': state.hasError,
             'aria-errormessage': state.errorMessage,
             'aria-readonly': props.readonly,
             'aria-disabled': props.disabled,
+            'aria-expanded': false,
             ...map
         }
     })

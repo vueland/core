@@ -44,7 +44,7 @@
         v-model="model"
         validate-on="blur"
     >
-        <template #field="{onFocus, focused, presets, attrs}">
+        <template #field="{onFocus, focused, presets, attrs, uid}">
             <c-menu
                 bottom
                 open-on-focus
@@ -61,6 +61,7 @@
                         :class="presets"
                     >
                         <c-field
+                            :id="uid"
                             class="c-select__field"
                             v-bind="attrs"
                             :model-value="inputValue"

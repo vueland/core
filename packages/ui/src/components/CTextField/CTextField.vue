@@ -14,12 +14,13 @@
         v-model="model"
         v-bind="$attrs"
     >
-        <template #field="{onFocus, onInput, onBlur, focused, presets, attrs}">
+        <template #field="{onFocus, onInput, onBlur, focused, presets, attrs, uid}">
             <div
                 class="c-text-field"
                 :class="presets"
             >
                 <c-field
+                    :id="uid"
                     v-model="model"
                     class="c-text-field__input"
                     :focused

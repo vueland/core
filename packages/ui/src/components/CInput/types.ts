@@ -31,6 +31,7 @@ export type CInputSlots = {
         errorMessage: ValidateState['errorMessage']
         hasError: ValidateState['hasError']
         attrs: Record<string, any>
+        uid: string
         validate(): boolean
     }): VNode
 }

@@ -25,7 +25,7 @@ The goal of the platform is to provide a practical foundation for product teams,
 - **Theme-ready** — a foundation for design tokens, presets, and visual customization.
 - **Utility-powered** — includes a JIT utility layer for arbitrary utility classes.
 - **Developer-focused** — created with DX, clarity, and extensibility in mind.
-- **Platform mindset** — components, utilities, composables, directives, themes, presets, documentation, and playground in one ecosystem.
+- **Platform mindset** — components, utilities, composables, directives, themes, presets in one ecosystem.
 
 ## Packages
 
@@ -38,14 +38,6 @@ A Vue 3 component library focused on clean APIs, flexible styling, and consisten
 ### `@vueland/utils-jit`
 
 A Vite JIT plugin for generating arbitrary utility classes on demand.
-
-### `docs`
-
-Documentation powered by VitePress.
-
-### `playground`
-
-A development playground for testing components, utilities, themes, and platform features.
 
 ## Project status
 
@@ -65,8 +57,6 @@ Vueland aims to bring together:
 - Utility classes
 - Composables
 - Directives
-- Documentation tools
-- Playground environment
 - Developer-first workflows
 
 The goal is to give Vue developers a solid base for building polished applications without losing flexibility or control.
@@ -136,8 +126,6 @@ Vueland стремится объединить:
 - Utility-классы
 - Composables
 - Директивы
-- Документацию
-- Playground
 - Удобные workflows для разработчиков
 
 Цель платформы — дать Vue-разработчикам прочную базу для создания качественных приложений без потери гибкости и контроля.

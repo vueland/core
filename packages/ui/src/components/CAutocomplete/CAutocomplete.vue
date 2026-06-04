@@ -57,7 +57,7 @@
         v-bind="$attrs"
         validate-on="blur"
     >
-        <template #field="{onInput, onFocus, focused, presets, readonly, attrs}">
+        <template #field="{onInput, onFocus, focused, presets, readonly, attrs, uid}">
             <c-menu
                 bottom
                 open-on-focus
@@ -76,6 +76,7 @@
                         :class="presets"
                     >
                         <c-field
+                            :id="uid"
                             v-model="input"
                             class="c-autocomplete__field"
                             type="text"
