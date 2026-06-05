@@ -1,5 +1,4 @@
-import type { CssBody, ParsedToken, RuleMatch, UtilityRule } from './types'
-import * as rules from './rules'
+import type { CssBody, ParsedToken, RuleMatch, RuleOptions, UtilityRule } from './types'
 
 export const DEFAULT_INCLUDE = [/\.(vue|js|ts|html)$/]
 
@@ -183,9 +182,7 @@ export function parseToken(token: string): ParsedToken | null {
     }
 }
 
-// -----------------------------------------------------------------------------
-// Rule factories
-// -----------------------------------------------------------------------------
+
 export function createArbitraryRule(
     name: string,
     matcher: RegExp,
@@ -213,24 +210,8 @@ export function createArbitraryRule(
     }
 }
 
-export function createMultiDeclRule(
-    name: string,
-    matcher: RegExp,
-    properties: string[],
-    valueValidator?: (value: string) => boolean
-): UtilityRule {
-    return createArbitraryRule(
-        name,
-        matcher,
-        (value) => properties.map((prop) => `${prop}: ${value} !important;`),
-        valueValidator
-    )
-}
-
-export const RULES: UtilityRule[] = Object.values(rules)
-
-export function resolveRule(utility: string): CssBody | null {
-    for (const rule of RULES) {
+export function resolveRule(utility: string, rules: UtilityRule[]): CssBody | null {
+    for (const rule of rules) {
         const match = rule.match(utility)
         if (match) {
             return { declarations: match.declarations }
@@ -238,6 +219,22 @@ export function resolveRule(utility: string): CssBody | null {
     }
 
     return null
+}
+
+export function camelToKebab(value: string): string {
+    return value.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+}
+
+export function defineRule(options: RuleOptions): UtilityRule {
+    return createArbitraryRule(
+        options.name,
+        options.matcher,
+        (value: string) => {
+            const entries = Object.entries(options.declaration(value))
+            return entries.map(([prop, val]) => `${camelToKebab(prop)}: ${val};`)
+        },
+        options.validate
+    )
 }
 
 /**

@@ -16,7 +16,7 @@
     "@vueland/utils-jit": "workspace:*"
   },
   "devDependencies": {
-    "vite": "^7.3.1",
+    "vite": "^7.3.5",
     "@vitejs/plugin-vue": "^6.0.3",
     "typescript": "^5.9.3",
     "vue-tsc": "^2.2.0",

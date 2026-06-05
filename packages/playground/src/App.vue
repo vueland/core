@@ -106,13 +106,13 @@
                     md="6"
                     class="d-flex pb-1"
                 >
-                    <content-card />
+                    <content-card class="translate-[10px, 20px] md:translate-[10px, 20px]" />
                 </c-col>
                 <c-col
                     xl="3"
                     lg="3"
                     md="6"
-                    class="d-flex pb-1"
+                    class="d-flex pb-1 z-[10]"
                 >
                     <content-card />
                 </c-col>

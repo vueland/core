@@ -4,11 +4,11 @@ const CSS_LENGTH_RE = new RegExp(
     `^-?(?:\\d+|\\d*\\.\\d+)${CSS_LENGTH_UNIT_RE.source}$`
 )
 
-function isFunctionalCssValue(value: string): boolean {
+export function isFunctionalCssValue(value: string): boolean {
     return /^(?:calc|min|max|clamp|var)\(.+\)$/.test(value)
 }
 
-function isLengthLikeValue(value: string): boolean {
+export function isLengthLikeValue(value: string): boolean {
     return CSS_LENGTH_RE.test(value) || isFunctionalCssValue(value)
 }
 

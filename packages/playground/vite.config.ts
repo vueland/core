@@ -1,7 +1,7 @@
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig, type PluginOption } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'node:path'
-import { utilsJIT } from '@vueland/utils-jit'
+import { utilsJIT, defineRule } from '@vueland/utils-jit'
 
 // Для максимально комфортной разработки компонентов:
 // алиасим на исходники ui, чтобы не ждать сборку и ловить HMR.
@@ -16,7 +16,18 @@ export default defineConfig({
                 lg: 1024,
                 xl: 1440
             },
-        }) as Plugin],
+            rules: [
+                defineRule({
+                    name: 'translate',
+                    matcher: /^translate-\[(.+)\]$/,
+                    validate: (v) => !!v,
+                    declaration: (value) => ({
+                        transform: `translate(${value})`,
+                    })
+                })
+            ]
+        }) as PluginOption
+    ],
     resolve: {
         alias: {
             '@vueland/ui': path.resolve(__dirname, '../ui/src/'),

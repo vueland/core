@@ -8,6 +8,8 @@ import {
     tokenize,
 } from '../src/core'
 
+import * as rules from '../src/rules'
+
 describe('extractClassCandidates', () => {
     it('извлекает обычный class', () => {
         const code = `<div class="w-[200px] h-[100px]"></div>`
@@ -240,28 +242,28 @@ describe('parseToken', () => {
 
 describe('resolveRule', () => {
     it('разрешает правило width', () => {
-        const result = resolveRule('w-[200px]')
+        const result = resolveRule('w-[200px]', Object.values(rules))
         expect(result).toEqual({
             declarations: ['width: 200px !important;'],
         })
     })
 
     it('разрешает правило width с calc()', () => {
-        const result = resolveRule('w-[calc(100%-32px)]')
+        const result = resolveRule('w-[calc(100%-32px)]', Object.values(rules))
         expect(result).toEqual({
             declarations: ['width: calc(100%-32px) !important;'],
         })
     })
 
     it('разрешает правило width с var()', () => {
-        const result = resolveRule('w-[var(--size)]')
+        const result = resolveRule('w-[var(--size)]', Object.values(rules))
         expect(result).toEqual({
             declarations: ['width: var(--size) !important;'],
         })
     })
 
     it('разрешает правило px (padding-left/right)', () => {
-        const result = resolveRule('px-[16px]')
+        const result = resolveRule('px-[16px]', Object.values(rules))
         expect(result).toEqual({
             declarations: [
                 'padding-left: 16px !important;',
@@ -271,12 +273,12 @@ describe('resolveRule', () => {
     })
 
     it('не разрешает padding auto', () => {
-        expect(resolveRule('px-[auto]')).toBeNull()
-        expect(resolveRule('pt-[auto]')).toBeNull()
+        expect(resolveRule('px-[auto]', Object.values(rules))).toBeNull()
+        expect(resolveRule('pt-[auto]', Object.values(rules))).toBeNull()
     })
 
     it('разрешает правило mx (margin-left/right) с auto', () => {
-        const result = resolveRule('mx-[auto]')
+        const result = resolveRule('mx-[auto]', Object.values(rules))
         expect(result).toEqual({
             declarations: [
                 'margin-left: auto !important;',
@@ -286,88 +288,88 @@ describe('resolveRule', () => {
     })
 
     it('разрешает правило margin с calc()', () => {
-        const result = resolveRule('mt-[calc(100%-16px)]')
+        const result = resolveRule('mt-[calc(100%-16px)]', Object.values(rules))
         expect(result).toEqual({
             declarations: ['margin-top: calc(100%-16px) !important;'],
         })
     })
 
     it('разрешает правило r (border-radius)', () => {
-        const result = resolveRule('radius-[12px]')
+        const result = resolveRule('radius-[12px]', Object.values(rules))
         expect(result).toEqual({
             declarations: ['border-radius: 12px !important;'],
         })
     })
 
     it('разрешает правило radius-tl (top-left radius)', () => {
-        const result = resolveRule('radius-tl-[8px]')
+        const result = resolveRule('radius-tl-[8px]', Object.values(rules))
         expect(result).toEqual({
             declarations: ['border-top-left-radius: 8px !important;'],
         })
     })
 
     it('разрешает правило radius-tr (top-right radius)', () => {
-        const result = resolveRule('radius-tr-[10px]')
+        const result = resolveRule('radius-tr-[10px]', Object.values(rules))
         expect(result).toEqual({
             declarations: ['border-top-right-radius: 10px !important;'],
         })
     })
 
     it('разрешает правило radius-bl (bottom-left radius)', () => {
-        const result = resolveRule('radius-bl-[14px]')
+        const result = resolveRule('radius-bl-[14px]', Object.values(rules))
         expect(result).toEqual({
             declarations: ['border-bottom-left-radius: 14px !important;'],
         })
     })
 
     it('разрешает правило radius-br (bottom-right radius)', () => {
-        const result = resolveRule('radius-br-[50%]')
+        const result = resolveRule('radius-br-[50%]', Object.values(rules))
         expect(result).toEqual({
             declarations: ['border-bottom-right-radius: 50% !important;'],
         })
     })
 
     it('не разрешает мусорные radius значения', () => {
-        expect(resolveRule('radius-[.]')).toBeNull()
-        expect(resolveRule('radius-[%]')).toBeNull()
-        expect(resolveRule('radius-[abc]')).toBeNull()
+        expect(resolveRule('radius-[.]', Object.values(rules))).toBeNull()
+        expect(resolveRule('radius-[%]', Object.values(rules))).toBeNull()
+        expect(resolveRule('radius-[abc]', Object.values(rules))).toBeNull()
     })
 
     it('разрешает правило z-index с числом', () => {
-        const result = resolveRule('z-[10]')
+        const result = resolveRule('z-[10]', Object.values(rules))
         expect(result).toEqual({
             declarations: ['z-index: 10 !important;'],
         })
     })
 
     it('разрешает правило z-index с auto', () => {
-        const result = resolveRule('z-[auto]')
+        const result = resolveRule('z-[auto]', Object.values(rules))
         expect(result).toEqual({
             declarations: ['z-index: auto !important;'],
         })
     })
 
     it('разрешает правило z-index с var()', () => {
-        const result = resolveRule('z-[var(--z-index)]')
+        const result = resolveRule('z-[var(--z-index)]', Object.values(rules))
         expect(result).toEqual({
             declarations: ['z-index: var(--z-index) !important;'],
         })
     })
 
     it('не разрешает мусорные z-index значения', () => {
-        expect(resolveRule('z-[.]')).toBeNull()
-        expect(resolveRule('z-[10px]')).toBeNull()
+        expect(resolveRule('z-[.]', Object.values(rules))).toBeNull()
+        expect(resolveRule('z-[10px]', Object.values(rules))).toBeNull()
     })
 
     it('возвращает null для неизвестного utility', () => {
-        expect(resolveRule('unknown-[1px]')).toBeNull()
+        expect(resolveRule('unknown-[1px]', Object.values(rules))).toBeNull()
     })
 })
 
 describe('buildCssRule', () => {
     it('генерирует обычное CSS правило', () => {
         const parsed = parseToken('w-[200px]')
-        const cssBody = resolveRule('w-[200px]')
+        const cssBody = resolveRule('w-[200px]', Object.values(rules))
 
         const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
 
@@ -376,7 +378,7 @@ describe('buildCssRule', () => {
 
     it('генерирует правило с pseudo variant', () => {
         const parsed = parseToken('hover:w-[200px]')
-        const cssBody = resolveRule('w-[200px]')
+        const cssBody = resolveRule('w-[200px]', Object.values(rules))
 
         const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
 
@@ -385,7 +387,7 @@ describe('buildCssRule', () => {
 
     it('генерирует media query для breakpoint', () => {
         const parsed = parseToken('md:w-[300px]')
-        const cssBody = resolveRule('w-[300px]')
+        const cssBody = resolveRule('w-[300px]', Object.values(rules))
 
         const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
 
@@ -396,7 +398,7 @@ describe('buildCssRule', () => {
 
     it('генерирует комбинацию pseudo + media', () => {
         const parsed = parseToken('hover:md:px-[24px]')
-        const cssBody = resolveRule('px-[24px]')
+        const cssBody = resolveRule('px-[24px]', Object.values(rules))
 
         const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
 
@@ -407,7 +409,7 @@ describe('buildCssRule', () => {
 
     it('генерирует radius utility', () => {
         const parsed = parseToken('radius-[12px]')
-        const cssBody = resolveRule('radius-[12px]')
+        const cssBody = resolveRule('radius-[12px]', Object.values(rules))
 
         const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
 
@@ -416,7 +418,7 @@ describe('buildCssRule', () => {
 
     it('генерирует corner radius utility', () => {
         const parsed = parseToken('radius-tl-[8px]')
-        const cssBody = resolveRule('radius-tl-[8px]')
+        const cssBody = resolveRule('radius-tl-[8px]', Object.values(rules))
 
         const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
 
@@ -425,7 +427,7 @@ describe('buildCssRule', () => {
 
     it('возвращает null для неизвестного variant', () => {
         const parsed = parseToken('dark:w-[200px]')
-        const cssBody = resolveRule('w-[200px]')
+        const cssBody = resolveRule('w-[200px]', Object.values(rules))
 
         const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
 
@@ -434,7 +436,7 @@ describe('buildCssRule', () => {
 
     it('поддерживает пользовательские breakpoints', () => {
         const parsed = parseToken('xl:w-[1200px]')
-        const cssBody = resolveRule('w-[1200px]')
+        const cssBody = resolveRule('w-[1200px]', Object.values(rules))
 
         const result = buildCssRule(parsed!, cssBody!, {
             xl: 1440,

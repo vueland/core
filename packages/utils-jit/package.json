@@ -28,7 +28,7 @@
     "lint:jit": "eslint ."
   },
   "peerDependencies": {
-    "vite": "^7.0.0"
+    "vite": "^7.3.5"
   },
   "devDependencies": {
     "@types/node": "^25.4.0",

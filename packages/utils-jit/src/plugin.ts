@@ -1,7 +1,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import type { Plugin, ViteDevServer } from 'vite'
+import type { ViteDevServer, PluginOption } from 'vite'
 import type { JitOptions, ParsedToken, } from './types'
+import * as rules from './rules'
 import {
     buildCssRule,
     DEFAULT_BREAKPOINTS,
@@ -53,7 +54,7 @@ function collectProjectFiles(
     return files
 }
 
-export function utilsJIT(options?: JitOptions): Plugin {
+export function utilsJIT(options?: JitOptions): PluginOption {
     const include = options?.include ?? DEFAULT_INCLUDE
     const breakpoints = options?.breakpoints ?? DEFAULT_BREAKPOINTS
 
@@ -90,12 +91,16 @@ export function utilsJIT(options?: JitOptions): Plugin {
         }
 
         const parsed = getParsedToken(token)
+
         if (!parsed) {
             tokenCssCache.set(token, null)
             return null
         }
 
-        const cssBody = resolveRule(parsed.utility)
+        const cssBody = resolveRule(parsed.utility, [
+            ...Object.values(rules),
+            ...(options?.rules ? options.rules : [])
+        ])
 
         if (!cssBody) {
             tokenCssCache.set(token, null)
