@@ -27,7 +27,7 @@ describe('useFieldAttrs', () => {
                 label: 'Email',
             }),
             attrs: {},
-            state: createState({
+            errors: createState({
                 hasError: false,
                 errorMessage: undefined,
             }),
@@ -51,7 +51,7 @@ describe('useFieldAttrs', () => {
                 required: true,
                 maxlength: 100,
             },
-            state: createState(),
+            errors: createState(),
             uid: unique(6)
         })
 
@@ -78,7 +78,7 @@ describe('useFieldAttrs', () => {
                 disabled: false,
                 placeholder: 'Введите email',
             },
-            state: createState(),
+            errors: createState(),
             uid: unique(6)
         })
 
@@ -98,7 +98,7 @@ describe('useFieldAttrs', () => {
                 'aria-expanded': true,
                 'aria-haspopup': 'listbox',
             },
-            state: createState(),
+            errors: createState(),
             uid: unique(6)
         })
 
@@ -116,7 +116,7 @@ describe('useFieldAttrs', () => {
                 'data-testid': 'email-input',
                 'data-size': 'lg',
             },
-            state: createState(),
+            errors: createState(),
             uid: unique(6)
         })
 
@@ -136,7 +136,7 @@ describe('useFieldAttrs', () => {
                 onclick: vi.fn(),
                 unknown: 'value',
             },
-            state: createState(),
+            errors: createState(),
             uid: unique(6)
         })
 
@@ -151,7 +151,7 @@ describe('useFieldAttrs', () => {
         const fieldAttrs = useFieldAttrs({
             props: createProps(),
             attrs: {},
-            state: createState({
+            errors: createState({
                 hasError: true,
                 errorMessage: 'Поле обязательно для заполнения',
             }),
@@ -175,7 +175,7 @@ describe('useFieldAttrs', () => {
                 'aria-invalid': 'true',
                 'aria-errormessage': 'custom-error-id',
             },
-            state: createState({
+            errors: createState({
                 hasError: false,
                 errorMessage: undefined,
             }),
@@ -200,7 +200,7 @@ describe('useFieldAttrs', () => {
             required: true,
         })
 
-        const state = reactive(createState({
+        const errors = reactive(createState({
             hasError: false,
             errorMessage: undefined,
         }))
@@ -210,7 +210,7 @@ describe('useFieldAttrs', () => {
         const fieldAttrs = useFieldAttrs({
             props,
             attrs,
-            state,
+            errors,
             uid
         })
 
@@ -223,10 +223,8 @@ describe('useFieldAttrs', () => {
 
         props.label = 'Новый email'
         attrs.placeholder = 'Введите новый email'
-        state.hasError = true
-        state.errorMessage = 'Некорректный email'
-
-        console.log(fieldAttrs.value)
+        errors.hasError = true
+        errors.errorMessage = 'Некорректный email'
 
         expect(fieldAttrs.value).toMatchObject({
             'aria-labelledby': `${uid}-label`,

@@ -31,51 +31,51 @@ describe('useInputState', () => {
         const wrapper = mountWithModelValue(undefined) as any
         await nextTick()
 
-        expect(unwrap<boolean>(wrapper.vm.focused)).toBe(false)
-        expect(unwrap<boolean>(wrapper.vm.isDirty)).toBe(false)
-        expect(unwrap<boolean>(wrapper.vm.hasValue)).toBe(false)
+        expect(unwrap<boolean>(wrapper.vm.state.focused)).toBe(false)
+        expect(unwrap<boolean>(wrapper.vm.state.isDirty)).toBe(false)
+        expect(unwrap<boolean>(wrapper.vm.state.hasValue)).toBe(false)
     })
 
     it('immediate watch: hasValue = true для truthy, false для falsy', async () => {
         const w1 = mountWithModelValue('hello') as any
         await nextTick()
-        expect(unwrap<boolean>(w1.vm.hasValue)).toBe(true)
+        expect(unwrap<boolean>(w1.vm.state.hasValue)).toBe(true)
 
         const w2 = mountWithModelValue('') as any
         await nextTick()
-        expect(unwrap<boolean>(w2.vm.hasValue)).toBe(false)
+        expect(unwrap<boolean>(w2.vm.state.hasValue)).toBe(false)
 
         const w3 = mountWithModelValue(0) as any
         await nextTick()
-        expect(unwrap<boolean>(w3.vm.hasValue)).toBe(true)
+        expect(unwrap<boolean>(w3.vm.state.hasValue)).toBe(true)
     })
 
     it('immediate watch: для массивов зависит от length', async () => {
         const w1 = mountWithModelValue([]) as any
         await nextTick()
-        expect(unwrap<boolean>(w1.vm.hasValue)).toBe(false)
+        expect(unwrap<boolean>(w1.vm.state.hasValue)).toBe(false)
 
         const w2 = mountWithModelValue([1]) as any
         await nextTick()
-        expect(unwrap<boolean>(w2.vm.hasValue)).toBe(true)
+        expect(unwrap<boolean>(w2.vm.state.hasValue)).toBe(true)
     })
 
     it('обновляет hasValue при изменении modelValue', async () => {
         const wrapper = mountWithModelValue('') as any
         await nextTick()
-        expect(unwrap<boolean>(wrapper.vm.hasValue)).toBe(false)
+        expect(unwrap<boolean>(wrapper.vm.state.hasValue)).toBe(false)
 
         await wrapper.setProps({ modelValue: 'x' })
         await nextTick()
-        expect(unwrap<boolean>(wrapper.vm.hasValue)).toBe(true)
+        expect(unwrap<boolean>(wrapper.vm.state.hasValue)).toBe(true)
 
         await wrapper.setProps({ modelValue: [] })
         await nextTick()
-        expect(unwrap<boolean>(wrapper.vm.hasValue)).toBe(false)
+        expect(unwrap<boolean>(wrapper.vm.state.hasValue)).toBe(false)
 
         await wrapper.setProps({ modelValue: [1, 2] })
         await nextTick()
-        expect(unwrap<boolean>(wrapper.vm.hasValue)).toBe(true)
+        expect(unwrap<boolean>(wrapper.vm.state.hasValue)).toBe(true)
     })
 
     it('onFocus: focused=true, эмит focus(true), isDirty становится true', async () => {
@@ -85,8 +85,8 @@ describe('useInputState', () => {
         wrapper.vm.onFocus()
         await nextTick()
 
-        expect(unwrap<boolean>(wrapper.vm.focused)).toBe(true) as any
-        expect(unwrap<boolean>(wrapper.vm.isDirty)).toBe(true)
+        expect(unwrap<boolean>(wrapper.vm.state.focused)).toBe(true) as any
+        expect(unwrap<boolean>(wrapper.vm.state.isDirty)).toBe(true)
         expect(wrapper.emitted('focus')).toEqual([[true]])
 
         wrapper.vm.onFocus()
@@ -100,12 +100,12 @@ describe('useInputState', () => {
 
         wrapper.vm.onFocus()
         await nextTick()
-        expect(unwrap<boolean>(wrapper.vm.focused)).toBe(true)
+        expect(unwrap<boolean>(wrapper.vm.state.focused)).toBe(true)
 
         wrapper.vm.onBlur()
         await nextTick()
 
-        expect(unwrap<boolean>(wrapper.vm.focused)).toBe(false)
+        expect(unwrap<boolean>(wrapper.vm.state.focused)).toBe(false)
         expect(wrapper.emitted('blur')).toEqual([[false]])
     })
 

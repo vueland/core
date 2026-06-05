@@ -1,4 +1,4 @@
-import { computed, onBeforeMount, reactive, toRefs, unref, watch } from 'vue'
+import { computed, onBeforeMount, type Reactive, reactive, toRefs, unref, watch } from 'vue'
 import type { Maybe } from '../types'
 import { type InputState } from './use-input-state'
 import { isDef } from '../helpers'
@@ -25,7 +25,7 @@ export enum InputEvents {
     BLUR = 'blur'
 }
 
-export function useValidate(props: ValidateProps & { modelValue: any }, state: InputState) {
+export function useValidate(props: ValidateProps & { modelValue: any }, state: Reactive<InputState>) {
     const { validateOn = InputEvents.INPUT, modelValue } = toRefs(props)
 
     const errors = reactive<ValidateState>({
