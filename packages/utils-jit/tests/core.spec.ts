@@ -62,36 +62,36 @@ describe('tokenize', () => {
 
     it('сохраняет токены с variants', () => {
         const code = `
-      <div class="hover:w-[200px] md:px-[24px] active:r-[12px]"></div>
+      <div class="hover:w-[200px] md:px-[24px] active:radius-[12px]"></div>
     `
         const tokens = tokenize(code)
 
         expect(tokens.has('hover:w-[200px]')).toBe(true)
         expect(tokens.has('md:px-[24px]')).toBe(true)
-        expect(tokens.has('active:r-[12px]')).toBe(true)
+        expect(tokens.has('active:radius-[12px]')).toBe(true)
     })
 
     it('вытаскивает статические arbitrary токены из :class выражения', () => {
         const code = `
-      <div :class="['w-[200px]', isActive && 'px-[16px]', cond ? 'r-[12px]' : '']"></div>
+      <div :class="['w-[200px]', isActive && 'px-[16px]', cond ? 'radius-[12px]' : '']"></div>
     `
         const tokens = tokenize(code)
 
         expect(tokens.has('w-[200px]')).toBe(true)
         expect(tokens.has('px-[16px]')).toBe(true)
-        expect(tokens.has('r-[12px]')).toBe(true)
+        expect(tokens.has('radius-[12px]')).toBe(true)
         expect(tokens.size).toBe(3)
     })
 
     it('вытаскивает статические arbitrary токены из object syntax', () => {
         const code = `
-      <div :class="{ 'w-[200px]': true, 'px-[16px]': isActive, 'rtl-[8px]': cond, foo: bar }"></div>
+      <div :class="{ 'w-[200px]': true, 'px-[16px]': isActive, 'radius-tl-[8px]': cond, foo: bar }"></div>
     `
         const tokens = tokenize(code)
 
         expect(tokens.has('w-[200px]')).toBe(true)
         expect(tokens.has('px-[16px]')).toBe(true)
-        expect(tokens.has('rtl-[8px]')).toBe(true)
+        expect(tokens.has('radius-tl-[8px]')).toBe(true)
         expect(tokens.size).toBe(3)
     })
 
@@ -101,7 +101,7 @@ describe('tokenize', () => {
         'w-[200px]'
         "h-[100px]"
         \`px-[16px]\`
-        (r-[12px]),
+        (radius-[12px]),
       }
     `
         const tokens = tokenize(code)
@@ -109,20 +109,20 @@ describe('tokenize', () => {
         expect(tokens.has('w-[200px]')).toBe(true)
         expect(tokens.has('h-[100px]')).toBe(true)
         expect(tokens.has('px-[16px]')).toBe(true)
-        expect(tokens.has('r-[12px]')).toBe(true)
+        expect(tokens.has('radius-[12px]')).toBe(true)
         expect(tokens.size).toBe(4)
     })
 
     it('обрезает лишние символы после закрывающей ]', () => {
         const code = `
-      const cls = "w-[200px], h-[100px]; px-[16px]) rtr-[10px];"
+      const cls = "w-[200px], h-[100px]; px-[16px]) radius-tr-[10px];"
     `
         const tokens = tokenize(code)
 
         expect(tokens.has('w-[200px]')).toBe(true)
         expect(tokens.has('h-[100px]')).toBe(true)
         expect(tokens.has('px-[16px]')).toBe(true)
-        expect(tokens.has('rtr-[10px]')).toBe(true)
+        expect(tokens.has('radius-tr-[10px]')).toBe(true)
         expect(tokens.size).toBe(4)
     })
 
@@ -182,13 +182,13 @@ describe('tokenize', () => {
         const code = `
       const cls = 'w-[200px]'
       const cls2 = 'px-[16px]'
-      const cls3 = 'r-[12px]'
+      const cls3 = 'radius-[12px]'
     `
         const tokens = tokenize(code)
 
         expect(tokens.has('w-[200px]')).toBe(true)
         expect(tokens.has('px-[16px]')).toBe(true)
-        expect(tokens.has('r-[12px]')).toBe(true)
+        expect(tokens.has('radius-[12px]')).toBe(true)
         expect(tokens.size).toBe(3)
     })
 
@@ -293,44 +293,44 @@ describe('resolveRule', () => {
     })
 
     it('разрешает правило r (border-radius)', () => {
-        const result = resolveRule('r-[12px]')
+        const result = resolveRule('radius-[12px]')
         expect(result).toEqual({
             declarations: ['border-radius: 12px !important;'],
         })
     })
 
-    it('разрешает правило rtl (top-left radius)', () => {
-        const result = resolveRule('rtl-[8px]')
+    it('разрешает правило radius-tl (top-left radius)', () => {
+        const result = resolveRule('radius-tl-[8px]')
         expect(result).toEqual({
             declarations: ['border-top-left-radius: 8px !important;'],
         })
     })
 
-    it('разрешает правило rtr (top-right radius)', () => {
-        const result = resolveRule('rtr-[10px]')
+    it('разрешает правило radius-tr (top-right radius)', () => {
+        const result = resolveRule('radius-tr-[10px]')
         expect(result).toEqual({
             declarations: ['border-top-right-radius: 10px !important;'],
         })
     })
 
-    it('разрешает правило rbl (bottom-left radius)', () => {
-        const result = resolveRule('rbl-[14px]')
+    it('разрешает правило radius-bl (bottom-left radius)', () => {
+        const result = resolveRule('radius-bl-[14px]')
         expect(result).toEqual({
             declarations: ['border-bottom-left-radius: 14px !important;'],
         })
     })
 
-    it('разрешает правило rbr (bottom-right radius)', () => {
-        const result = resolveRule('rbr-[50%]')
+    it('разрешает правило radius-br (bottom-right radius)', () => {
+        const result = resolveRule('radius-br-[50%]')
         expect(result).toEqual({
             declarations: ['border-bottom-right-radius: 50% !important;'],
         })
     })
 
     it('не разрешает мусорные radius значения', () => {
-        expect(resolveRule('r-[.]')).toBeNull()
-        expect(resolveRule('r-[%]')).toBeNull()
-        expect(resolveRule('r-[abc]')).toBeNull()
+        expect(resolveRule('radius-[.]')).toBeNull()
+        expect(resolveRule('radius-[%]')).toBeNull()
+        expect(resolveRule('radius-[abc]')).toBeNull()
     })
 
     it('разрешает правило z-index с числом', () => {
@@ -406,21 +406,21 @@ describe('buildCssRule', () => {
     })
 
     it('генерирует radius utility', () => {
-        const parsed = parseToken('r-[12px]')
-        const cssBody = resolveRule('r-[12px]')
+        const parsed = parseToken('radius-[12px]')
+        const cssBody = resolveRule('radius-[12px]')
 
         const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
 
-        expect(result).toBe('.r-\\[12px\\]{border-radius: 12px !important;}')
+        expect(result).toBe('.radius-\\[12px\\]{border-radius: 12px !important;}')
     })
 
     it('генерирует corner radius utility', () => {
-        const parsed = parseToken('rtl-[8px]')
-        const cssBody = resolveRule('rtl-[8px]')
+        const parsed = parseToken('radius-tl-[8px]')
+        const cssBody = resolveRule('radius-tl-[8px]')
 
         const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
 
-        expect(result).toBe('.rtl-\\[8px\\]{border-top-left-radius: 8px !important;}')
+        expect(result).toBe('.radius-tl-\\[8px\\]{border-top-left-radius: 8px !important;}')
     })
 
     it('возвращает null для неизвестного variant', () => {

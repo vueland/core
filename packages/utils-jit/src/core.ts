@@ -7,6 +7,7 @@ export const DEFAULT_BREAKPOINTS: Record<string, number> = {
     sm: 640,
     md: 768,
     lg: 1024,
+    xl: 1440
 }
 
 export const PSEUDO_VARIANTS = new Set(['hover', 'focus', 'active'])
@@ -127,7 +128,7 @@ function tokenizeChunk(code: string): Set<string> {
     const result = new Set<string>()
 
     const pattern =
-        /(?<![a-zA-Z0-9-_])((?:(?:hover|focus|active|sm|md|lg):)*[a-zA-Z][a-zA-Z0-9-]*-\[(?:[^[\]\r\n]|(?:\[[^[\]\r\n]*\]))+\])(?![a-zA-Z0-9-_])/g
+        /(?<![a-zA-Z0-9-_])((?:(?:hover|focus|active|xxl|xl|xs|sm|md|lg):)*[a-zA-Z][a-zA-Z0-9-]*-\[(?:[^[\]\r\n]|(?:\[[^[\]\r\n]*\]))+\])(?![a-zA-Z0-9-_])/g
 
     for (const match of code.matchAll(pattern)) {
         const token = stripEdgeGarbage(match[1] || '')

@@ -10,11 +10,11 @@ export default defineConfig({
         vue(),
         utilsJIT({
             breakpoints: {
-                sm: 375,
+                xs: 480,
+                sm: 640,
                 md: 768,
-                lg: 992,
-                xl: 1024,
-                xxl: 1920
+                lg: 1024,
+                xl: 1440
             },
         }) as Plugin],
     resolve: {
