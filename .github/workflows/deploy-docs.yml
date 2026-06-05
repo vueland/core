@@ -6,7 +6,8 @@ on:
       - master
     paths:
       - 'packages/docs/**'
-      - 'packages/**'
+      - 'packages/ui/**'
+      - 'packages/utils-jit/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
@@ -43,6 +44,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: |
+          pnpm --filter @vueland/utils-jit build-jit
+          pnpm --filter @vueland/ui build-lib
 
       - name: Build docs
         working-directory: packages/docs

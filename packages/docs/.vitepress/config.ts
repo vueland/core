@@ -4,6 +4,7 @@ import { navItems } from './nav-links'
 import { sidebar } from './sidebar'
 
 export default defineConfig({
+    base: '/vueland/',
     title: 'Vueland',
     description: 'Modern frontend platform for Vue 3',
     appearance: 'dark',

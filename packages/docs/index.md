@@ -26,7 +26,7 @@ title: Vueland
             <img src="./.vitepress/static/logo.png" alt="" style="max-width: 150%">
         </c-card-body>
         <c-card-footer class="d-flex justify-center items-center pb-5">
-            <c-btn @click="router.go('/guide/getting-started')" width="180" variant="outlined" style="color: var(--vp-c-brand-1)">Поехали</c-btn>
+            <c-btn @click="router.go('/vueland/guide/getting-started')" width="180" variant="outlined" style="color: var(--vp-c-brand-1)">Поехали</c-btn>
         </c-card-footer>
     </c-card>
 </div>

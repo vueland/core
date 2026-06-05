@@ -19,7 +19,6 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build:deploy": "tsdown",
     "build-jit": "tsdown",
     "dev": "tsdown --watch",
     "clean": "rm -rf dist",

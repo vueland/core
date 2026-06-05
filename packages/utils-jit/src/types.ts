@@ -24,7 +24,7 @@ export type UtilityRule = {
     match: (utility: string) => RuleMatch | null
 }
 
-export interface RuleOptions {
+export type RuleOptions = {
     name: string,
     matcher: RegExp
     validate: (value: string) => boolean
