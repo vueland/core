@@ -305,6 +305,9 @@ even
 ```
 
 ### Theme variants
+
+`@vueland/utils-jit` не включает `dark` как built-in variant.
+
 Dark mode — это часть стратегии темизации приложения. В разных проектах она может быть реализована через `.dark`, `data-theme`, CSS variables, provider или собственный theme layer. Поэтому плагин не навязывает конкретную модель.
 
 Если нужен `dark:` variant, добавьте его явно через `variants`.
@@ -397,16 +400,6 @@ utilsJIT({
 
 Псевдоклассы, selector variants и responsive-варианты можно комбинировать:
 
-```ts
-utilsJIT({
-  variants: {
-    hocus: {
-      kind: 'selector',
-      value: '&:hover,&:focus',
-    },
-  },
-})
-```
 ```vue
 <template>
   <button class="hover:md:w-[240px] focus:lg:px-[32px] hocus:xl:bg-[#eee]">

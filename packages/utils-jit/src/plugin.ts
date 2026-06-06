@@ -1,41 +1,88 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import type { ViteDevServer, PluginOption } from 'vite'
-import type { JitOptions, ParsedToken, } from './types'
-import * as rules from './rules'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
+import type { Plugin, ViteDevServer } from 'vite'
+import type { JitOptions, ParsedToken, Pattern, ResolvedJitOptions, UtilityRule } from './types'
+import { defaultRules } from './rules'
 import {
     buildCssRule,
     DEFAULT_BREAKPOINTS,
+    DEFAULT_EXCLUDE,
     DEFAULT_INCLUDE,
+    DEFAULT_VARIANTS,
     parseToken,
     resolveRule,
     shouldProcess,
     tokenize,
 } from './core'
 
+function resolveOptions(options: JitOptions = {}): ResolvedJitOptions {
+    return {
+        include: options.include ?? DEFAULT_INCLUDE,
+        exclude: [
+            ...DEFAULT_EXCLUDE,
+            ...(options.exclude ?? []),
+        ],
+        outFile: options.outFile ?? 'src/.generated/utils-jit.css',
+        breakpoints: {
+            ...DEFAULT_BREAKPOINTS,
+            ...(options.breakpoints ?? {}),
+        },
+        rules: options.rules ?? [],
+        variants: {
+            ...DEFAULT_VARIANTS,
+            ...(options.variants ?? {}),
+        },
+        banner: options.banner ?? '/* @vueland/utils-jit: generated utilities */',
+        emitEmptyFile: options.emitEmptyFile ?? true,
+        debug: options.debug ?? false,
+    }
+}
+
+function normalizePath(value: string): string {
+    return value.replace(/\\/g, '/')
+}
+
+function isSameFile(a: string, b: string): boolean {
+    return normalizePath(path.resolve(a)) === normalizePath(path.resolve(b))
+}
+
+function matchesPattern(value: string, pattern: Pattern): boolean {
+    const normalized = normalizePath(value)
+
+    if (typeof pattern === 'string') {
+        return normalized.includes(normalizePath(pattern))
+    }
+
+    pattern.lastIndex = 0
+
+    return pattern.test(normalized)
+}
+
+function isExcluded(file: string, exclude: Pattern[]): boolean {
+    return exclude.some((pattern) => matchesPattern(file, pattern))
+}
+
 function collectProjectFiles(
     root: string,
-    include: RegExp[],
-    excludeFile: string
+    options: ResolvedJitOptions,
+    outFile: string
 ): string[] {
     const files: string[] = []
 
     function walk(dir: string): void {
-        const entries = fs.readdirSync(dir, { withFileTypes: true })
+        if (isExcluded(dir, options.exclude)) {
+            return
+        }
+
+        let entries: fs.Dirent[]
+
+        try {
+            entries = fs.readdirSync(dir, { withFileTypes: true })
+        } catch {
+            return
+        }
 
         for (const entry of entries) {
-            if (
-                entry.name === 'node_modules' ||
-                entry.name === '.git' ||
-                entry.name === 'dist' ||
-                entry.name === '.output' ||
-                entry.name === '.nuxt' ||
-                entry.name === '.turbo' ||
-                entry.name === '.generated'
-            ) {
-                continue
-            }
-
             const fullPath = path.join(dir, entry.name)
 
             if (entry.isDirectory()) {
@@ -43,25 +90,45 @@ function collectProjectFiles(
                 continue
             }
 
-            if (fullPath === excludeFile) continue
-            if (shouldProcess(fullPath, include)) {
+            if (!entry.isFile()) {
+                continue
+            }
+
+            if (isSameFile(fullPath, outFile)) {
+                continue
+            }
+
+            if (shouldProcess(fullPath, options.include, options.exclude)) {
                 files.push(fullPath)
             }
         }
     }
 
     walk(root)
+
     return files
 }
 
-export function utilsJIT(options?: JitOptions): PluginOption {
-    const include = options?.include ?? DEFAULT_INCLUDE
-    const breakpoints = options?.breakpoints ?? DEFAULT_BREAKPOINTS
+function readFileSafe(file: string): string | null {
+    try {
+        return fs.readFileSync(file, 'utf8')
+    } catch {
+        return null
+    }
+}
+
+export function utilsJIT(options?: JitOptions): Plugin {
+    const resolvedOptions = resolveOptions(options)
 
     let root = process.cwd()
     let outFile = ''
     let devServer: ViteDevServer | null = null
     let currentCss = ''
+
+    const allRules: UtilityRule[] = [
+        ...defaultRules,
+        ...resolvedOptions.rules,
+    ]
 
     const fileToTokens = new Map<string, Set<string>>()
     const tokenRefCount = new Map<string, number>()
@@ -69,8 +136,17 @@ export function utilsJIT(options?: JitOptions): PluginOption {
     const tokenCssCache = new Map<string, string | null>()
     const activeCssRules = new Map<string, string>()
 
+    function debug(message: string): void {
+        if (resolvedOptions.debug) {
+            console.info(`[utils-jit] ${message}`)
+        }
+    }
+
     function notifyCssChanged(): void {
-        if (!devServer || !outFile) return
+        if (!devServer || !outFile) {
+            return
+        }
+
         devServer.watcher.emit('change', outFile)
     }
 
@@ -80,6 +156,7 @@ export function utilsJIT(options?: JitOptions): PluginOption {
         }
 
         const parsed = parseToken(token)
+
         tokenParseCache.set(token, parsed)
 
         return parsed
@@ -97,17 +174,20 @@ export function utilsJIT(options?: JitOptions): PluginOption {
             return null
         }
 
-        const cssBody = resolveRule(parsed.utility, [
-            ...Object.values(rules),
-            ...(options?.rules ? options.rules : [])
-        ])
+        const cssBody = resolveRule(parsed.utility, allRules)
 
         if (!cssBody) {
             tokenCssCache.set(token, null)
             return null
         }
 
-        const cssRule = buildCssRule(parsed, cssBody, breakpoints)
+        const cssRule = buildCssRule(
+            parsed,
+            cssBody,
+            resolvedOptions.breakpoints,
+            resolvedOptions.variants
+        )
+
         tokenCssCache.set(token, cssRule)
 
         return cssRule
@@ -115,21 +195,27 @@ export function utilsJIT(options?: JitOptions): PluginOption {
 
     function buildFinalCss(): string {
         if (!activeCssRules.size) {
-            return '/* @vueland/utils-jit: no utilities found */\n'
+            return resolvedOptions.emitEmptyFile
+                ? '/* @vueland/utils-jit: no utilities found */\n'
+                : ''
         }
 
-        const sortedRules = [...activeCssRules.entries()]
+        const sortedRules = Array.from(activeCssRules.entries())
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([, cssRule]) => cssRule)
 
         return [
-            '/* @vueland/utils-jit: generated utilities */',
+            resolvedOptions.banner,
             ...sortedRules,
             '',
         ].join('\n')
     }
 
     function writeCssFile(notify = false): void {
+        if (!outFile) {
+            return
+        }
+
         const nextCss = buildFinalCss()
 
         if (nextCss === currentCss) {
@@ -148,6 +234,8 @@ export function utilsJIT(options?: JitOptions): PluginOption {
         if (notify) {
             notifyCssChanged()
         }
+
+        debug(`wrote ${normalizePath(path.relative(root, outFile))}`)
     }
 
     function activateToken(token: string): void {
@@ -158,6 +246,7 @@ export function utilsJIT(options?: JitOptions): PluginOption {
 
         if (prevCount === 0) {
             const cssRule = getCssRuleForToken(token)
+
             if (cssRule) {
                 activeCssRules.set(token, cssRule)
             }
@@ -166,7 +255,10 @@ export function utilsJIT(options?: JitOptions): PluginOption {
 
     function deactivateToken(token: string): void {
         const prevCount = tokenRefCount.get(token) ?? 0
-        if (prevCount <= 0) return
+
+        if (prevCount <= 0) {
+            return
+        }
 
         const nextCount = prevCount - 1
 
@@ -180,7 +272,8 @@ export function utilsJIT(options?: JitOptions): PluginOption {
     }
 
     function applyFileTokens(file: string, nextTokens: Set<string>): void {
-        const prevTokens = fileToTokens.get(file) ?? new Set<string>()
+        const normalizedFile = normalizePath(file)
+        const prevTokens = fileToTokens.get(normalizedFile) ?? new Set<string>()
 
         for (const token of prevTokens) {
             if (!nextTokens.has(token)) {
@@ -195,9 +288,9 @@ export function utilsJIT(options?: JitOptions): PluginOption {
         }
 
         if (nextTokens.size > 0) {
-            fileToTokens.set(file, nextTokens)
+            fileToTokens.set(normalizedFile, nextTokens)
         } else {
-            fileToTokens.delete(file)
+            fileToTokens.delete(normalizedFile)
         }
     }
 
@@ -206,66 +299,87 @@ export function utilsJIT(options?: JitOptions): PluginOption {
         tokenRefCount.clear()
         activeCssRules.clear()
 
-        const files = collectProjectFiles(root, include, outFile)
+        const files = collectProjectFiles(root, resolvedOptions, outFile)
 
         for (const file of files) {
-            const code = fs.readFileSync(file, 'utf8')
+            const code = readFileSafe(file)
+
+            if (code === null) {
+                continue
+            }
+
             const tokens = tokenize(code)
 
             if (tokens.size > 0) {
-                fileToTokens.set(file, tokens)
+                fileToTokens.set(normalizePath(file), tokens)
 
                 for (const token of tokens) {
                     const count = tokenRefCount.get(token) ?? 0
+
                     tokenRefCount.set(token, count + 1)
                 }
             }
         }
 
         for (const [token, count] of tokenRefCount) {
-            if (count > 0) {
-                const cssRule = getCssRuleForToken(token)
+            if (count <= 0) {
+                continue
+            }
 
-                if (cssRule) {
-                    activeCssRules.set(token, cssRule)
-                }
+            const cssRule = getCssRuleForToken(token)
+
+            if (cssRule) {
+                activeCssRules.set(token, cssRule)
             }
         }
 
         writeCssFile(notify)
+
+        debug(`scanned ${files.length} files, found ${activeCssRules.size} utilities`)
     }
 
     function rebuildOne(file: string, code: string, notify = false): void {
-        if (file === outFile) return
+        if (isSameFile(file, outFile)) {
+            return
+        }
+
+        if (!shouldProcess(file, resolvedOptions.include, resolvedOptions.exclude)) {
+            return
+        }
 
         const nextTokens = tokenize(code)
+
         applyFileTokens(file, nextTokens)
         writeCssFile(notify)
     }
 
     function removeOne(file: string, notify = false): void {
-        if (file === outFile) return
+        if (isSameFile(file, outFile)) {
+            return
+        }
 
-        const prevTokens = fileToTokens.get(file)
-        if (!prevTokens) return
+        const normalizedFile = normalizePath(file)
+        const prevTokens = fileToTokens.get(normalizedFile)
+
+        if (!prevTokens) {
+            return
+        }
 
         for (const token of prevTokens) {
             deactivateToken(token)
         }
 
-        fileToTokens.delete(file)
+        fileToTokens.delete(normalizedFile)
         writeCssFile(notify)
     }
 
     return {
         name: 'utils-jit',
+        enforce: 'pre',
 
         configResolved(config) {
             root = config.root
-            outFile = options?.outFile
-                ? path.resolve(root, options.outFile)
-                : path.resolve(root, 'src/.generated/utils-jit.css')
-
+            outFile = path.resolve(root, resolvedOptions.outFile)
             rebuildAll(false)
         },
 
@@ -282,29 +396,53 @@ export function utilsJIT(options?: JitOptions): PluginOption {
         },
 
         transform(code, id) {
-            if (!shouldProcess(id, include)) return null
-            if (id === outFile) return null
+            const file = id.split('?')[0]
 
-            rebuildOne(id, code, false)
+            if (!file || isSameFile(file, outFile)) {
+                return null
+            }
+
+            rebuildOne(file, code, false)
+
             return null
         },
 
         async handleHotUpdate(ctx) {
             const { file } = ctx
 
-            if (!shouldProcess(file, include)) return
-            if (file === outFile) return
+            if (isSameFile(file, outFile)) {
+                return
+            }
+
+            if (!shouldProcess(file, resolvedOptions.include, resolvedOptions.exclude)) {
+                return
+            }
 
             const code = await ctx.read()
+
             rebuildOne(file, code, true)
         },
 
         watchChange(id, change) {
-            if (!shouldProcess(id, include)) return
-            if (id === outFile) return
+            const file = id.split('?')[0]
+
+            if (!file || isSameFile(file, outFile)) {
+                return
+            }
 
             if (change.event === 'delete') {
-                removeOne(id, true)
+                removeOne(file, true)
+                return
+            }
+
+            if (!shouldProcess(file, resolvedOptions.include, resolvedOptions.exclude)) {
+                return
+            }
+
+            const code = readFileSafe(file)
+
+            if (code !== null) {
+                rebuildOne(file, code, true)
             }
         },
     }
