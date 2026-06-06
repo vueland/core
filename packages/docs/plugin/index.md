@@ -395,8 +395,9 @@ utilsJIT({
 
 ## Комбинирование variants
 
-Псевдоклассы, selector variants и responsive-варианты можно комбинировать:
+Псевдоклассы, selector variants и responsive-варианты можно комбинировать.
 
+`hocus:` не является встроенным variant. Перед использованием его нужно добавить в `variants`:
 ```ts
 utilsJIT({
   variants: {
@@ -422,8 +423,6 @@ utilsJIT({
 @media (min-width: 1024px) { .focus\:lg\:px-\[32px\]:focus{padding-left: 32px !important;padding-right: 32px !important;} }
 @media (min-width: 1280px) { .hocus\:xl\:bg-\[\#eee\]:hover,.hocus\:xl\:bg-\[\#eee\]:focus{background-color: #eee !important;} }
 ```
-
-В примере `hocus` должен быть добавлен в `variants` как пользовательский selector variant.
 
 ## Конфигурация
 
