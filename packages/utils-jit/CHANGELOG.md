@@ -1,0 +1,7 @@
+# @vueland/utils-jit
+
+## 0.2.0
+
+### Minor Changes
+
+- [#2](https://github.com/vueland/vueland/pull/2) [`e7f06ae`](https://github.com/vueland/vueland/commit/e7f06aebdab1607cf14812c0013a4a0d9ba11a8f) Thanks [@wiseadme](https://github.com/wiseadme)! - utils jit update to minor
