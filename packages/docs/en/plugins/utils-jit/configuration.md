@@ -316,21 +316,6 @@ utilsJIT({
 })
 ```
 
-### `dark:` does not work
-
-`dark:` is not a built-in variant. Add it explicitly:
-
-```ts
-utilsJIT({
-  variants: {
-    dark: {
-      kind: 'selector',
-      value: '[data-theme="dark"] &',
-    },
-  },
-})
-```
-
 ### A custom rule does not work
 
 Check that `matcher` describes the utility part without variants.

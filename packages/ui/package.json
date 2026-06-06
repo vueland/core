@@ -4,6 +4,10 @@
   "version": "0.0.1",
   "private": false,
   "type": "module",
+  "author": {
+    "name": "Anar Allakhverdiev",
+    "url": "https://github.com/wiseadme"
+  },
   "sideEffects": [
     "**/*.scss",
     "**/*.css"

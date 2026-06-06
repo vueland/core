@@ -1,9 +1,20 @@
 <script setup lang="ts" generic="T">
-    import { computed, onBeforeMount, onBeforeUnmount, unref, useAttrs } from 'vue'
+    import {
+        computed,
+        onBeforeMount,
+        onBeforeUnmount, shallowReactive,
+        unref,
+        useAttrs, watch
+    } from 'vue'
     import { CLabel } from '../CLabel'
-    import { useFieldAttrs, useForm, useInputPresets, useInputState, useValidate } from '../../composables'
-    import type { CInputProps, CInputSlots } from './types'
-    import { unique } from '../../helpers'
+    import {
+        useForm,
+        useInputPresets,
+        useValidate
+    } from '../../composables'
+    import type { CInputProps, CInputSlots, CInputEmits, InputState } from './types'
+    import { isNotEmpty, unique } from '../../helpers'
+    import { FIELD_ATTRS } from '../../constants'
 
     defineOptions({
         name: 'CInput',
@@ -12,15 +23,13 @@
 
     const props = defineProps<CInputProps<T>>()
     const slots = defineSlots<CInputSlots>()
+    const emit = defineEmits<CInputEmits>()
 
-    const uid = `input-${props.id ?? unique(6)}`
-
-    const {
-        state,
-        onBlur,
-        onInput,
-        onFocus
-    } = useInputState(props)
+    const state = shallowReactive<InputState>({
+        focused: props.focused ?? false,
+        isDirty: false,
+        hasValue: false,
+    })
 
     const {
         errors,
@@ -28,6 +37,7 @@
     } = useValidate(props, state)
 
     const formApi = useForm()
+    const attrs = useAttrs()
 
     const preset = useInputPresets({
         props,
@@ -35,11 +45,36 @@
         errors
     })
 
-    const attrs = useAttrs()
-    const fieldAttrs = useFieldAttrs({ props, attrs, errors, uid })
+    const fieldId = `input-${props.id ?? unique(6)}`
 
     const hasLabel = computed(() => !!slots.label || !!props.label)
-    const hasDetails = computed(() => !props.noDetails && (props.details || !!slots?.details))
+    const hasDetails = computed(() => !props.noDetails && (
+        !!props.details ||
+        !!slots?.details ||
+        errors.hasError)
+    )
+
+    const normalizedAttrsMap = computed(() => Object.entries(attrs).reduce((acc, [k, v]) => {
+        if (
+            (!(k in props) && FIELD_ATTRS.has(k))
+            || k.startsWith('aria-')
+            || k.startsWith('data-')
+        ) {
+            acc[k] = v
+        }
+
+        return acc
+    }, {}))
+
+    const fieldAttrs = computed(() => ({
+        ...unref(normalizedAttrsMap),
+        ...(unref(hasLabel) ? { 'aria-labelledby': `${fieldId}-label` } : {}),
+        ...(unref(hasDetails) ? { 'aria-describedby': `${fieldId}-details` } : {}),
+        ...(errors.hasError ? { 'aria-invalid': 'true' } : {}),
+        ...(errors.errorMessage ? { 'aria-errormessage': `${fieldId}-details` } : {}),
+        ...(props.readonly ? { 'aria-readonly': 'true' } : {}),
+        ...(props.disabled ? { 'aria-disabled': 'true' } : {}),
+    }))
 
     const classes = computed(() => [
         {
@@ -55,6 +90,35 @@
         },
         ...unref(preset).root
     ])
+
+    function onFocus() {
+        if (props.readonly || props.disabled) {
+            return
+        }
+
+        state.focused = true
+
+        emit('focus', state.focused)
+    }
+
+    function onBlur() {
+        state.focused = false
+
+        if (!state.isDirty) {
+            state.isDirty = true
+        }
+
+        emit('blur', state.focused)
+    }
+
+    function onInput(val: string | number) {
+        emit('input', val)
+    }
+
+    watch(() => props.modelValue, (value) => {
+        const isArray = Array.isArray(value)
+        state.hasValue = isArray ? !!value.length : isNotEmpty(value)
+    }, { immediate: true })
 
     onBeforeMount(() => {
         formApi?.add(validate)
@@ -90,11 +154,11 @@
                 name="field"
                 v-bind="errors"
                 :validate
-                :focused="state.focused"
                 :label
                 :disabled
                 :readonly
-                :uid
+                :focused="state.focused"
+                :uid="fieldId"
                 :presets="preset.field"
                 :on-focus
                 :on-blur
@@ -115,13 +179,13 @@
         >
             <slot
                 name="label"
-                :uid
+                :uid="fieldId"
             >
                 <c-label
-                    :id="`${uid}-label`"
+                    :id="`${fieldId}-label`"
                     v-memo="[label]"
                     tag="label"
-                    :for="uid"
+                    :for="fieldId"
                 >
                     {{ label }}
                 </c-label>
@@ -129,17 +193,16 @@
         </div>
         <div
             v-if="hasDetails"
-            :id="`${uid}-details`"
+            :id="`${fieldId}-details`"
             class="c-input__details"
             :class="preset.details"
         >
             <slot
                 name="details"
                 v-bind="errors"
-                :uid
-            >
-                {{ details }}
-            </slot>
+                :details
+                :uid="fieldId"
+            />
         </div>
     </div>
 </template>

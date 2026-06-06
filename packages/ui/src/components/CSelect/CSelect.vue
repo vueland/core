@@ -98,8 +98,8 @@
                 size="20"
             />
         </template>
-        <template #details="{errorMessage}">
-            <span>{{ errorMessage }}</span>
+        <template #details="{errorMessage, details}">
+            <span>{{ errorMessage || details }}</span>
         </template>
         <template
             v-for="(_, slotName) in $slots"
