@@ -1,36 +1,272 @@
-@import './utils-jit.css';
-:root {
-  --vp-c-brand-1: #5fb234;
-  --vp-c-brand-2: #8ce75f;
-  --vp-c-bg: #1b1b1f;
-  //--vp-code-bg: red;
-  --vp-c-bg-soft: #1b1b1f;
-  --vp-code-block-bg: #181818;
-  --vp-nav-bg-color: #1b1b1f;
+/* Landing page */
+.VPDoc:has(.vueland-home) {
+  padding: 0;
 }
 
-.VPSwitchAppearance,
-.dark .VPSwitchAppearance,
-.appearance-action,
-.vitepress-dark-mode-switch {
-  //display: none !important;
+.VPDoc:has(.vueland-home) .container,
+.VPDoc:has(.vueland-home) .content,
+.VPDoc:has(.vueland-home) .content-container {
+  max-width: none;
+  padding: 0;
 }
 
-/* Также скрываем кнопку в мобильном меню */
-.VPNavBarAppearance,
-.VPNavScreenAppearance {
-  display: none !important;
+.vueland-home {
+  width: 100%;
+  min-height: calc(100vh - var(--vp-nav-height));
+  padding: 48px 20px 72px;
 }
 
-.VPHome {
-  margin: 0 !important;
-  height: 100%;
+.vueland-hero {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  text-align: center;
 }
 
-.dark .VPNavBar {
-  background-color: var(--vp-nav-bg-color) !important;
+.vueland-hero__logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.vp-doc tr {
-  //background-color: var(--vp-c-bg-soft) !important;
+.vueland-hero__logo img {
+  display: block;
+  width: min(260px, 72vw);
+  height: auto;
+}
+
+.vueland-hero__content {
+  width: 100%;
+}
+
+.vueland-hero__eyebrow {
+  margin: 0 0 12px;
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #27d98c 0%, #2f8cff 100%);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.vueland-hero h1 {
+  margin: 0;
+  font-size: clamp(40px, 13vw, 60px);
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+  font-weight: 900;
+  color: var(--vp-c-text-1);
+}
+
+.vueland-hero__description {
+  margin: 22px auto 0;
+  max-width: 580px;
+  font-size: 18px;
+  line-height: 1.55;
+  font-weight: 500;
+  color: var(--vp-c-text-2);
+}
+
+.vueland-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.vp-doc .vueland-button,
+.vueland-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: 999px;
+  border: 0;
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 700;
+  text-decoration: none !important;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.vp-doc .vueland-button:hover,
+.vueland-button:hover {
+  transform: translateY(-1px);
+  text-decoration: none !important;
+}
+
+.vp-doc .vueland-button--primary,
+.vueland-button--primary {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #27d98c 0%, #2f8cff 100%);
+  box-shadow: 0 16px 34px rgba(47, 140, 255, 0.28);
+}
+
+.vp-doc .vueland-button--primary:hover,
+.vueland-button--primary:hover {
+  color: #ffffff !important;
+  box-shadow: 0 20px 42px rgba(47, 140, 255, 0.34);
+}
+
+.vp-doc .vueland-button--secondary,
+.vueland-button--secondary {
+  color: var(--vp-c-text-1) !important;
+  background: var(--vp-c-bg-soft);
+}
+
+.vp-doc .vueland-button--secondary:hover,
+.vueland-button--secondary:hover {
+  color: var(--vp-c-text-1) !important;
+  background: var(--vp-c-default-soft);
+}
+
+.vueland-features {
+  width: 100%;
+  max-width: 640px;
+  margin: 56px auto 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.vueland-feature {
+  padding: 24px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(39, 217, 140, 0.08), transparent),
+    var(--vp-c-bg-soft);
+}
+
+.vueland-feature h2 {
+  margin: 0;
+  border-top: 0;
+  padding-top: 0;
+  font-size: 19px;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.vueland-feature p {
+  margin: 12px 0 0;
+  color: var(--vp-c-text-2);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .vueland-home {
+    padding: 72px 32px 96px;
+  }
+
+  .vueland-hero__logo img {
+    width: 320px;
+  }
+
+  .vueland-hero h1 {
+    font-size: 64px;
+  }
+
+  .vueland-hero__description {
+    font-size: 21px;
+  }
+
+  .vueland-features {
+    max-width: 760px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .vueland-feature {
+    min-height: 168px;
+    padding: 24px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1120px) {
+  .vueland-home {
+    min-height: calc(100vh - var(--vp-nav-height));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 32px 96px;
+  }
+
+  .vueland-hero {
+    max-width: 1080px;
+    grid-template-columns: 420px 560px;
+    justify-content: center;
+    align-items: center;
+    gap: 72px;
+    text-align: left;
+  }
+
+  .vueland-hero__logo img {
+    width: 340px;
+  }
+
+  .vueland-hero__content {
+    width: 560px;
+  }
+
+  .vueland-hero h1 {
+    min-height: 205px;
+    display: flex;
+    align-items: center;
+    font-size: 64px;
+  }
+
+  .vueland-hero__description {
+    min-height: 102px;
+    margin-left: 0;
+    margin-right: 0;
+    font-size: 22px;
+  }
+
+  .vueland-hero__actions {
+    justify-content: flex-start;
+  }
+
+  .vueland-features {
+    max-width: 1080px;
+    margin-top: 72px;
+  }
+}
+
+/* Wide desktop */
+@media (min-width: 1440px) {
+  .vueland-hero {
+    max-width: 1160px;
+    grid-template-columns: 440px 600px;
+    gap: 80px;
+  }
+
+  .vueland-hero__logo img {
+    width: 380px;
+  }
+
+  .vueland-hero__content {
+    width: 600px;
+  }
+
+  .vueland-hero h1 {
+    font-size: 72px;
+    min-height: 220px;
+  }
+
+  .vueland-features {
+    max-width: 1160px;
+  }
 }
