@@ -1,5 +1,11 @@
 # @vueland/utils-jit
 
+## 0.2.2
+
+### Patch Changes
+
+- [#11](https://github.com/vueland/vueland/pull/11) [`a1252f6`](https://github.com/vueland/vueland/commit/a1252f6be979206fc2a0386f74bf20fe782dfd40) Thanks [@wiseadme](https://github.com/wiseadme)! - fix readme file
+
 ## 0.2.1
 
 ### Patch Changes
