@@ -3,12 +3,24 @@
     "title": "Utils JIT",
     "items": [
       {
-        "title": "Установка",
+        "title": "Getting Started",
         "file": "utils-jit/index"
       } ,
       {
-        "title": "Конфигурация",
+        "title": "Configuration",
         "file": "utils-jit/configuration"
+      },
+      {
+        "title": "Custom rules",
+        "file": "utils-jit/custom-rules"
+      },
+      {
+        "title": "Utilities",
+        "file": "utils-jit/utilities"
+      },
+      {
+        "title": "Variants",
+        "file": "utils-jit/variants"
       }
     ]
   }

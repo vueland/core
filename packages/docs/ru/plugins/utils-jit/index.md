@@ -70,10 +70,3 @@ import './.generated/utils-jit.css'
 ```
 
 Порядок правил в итоговом файле сортируется по имени utility-токена, поэтому не стоит завязывать поведение на порядок объявления классов в шаблоне.
-
-## Разделы
-
-- [Utilities](./utilities.md) — встроенные utility-классы и допустимые значения.
-- [Variants](./variants.md) — pseudo, responsive и custom variants.
-- [Custom Rules](./custom-rules.md) — расширение плагина через `defineRule`.
-- [Configuration](./configuration.md) — options, генерация, ограничения и troubleshooting.

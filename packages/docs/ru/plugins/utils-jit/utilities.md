@@ -119,7 +119,7 @@ calc(), min(), max(), clamp(), var()
 
 ## Opacity
 
-Для `opacity-[value]` поддерживаются значения от `0` до `1`, CSS-переменные и global CSS values:
+Для `opacity-[value]` поддерживаются значения от `0` до `1`:
 
 ```html
 <div class="opacity-[0]"></div>

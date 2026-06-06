@@ -13,6 +13,14 @@
       {
         "title": "Пользовательские правила",
         "file": "utils-jit/custom-rules"
+      },
+      {
+        "title": "Утилитарные классы",
+        "file": "utils-jit/utilities"
+      },
+      {
+        "title": "Вариативность",
+        "file": "utils-jit/variants"
       }
     ]
   }

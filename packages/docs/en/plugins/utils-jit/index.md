@@ -1,44 +1,8 @@
-# Utils JIT
+# Getting Started
 
-`@vueland/utils-jit` — Vite-плагин для генерации CSS-утилит в JIT-режиме.
+`@vueland/utils-jit` is a Vite plugin for generating CSS utilities in JIT mode.
 
-Плагин сканирует исходники проекта, находит используемые arbitrary utility classes и генерирует CSS только для реально найденных классов. Это удобно для точечных CSS-значений, которые не хочется заранее описывать в теме, preset-ах или большом наборе готовых классов.
-
-```vue
-<template>
-  <div class="w-[320px] px-[16px] radius-[12px] hover:w-[360px] md:px-[24px]">
-    Card content
-  </div>
-</template>
-```
-
-## Когда использовать
-
-Utils JIT полезен, когда нужно быстро применить точное CSS-значение прямо в разметке:
-
-```vue
-<template>
-  <aside class="w-[280px] min-h-[100vh] px-[20px] z-[10]">
-    Sidebar
-  </aside>
-</template>
-```
-
-Плагин хорошо подходит для:
-
-- размеров блоков;
-- внутренних и внешних отступов;
-- радиусов;
-- позиционирования;
-- z-index;
-- opacity;
-- цветов;
-- responsive-вариантов;
-- pseudo-состояний;
-- selector и attribute variants;
-- кастомных utility-правил через `defineRule`.
-
-## Установка
+## Installation
 
 ::: code-group
 
@@ -56,9 +20,9 @@ yarn add -D @vueland/utils-jit
 
 :::
 
-## Подключение плагина
+## Plugin setup
 
-Добавьте `utilsJIT()` в `vite.config.ts`.
+Add `utilsJIT()` to your `vite.config.ts`.
 
 ```ts
 import { defineConfig } from 'vite'
@@ -73,19 +37,19 @@ export default defineConfig({
 })
 ```
 
-По умолчанию плагин создаёт файл:
+By default, the plugin generates the following file:
 
 ```txt
 src/.generated/utils-jit.css
 ```
 
-Импортируйте его в точке входа приложения, например в `src/main.ts`:
+Import it in your application entry file, for example in `src/main.ts`:
 
 ```ts
 import './.generated/utils-jit.css'
 ```
 
-## Быстрый пример
+## Quick example
 
 ```vue
 <template>
@@ -95,7 +59,7 @@ import './.generated/utils-jit.css'
 </template>
 ```
 
-Сгенерированный CSS будет выглядеть примерно так:
+The generated CSS will look roughly like this:
 
 ```css
 /* @vueland/utils-jit: generated utilities */
@@ -106,11 +70,4 @@ import './.generated/utils-jit.css'
 .z-\[10\]{z-index: 10 !important;}
 ```
 
-Порядок правил в итоговом файле сортируется по имени utility-токена, поэтому не стоит завязывать поведение на порядок объявления классов в шаблоне.
-
-## Разделы
-
-- [Utilities](./utilities.md) — встроенные utility-классы и допустимые значения.
-- [Variants](./variants.md) — pseudo, responsive и custom variants.
-- [Custom Rules](./custom-rules.md) — расширение плагина через `defineRule`.
-- [Configuration](./configuration.md) — options, генерация, ограничения и troubleshooting.
+Generated rules are sorted by utility token name, so you should not rely on the order of classes in the template.

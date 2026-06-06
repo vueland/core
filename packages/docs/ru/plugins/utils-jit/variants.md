@@ -76,7 +76,7 @@ even
 @media (min-width: 1536px) { .2xl\:w-\[1440px\]{width: 1440px !important;} }
 ```
 
-## Пользовательские variants
+## Пользовательские варианты
 
 Пользовательские варианты позволяют расширять синтаксис состояний.
 
@@ -113,9 +113,7 @@ utilsJIT({
 @media (min-width: 900px) { .tablet\:px-\[24px\]{padding-left: 24px !important;padding-right: 24px !important;} }
 ```
 
-## Theme variants
-
-`dark:` не является встроенным variant.
+## Темы
 
 Dark mode — это часть стратегии темизации приложения. В разных проектах она может быть реализована через `.dark`, `data-theme`, CSS variables, provider или собственный theme layer. Поэтому плагин не навязывает конкретную модель.
 

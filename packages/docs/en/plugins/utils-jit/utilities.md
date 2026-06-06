@@ -1,10 +1,10 @@
-# Утилитарные классы
+# Utility Classes
 
-Эта страница описывает встроенные utility-классы `@vueland/utils-jit` и допустимые значения.
+This page describes the built-in utility classes provided by `@vueland/utils-jit` and the values they support.
 
-## Поддерживаемые по умолчанию
+## Default utility classes
 
-| Utility | CSS-свойства | Пример |
+| Utility | CSS properties | Example |
 | --- | --- | --- |
 | `w-[value]` | `width` | `w-[320px]` |
 | `h-[value]` | `height` | `h-[200px]` |
@@ -41,15 +41,15 @@
 | `color-[value]` | `color` | `color-[#111]` |
 | `bg-[value]` | `background-color` | `bg-[#fff]` |
 
-Все встроенные правила генерируются с `!important`.
+All built-in rules generate declarations with `!important`.
 
-## Допустимые значения
+## Supported values
 
-Значения проходят валидацию перед генерацией CSS. Если значение не проходит проверку, CSS-правило не создаётся.
+Values are validated before CSS is generated. If a value does not pass validation, the CSS rule is not created.
 
-## Size, padding, radius и position
+## Size, padding, radius, and position
 
-Для `w`, `h`, `min-w`, `max-w`, `min-h`, `max-h`, `pa`, `px`, `py`, `pt`, `pr`, `pb`, `pl`, `radius`, `left`, `right`, `top`, `bottom`, `inset` поддерживаются CSS length-like значения:
+For `w`, `h`, `min-w`, `max-w`, `min-h`, `max-h`, `pa`, `px`, `py`, `pt`, `pr`, `pb`, `pl`, `radius`, `left`, `right`, `top`, `bottom`, and `inset`, CSS length-like values are supported:
 
 ```html
 <div class="w-[320px]"></div>
@@ -62,13 +62,13 @@
 <div class="h-[var(--panel-height)]"></div>
 ```
 
-Поддерживаемые единицы:
+Supported units:
 
 ```txt
 px, em, rem, %, vw, vh, svw, svh, lvw, lvh, dvw, dvh, vmin, vmax, ch, ex, cm, mm, in, pt, pc
 ```
 
-Также поддерживаются функции:
+Supported functions:
 
 ```txt
 calc(), min(), max(), clamp(), var()
@@ -76,7 +76,7 @@ calc(), min(), max(), clamp(), var()
 
 ## Margin
 
-Для margin-утилит поддерживаются length-like значения и `auto`:
+Margin utilities support length-like values and `auto`:
 
 ```html
 <div class="ma-[16px]"></div>
@@ -88,7 +88,7 @@ calc(), min(), max(), clamp(), var()
 
 ## Padding
 
-Для padding-утилит поддерживаются length-like значения:
+Padding utilities support length-like values:
 
 ```html
 <div class="pa-[16px]"></div>
@@ -98,7 +98,7 @@ calc(), min(), max(), clamp(), var()
 
 ## Radius
 
-Для radius-утилит поддерживаются length-like значения:
+Radius utilities support length-like values:
 
 ```html
 <div class="radius-[8px]"></div>
@@ -108,7 +108,7 @@ calc(), min(), max(), clamp(), var()
 
 ## Z-index
 
-Для `z-[value]` поддерживаются числа, `auto` и CSS-переменные:
+`z-[value]` supports numbers, `auto`, and CSS variables:
 
 ```html
 <div class="z-[1]"></div>
@@ -119,7 +119,7 @@ calc(), min(), max(), clamp(), var()
 
 ## Opacity
 
-Для `opacity-[value]` поддерживаются значения от `0` до `1`, CSS-переменные и global CSS values:
+`opacity-[value]` supports values from `0` to `1`:
 
 ```html
 <div class="opacity-[0]"></div>
@@ -128,9 +128,9 @@ calc(), min(), max(), clamp(), var()
 <div class="opacity-[var(--opacity)]"></div>
 ```
 
-## Color и background-color
+## Color and background-color
 
-Для `color-[value]` и `bg-[value]` поддерживаются hex, CSS color functions, CSS-переменные и некоторые ключевые значения:
+`color-[value]` and `bg-[value]` support hex colors, CSS color functions, CSS variables, and selected keyword values:
 
 ```html
 <div class="color-[#111]"></div>
@@ -141,7 +141,7 @@ calc(), min(), max(), clamp(), var()
 <div class="color-[currentColor]"></div>
 ```
 
-Некорректные значения игнорируются:
+Invalid values are ignored:
 
 ```html
 <div class="w-[;]"></div>

@@ -1,14 +1,14 @@
 # Variants
 
-Variants добавляются перед utility через `:`.
+Variants are added before the utility class name using `:`.
 
 ```html
 <div class="hover:w-[320px] md:px-[24px] focus-visible:bg-[#eee]"></div>
 ```
 
-## Псевдоклассы
+## Pseudo-classes
 
-По умолчанию доступны:
+The following variants are available by default:
 
 ```txt
 hover
@@ -25,7 +25,7 @@ odd
 even
 ```
 
-Пример:
+Example:
 
 ```vue
 <template>
@@ -35,7 +35,7 @@ even
 </template>
 ```
 
-Результат:
+Result:
 
 ```css
 .hover\:w-\[180px\]:hover{width: 180px !important;}
@@ -43,9 +43,9 @@ even
 .active\:radius-\[10px\]:active{border-radius: 10px !important;}
 ```
 
-## Responsive-варианты
+## Responsive variants
 
-По умолчанию доступны breakpoints:
+The following breakpoints are available by default:
 
 ```ts
 {
@@ -57,7 +57,7 @@ even
 }
 ```
 
-Пример:
+Example:
 
 ```vue
 <template>
@@ -67,7 +67,7 @@ even
 </template>
 ```
 
-Результат:
+Result:
 
 ```css
 @media (min-width: 768px) { .md\:w-\[720px\]{width: 720px !important;} }
@@ -76,9 +76,9 @@ even
 @media (min-width: 1536px) { .2xl\:w-\[1440px\]{width: 1440px !important;} }
 ```
 
-## Пользовательские variants
+## Custom variants
 
-Пользовательские variants позволяют расширять синтаксис состояний.
+Custom variants allow you to extend the state and selector syntax.
 
 ```ts
 utilsJIT({
@@ -99,13 +99,13 @@ utilsJIT({
 })
 ```
 
-Использование:
+Usage:
 
 ```html
 <div class="hocus:w-[320px] selected:bg-[#eee] tablet:px-[24px]"></div>
 ```
 
-Результат:
+Result:
 
 ```css
 .hocus\:w-\[320px\]:hover,.hocus\:w-\[320px\]:focus{width: 320px !important;}
@@ -115,13 +115,11 @@ utilsJIT({
 
 ## Theme variants
 
-`dark:` не является встроенным variant.
+Dark mode is part of the application's theming strategy. Different projects may implement it through `.dark`, `data-theme`, CSS variables, a provider, or a custom theme layer. The plugin does not enforce a specific model.
 
-Dark mode — это часть стратегии темизации приложения. В разных проектах она может быть реализована через `.dark`, `data-theme`, CSS variables, provider или собственный theme layer. Поэтому плагин не навязывает конкретную модель.
+If you need a `dark:` variant, add it explicitly through `variants`.
 
-Если нужен `dark:` variant, добавьте его явно через `variants`.
-
-### Через `data-theme`
+### Using `data-theme`
 
 ```ts
 utilsJIT({
@@ -134,20 +132,20 @@ utilsJIT({
 })
 ```
 
-Использование:
+Usage:
 
 ```html
 <div class="bg-[#fff] dark:bg-[#111] color-[#111] dark:color-[#fff]"></div>
 ```
 
-Результат:
+Result:
 
 ```css
 [data-theme="dark"] .dark\:bg-\[\#111\]{background-color: #111 !important;}
 [data-theme="dark"] .dark\:color-\[\#fff\]{color: #fff !important;}
 ```
 
-### Через `.dark`
+### Using `.dark`
 
 ```ts
 utilsJIT({
@@ -160,23 +158,23 @@ utilsJIT({
 })
 ```
 
-Использование:
+Usage:
 
 ```html
 <div class="dark:bg-[#111]"></div>
 ```
 
-Результат:
+Result:
 
 ```css
 .dark .dark\:bg-\[\#111\]{background-color: #111 !important;}
 ```
 
-## Комбинирование variants
+## Combining variants
 
-Псевдоклассы, selector variants и responsive-варианты можно комбинировать.
+Pseudo-classes, selector variants, and responsive variants can be combined.
 
-`hocus:` не является встроенным variant. Перед использованием его нужно добавить в `variants`:
+`hocus:` is not a built-in variant. Add it to `variants` before using it:
 
 ```ts
 utilsJIT({
@@ -189,7 +187,7 @@ utilsJIT({
 })
 ```
 
-Теперь `hocus:` можно комбинировать с responsive-вариантами:
+Now `hocus:` can be combined with responsive variants:
 
 ```vue
 <template>
@@ -199,7 +197,7 @@ utilsJIT({
 </template>
 ```
 
-Результат:
+Result:
 
 ```css
 @media (min-width: 768px) { .hover\:md\:w-\[240px\]:hover{width: 240px !important;} }

@@ -1,6 +1,6 @@
 # Configuration
 
-`utilsJIT` принимает объект настроек.
+`utilsJIT` accepts an options object.
 
 ```ts
 import { defineConfig } from 'vite'
@@ -30,21 +30,21 @@ export default defineConfig({
 
 ## Options
 
-| Option | Тип | По умолчанию | Описание |
+| Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `include` | `Array<string \| RegExp>` | `[/\.(vue\|js\|ts\|jsx\|tsx\|html)$/]` | Файлы, которые нужно анализировать. |
-| `exclude` | `Array<string \| RegExp>` | Служебные директории | Файлы и директории, которые нужно исключить. |
-| `outFile` | `string` | `src/.generated/utils-jit.css` | Путь к генерируемому CSS-файлу относительно Vite root. |
-| `breakpoints` | `Record<string, number>` | `sm`, `md`, `lg`, `xl`, `2xl` | Responsive variants. Пользовательские значения добавляются к дефолтным или переопределяют их. |
-| `rules` | `UtilityRule[]` | `[]` | Пользовательские utility-правила. |
-| `variants` | `VariantMap` | `{}` | Пользовательские variants, которые добавляются к built-in variants. |
-| `banner` | `string` | `/* @vueland/utils-jit: generated utilities */` | Баннер в начале CSS-файла. |
-| `emitEmptyFile` | `boolean` | `true` | Создавать файл с комментарием, если utilities не найдены. |
-| `debug` | `boolean` | `false` | Выводить диагностические сообщения. |
+| `include` | `Array<string \| RegExp>` | `[/\.(vue\|js\|ts\|jsx\|tsx\|html)$/]` | Files that should be scanned. |
+| `exclude` | `Array<string \| RegExp>` | Service directories | Files and directories that should be ignored. |
+| `outFile` | `string` | `src/.generated/utils-jit.css` | Path to the generated CSS file relative to the Vite root. |
+| `breakpoints` | `Record<string, number>` | `sm`, `md`, `lg`, `xl`, `2xl` | Responsive variants. Custom values are added to the defaults or override them. |
+| `rules` | `UtilityRule[]` | `[]` | Custom utility rules. |
+| `variants` | `VariantMap` | `{}` | Custom variants that are added to the built-in variants. |
+| `banner` | `string` | `/* @vueland/utils-jit: generated utilities */` | Banner at the top of the generated CSS file. |
+| `emitEmptyFile` | `boolean` | `true` | Creates a file with a comment when no utilities are found. |
+| `debug` | `boolean` | `false` | Prints diagnostic messages. |
 
 ## `outFile`
 
-Путь до генерируемого CSS-файла относительно `root` Vite-проекта.
+Path to the generated CSS file relative to the Vite project `root`.
 
 ```ts
 utilsJIT({
@@ -52,7 +52,7 @@ utilsJIT({
 })
 ```
 
-После этого импорт должен соответствовать новому пути:
+After changing this option, update the import path accordingly:
 
 ```ts
 import './styles/generated/utils.css'
@@ -60,15 +60,15 @@ import './styles/generated/utils.css'
 
 ## `include`
 
-Список паттернов для файлов, которые нужно анализировать.
+A list of patterns for files that should be scanned.
 
-По умолчанию:
+Default:
 
 ```ts
 [/\.(vue|js|ts|jsx|tsx|html)$/]
 ```
 
-Пример:
+Example:
 
 ```ts
 utilsJIT({
@@ -78,9 +78,9 @@ utilsJIT({
 
 ## `exclude`
 
-Список паттернов для файлов и директорий, которые нужно исключить из полного сканирования, `transform` и HMR.
+A list of patterns for files and directories that should be excluded from the initial scan, `transform`, and HMR.
 
-По умолчанию исключаются:
+By default, the following directories are excluded:
 
 ```txt
 node_modules
@@ -96,7 +96,7 @@ storybook-static
 playwright-report
 ```
 
-Пример:
+Example:
 
 ```ts
 utilsJIT({
@@ -110,7 +110,7 @@ utilsJIT({
 
 ## `breakpoints`
 
-Объект responsive-вариантов. Ключ используется в классе, значение — `min-width` в пикселях.
+An object with responsive variants. The key is used in the class name, and the value is used as `min-width` in pixels.
 
 ```ts
 utilsJIT({
@@ -126,7 +126,7 @@ utilsJIT({
 })
 ```
 
-После этого можно использовать:
+After that, you can use:
 
 ```html
 <div class="xs:w-[320px] 3xl:w-[1600px]"></div>
@@ -134,7 +134,7 @@ utilsJIT({
 
 ## `variants`
 
-Пользовательские variants позволяют расширять синтаксис состояний.
+Custom variants allow you to extend the state and selector syntax.
 
 ```ts
 utilsJIT({
@@ -161,13 +161,13 @@ utilsJIT({
 
 ## `emitEmptyFile`
 
-Если `emitEmptyFile: true`, при отсутствии utility-классов будет создан файл:
+When `emitEmptyFile: true`, a file is created with this content if no utility classes are found:
 
 ```css
 /* @vueland/utils-jit: no utilities found */
 ```
 
-Если `emitEmptyFile: false`, файл не будет создан, пока плагин не найдёт хотя бы один utility-класс.
+When `emitEmptyFile: false`, the file will not be created until the plugin finds at least one utility class.
 
 ```ts
 utilsJIT({
@@ -175,11 +175,11 @@ utilsJIT({
 })
 ```
 
-## Работа с Vue `class` и `:class`
+## Working with Vue `class` and `:class`
 
-Плагин сначала пытается быстро извлечь содержимое `class="..."` и `:class="..."`, а затем токенизирует найденные участки.
+The plugin first tries to quickly extract the content of `class="..."` and `:class="..."`, then tokenizes the extracted chunks.
 
-Поддерживаются статические строки внутри `:class`:
+Static strings inside `:class` are supported:
 
 ```vue
 <template>
@@ -188,9 +188,9 @@ utilsJIT({
 </template>
 ```
 
-Runtime-значения не вычисляются. Класс должен существовать в исходном коде как статический токен.
+Runtime values are not evaluated. The class must exist in the source code as a static token.
 
-Не сработает:
+This will not work:
 
 ```vue
 <script setup lang="ts">
@@ -202,7 +202,7 @@ const width = 320
 </template>
 ```
 
-Сработает:
+This will work:
 
 ```vue
 <template>
@@ -210,38 +210,38 @@ const width = 320
 </template>
 ```
 
-## Как работает генерация
+## How generation works
 
-Во время запуска Vite плагин:
+When Vite starts, the plugin:
 
-1. Обходит файлы проекта.
-2. Пропускает служебные директории вроде `node_modules`, `.git`, `dist`, `build`, `.generated` и других.
-3. Анализирует только файлы, подходящие под `include`.
-4. Извлекает utility-токены.
-5. Валидирует значения.
-6. Генерирует итоговый CSS-файл.
+1. Walks through project files.
+2. Skips service directories such as `node_modules`, `.git`, `dist`, `build`, `.generated`, and others.
+3. Scans only files that match `include`.
+4. Extracts utility tokens.
+5. Validates values.
+6. Generates the final CSS file.
 
-Во время разработки плагин обновляет CSS инкрементально:
+During development, the plugin updates CSS incrementally:
 
-- добавляет правила для новых токенов;
-- удаляет правила, если токен больше нигде не используется;
-- не удаляет правило, если такой же токен используется в другом файле;
-- переиспользует cache разбора токенов и CSS-правил;
-- уведомляет Vite watcher об изменении сгенерированного CSS.
+- adds rules for new tokens;
+- removes rules when a token is no longer used anywhere;
+- keeps a rule if the same token is still used in another file;
+- reuses token parsing and CSS rule caches;
+- notifies the Vite watcher when the generated CSS changes.
 
-## Ограничения и безопасность
+## Limits and safety
 
-Чтобы не генерировать небезопасный или некорректный CSS, плагин ограничивает arbitrary-значения:
+To avoid generating unsafe or invalid CSS, the plugin limits arbitrary values:
 
-- минимальная длина токена: `5`;
-- максимальная длина токена: `180`;
-- максимальная длина значения: `160`;
-- запрещены `;`, `{`, `}`, `<`, `>`;
-- запрещены CSS comments внутри значения;
-- значение должно содержать хотя бы одну букву или цифру;
-- разрешены только безопасные символы для CSS-значений.
+- minimum token length: `5`;
+- maximum token length: `180`;
+- maximum value length: `160`;
+- forbidden characters: `;`, `{`, `}`, `<`, `>`;
+- CSS comments are forbidden inside values;
+- the value must contain at least one letter or digit;
+- only a safe subset of CSS value characters is allowed.
 
-Поэтому такие классы будут проигнорированы:
+The following classes will be ignored:
 
 ```html
 <div class="w-[;]"></div>
@@ -250,11 +250,11 @@ const width = 320
 <div class="w-[...........................................]"></div>
 ```
 
-## Рекомендации
+## Recommendations
 
-Используйте Utils JIT для точечных arbitrary-значений, а не как замену всей дизайн-системе.
+Use Utils JIT for precise arbitrary values, not as a replacement for the entire design system.
 
-Хорошо:
+Good:
 
 ```vue
 <template>
@@ -264,43 +264,43 @@ const width = 320
 </template>
 ```
 
-Если значение повторяется по всему проекту, лучше добавить его в тему, preset или отдельный компонентный вариант.
+If a value is repeated across the project, it is better to move it into a theme, preset, or component variant.
 
 ## Troubleshooting
 
-### CSS-файл не появился
+### The CSS file was not created
 
-Проверьте, что:
+Check that:
 
-- `utilsJIT()` добавлен в `vite.config.ts`;
-- в проекте есть хотя бы один поддерживаемый utility-класс;
-- путь `outFile` корректный;
-- приложение импортирует сгенерированный CSS;
-- файл подходит под `include`;
-- файл не попадает под `exclude`.
+- `utilsJIT()` is added to `vite.config.ts`;
+- the project contains at least one supported utility class;
+- the `outFile` path is correct;
+- the generated CSS file is imported by the application;
+- the file matches `include`;
+- the file is not ignored by `exclude`.
 
-Если utility-классы не найдены и `emitEmptyFile: true`, файл будет создан с комментарием:
+If no utility classes are found and `emitEmptyFile: true`, the file will be created with this comment:
 
 ```css
 /* @vueland/utils-jit: no utilities found */
 ```
 
-Если `emitEmptyFile: false`, файл появится только после того, как будет найден хотя бы один utility-класс.
+If `emitEmptyFile: false`, the file will appear only after at least one utility class is found.
 
-### Класс есть, но CSS не генерируется
+### The class exists, but CSS is not generated
 
-Проверьте, что:
+Check that:
 
-- файл подходит под `include`;
-- файл не попадает под `exclude`;
-- класс написан статически, а не собирается в runtime;
-- значение проходит валидацию;
-- utility поддерживается встроенными правилами или добавлен через `rules`;
-- variant существует в `breakpoints` или `variants`.
+- the file matches `include`;
+- the file is not ignored by `exclude`;
+- the class is written statically and is not generated at runtime;
+- the value passes validation;
+- the utility is supported by built-in rules or added through `rules`;
+- the variant exists in `breakpoints` or `variants`.
 
-### Не работает `xs:` или `3xl:`
+### `xs:` or `3xl:` does not work
 
-Добавьте breakpoint в конфигурацию:
+Add the breakpoint to the configuration:
 
 ```ts
 utilsJIT({
@@ -316,9 +316,9 @@ utilsJIT({
 })
 ```
 
-### Не работает `dark:`
+### `dark:` does not work
 
-`dark:` не является встроенным variant. Добавьте его явно:
+`dark:` is not a built-in variant. Add it explicitly:
 
 ```ts
 utilsJIT({
@@ -331,17 +331,17 @@ utilsJIT({
 })
 ```
 
-### Не работает custom rule
+### A custom rule does not work
 
-Проверьте, что `matcher` описывает именно utility-часть без variants.
+Check that `matcher` describes the utility part without variants.
 
-Для класса:
+For this class:
 
 ```html
 <div class="hover:surface-[#fff]"></div>
 ```
 
-`matcher` должен матчить:
+`matcher` should match:
 
 ```txt
 surface-[#fff]
