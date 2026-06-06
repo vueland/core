@@ -1,33 +1,24 @@
 import { defineConfig } from 'vitepress'
-import { utilsJIT } from '@vueland/utils-jit'
-import { navItems } from './nav-links'
-import { sidebar } from './sidebar'
+import { sharedConfig } from './config/shared'
+import { enConfig } from './config/en'
+import { ruConfig } from './config/ru'
 
 export default defineConfig({
-    base: '/vueland/',
-    title: 'Vueland',
-    description: 'Modern frontend platform for Vue 3',
-    appearance: 'dark',
-    vite: {
-        plugins: [
-            utilsJIT({
-                outFile: './.vitepress/theme/utils-jit.css'
-            }) as any
-        ]
-    },
-    themeConfig: {
-        siteTitle: 'VueLand',
-        darkModeSwitchLabel: '',
-        lightModeSwitchTitle: '',
-        outline: {
-            label: 'Содержание страницы'
+    ...sharedConfig,
+
+    locales: {
+        root: {
+            label: 'Русский',
+            lang: 'ru-RU',
+            title: 'Vueland',
+            description: 'Современная frontend-платформа для Vue 3',
+            link: '/ru/',
+            themeConfig: ruConfig.themeConfig,
         },
-        nav: navItems,
-        sidebar,
-        socialLinks: [
-            { icon: 'github', link: 'https://github.com/vueland/vueland' }
-        ]
 
-    }
-
+        en: {
+            ...enConfig,
+            link: '/en/',
+        },
+    },
 })

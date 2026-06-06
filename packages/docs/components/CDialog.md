@@ -1,2 +1,0 @@
-# CDialog
-## CDialogsStack

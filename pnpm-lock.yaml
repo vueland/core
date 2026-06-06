@@ -8164,7 +8164,7 @@ snapshots:
       - '@swc-node/register'
       - '@swc/core'
       - '@types/node'
-      - babel-plugin-macros
+      - babel-plugins-macros
       - debug
       - supports-color
 

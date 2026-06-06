@@ -1,0 +1,29 @@
+[
+  {
+    "title": "General",
+    "items": [
+      {
+        "file": "CApp",
+        "title": "CApp"
+      }
+    ]
+  },
+  {
+    "title": "Form controls",
+    "items": [
+      {
+        "file": "CInput",
+        "title": "CInput"
+      }
+    ]
+  },
+  {
+    "title": "Actions",
+    "items": [
+      {
+        "file": "CBtn",
+        "title": "CBtn"
+      }
+    ]
+  }
+]
