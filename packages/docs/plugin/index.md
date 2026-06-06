@@ -943,21 +943,6 @@ const width = 320
 - utility поддерживается встроенными правилами или добавлен через `rules`;
 - variant существует в `breakpoints` или `variants`.
 
-### Не работает `dark:`
-
-`dark` не является built-in variant. Добавьте его явно:
-
-```ts
-utilsJIT({
-  variants: {
-    dark: {
-      kind: 'selector',
-      value: '[data-theme="dark"] &',
-    },
-  },
-})
-```
-
 ### Не работает `xs:` или `3xl:`
 
 Добавьте breakpoint в конфигурацию:
