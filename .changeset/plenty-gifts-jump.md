@@ -1,6 +1,6 @@
 ---
 "@vueland/utils-jit": minor
-"@vvueland/docs": minor
+"@vueland/docs": minor
 ---
 
 utils jit update to minor

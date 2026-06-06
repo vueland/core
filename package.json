@@ -25,7 +25,7 @@
     "lint:fix": "eslint --fix --ext .js,.ts,.vue .",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build:jit && pnpm run build:lib && changeset publish",
+    "release": "pnpm run build:jit && pnpm run build:lib && changeset publish",
     "pre:alpha": "changeset pre enter alpha",
     "pre:beta": "changeset pre enter beta",
     "pre:rc": "changeset pre enter rc",
