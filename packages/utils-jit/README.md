@@ -4,9 +4,9 @@
 
 # @vueland/utils-jit
 
-Vite JIT utility engine for the Vueland platform.
+Vite JIT utility engine for the `Vueland` platform.
 
-@vueland/utils-jit generates CSS utilities on demand from arbitrary utility classes used in your source files. It is designed for Vue/Vite projects that need a lightweight utility layer without shipping a large predefined CSS bundle.
+`@vueland/utils-jit` generates CSS utilities on demand from arbitrary utility classes used in your source files. It is designed for Vue/Vite projects that need a lightweight utility layer without shipping a large predefined CSS bundle.
 
 ## Documentation
 
@@ -26,11 +26,25 @@ bash pnpm add -D vite
 
 Add the plugin to your Vite config:
 
-ts import { defineConfig } from 'vite' import { utilsJit } from '@vueland/utils-jit'  export default defineConfig({   plugins: [     utilsJit(),   ], })
+```ts 
+import { defineConfig } from 'vite'
+import { utilsJit } from '@vueland/utils-jit' 
+export default defineConfig({   
+  plugins: [   
+    utilsJit(),  
+  ],
+})
+```
 
 Then use arbitrary utility classes in your templates:
 
-vue <template>   <button class="w-[160px] px-[20px] py-[12px] radius-[8px] bg-[#42b883] color-[#fff]">     Button   </button> </template>
+```vue
+<template> 
+   <button class="w-[160px] px-[20px] py-[12px] radius-[8px] bg-[#42b883] color-[#fff]">
+     Button   
+   </button> 
+</template>
+```
 
 The plugin scans your project files and generates only the CSS utilities that are actually used.
 
@@ -38,18 +52,34 @@ The plugin scans your project files and generates only the CSS utilities that ar
 
 Utility classes can be combined with variants:
 
-vue <template>   <button class="w-[160px] hover:w-[180px] focus:px-[24px]">     Button   </button> </template>
-
+```vue 
+<template>   
+  <button class="w-[160px] hover:w-[180px] focus:px-[24px]">    
+    Button   
+  </button> 
+</template>
+```
 Example output:
 
-css .hover\:w-\[180px\]:hover {   width: 180px !important; }  .focus\:px-\[24px\]:focus {   padding-left: 24px !important;   padding-right: 24px !important; }
-
+```css 
+.hover\:w-\[180px\]:hover {
+  width: 180px !important; 
+}  
+.focus\:px-\[24px\]:focus { 
+  padding-left: 24px !important;  
+  padding-right: 24px !important; 
+}
+```
 ## Responsive utilities
 
 Responsive variants are also supported:
 
-vue <template>   <div class="w-[100%] md:w-[720px] lg:w-[960px]"></div> </template>
-
+```vue 
+<template>   
+  <div class="w-[100%] md:w-[720px] lg:w-[960px]">
+  </div> 
+</template>
+```
 ## Why @vueland/utils-jit?
 
 - Generates utilities on demand
@@ -61,10 +91,10 @@ vue <template>   <div class="w-[100%] md:w-[720px] lg:w-[960px]"></div> </templa
 
 ## Package
 
-bash pnpm add -D @vueland/utils-jit
-
+```bash 
+pnpm add -D @vueland/utils-jit
+```
 npm:
-
 https://www.npmjs.com/package/@vueland/utils-jit
 
 ## License
