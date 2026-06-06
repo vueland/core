@@ -1,9 +1,91 @@
-export type JitOptions = {
-    include?: RegExp[]
-    outFile?: string,
-    breakpoints?: Record<string, number>
-    rules?: UtilityRule[]
+export type Pattern = string | RegExp
+
+export type MaybeArray<T> = T | T[]
+
+export type VariantKind = 'pseudo' | 'media' | 'selector' | 'attribute'
+
+export type VariantDefinition = {
+    kind: VariantKind
+    value: string | number
 }
+
+export type VariantMap = Record<string, VariantDefinition>
+
+export type JitOptions = {
+    /**
+     * Файлы, которые нужно анализировать.
+     *
+     * По умолчанию:
+     * - .vue
+     * - .js
+     * - .ts
+     * - .jsx
+     * - .tsx
+     * - .html
+     */
+    include?: Pattern[]
+
+    /**
+     * Файлы и директории, которые нужно исключить.
+     */
+    exclude?: Pattern[]
+
+    /**
+     * Путь к генерируемому CSS файлу относительно Vite root.
+     *
+     * По умолчанию: src/.generated/utils-jit.css
+     */
+    outFile?: string
+
+    /**
+     * Breakpoints в px.
+     */
+    breakpoints?: Record<string, number>
+
+    /**
+     * Пользовательские utility rules.
+     */
+    rules?: UtilityRule[]
+
+    /**
+     * Пользовательские variants.
+     */
+    variants?: VariantMap
+
+    /**
+     * Баннер в начале генерируемого CSS файла.
+     */
+    banner?: string
+
+    /**
+     * Писать файл даже если utilities не найдены.
+     *
+     * По умолчанию: true.
+     */
+    emitEmptyFile?: boolean
+
+    /**
+     * Выводить диагностические сообщения.
+     *
+     * По умолчанию: false.
+     */
+    debug?: boolean
+}
+
+export type ResolvedJitOptions = Required<
+    Pick<
+        JitOptions,
+        | 'include'
+        | 'exclude'
+        | 'outFile'
+        | 'breakpoints'
+        | 'rules'
+        | 'variants'
+        | 'banner'
+        | 'emitEmptyFile'
+        | 'debug'
+    >
+>
 
 export type ParsedToken = {
     raw: string
@@ -24,9 +106,58 @@ export type UtilityRule = {
     match: (utility: string) => RuleMatch | null
 }
 
+export type DeclarationValue = string | number
+
+export type DeclarationMap = Record<string, DeclarationValue>
+
 export type RuleOptions = {
-    name: string,
+    /**
+     * Название rule для отладки и читаемости.
+     */
+    name: string
+
+    /**
+     * Matcher utility-части без variants.
+     *
+     * Пример:
+     * class: hover:bg-[#fff]
+     * matcher получает: bg-[#fff]
+     */
     matcher: RegExp
-    validate: (value: string) => boolean
-    declaration: (value: string) => Record<string, string>
+
+    /**
+     * Проверка значения внутри [].
+     */
+    validate?: (value: string) => boolean
+
+    /**
+     * Генерация CSS declarations.
+     *
+     * Можно возвращать JS-style object:
+     * {
+     *   backgroundColor: value,
+     *   zIndex: 10,
+     * }
+     *
+     * Можно использовать CSS variables:
+     * {
+     *   '--vl-color': value,
+     * }
+     *
+     * Можно вернуть готовые строки:
+     * [
+     *   `background-color: ${value};`
+     * ]
+     */
+    declaration: (value: string) => DeclarationMap | string[]
+
+    /**
+     * Добавлять ли !important к object-based declarations.
+     *
+     * По умолчанию: true.
+     *
+     * Важно: если declaration возвращает string[], строки считаются уже готовым CSS
+     * и important автоматически не добавляется.
+     */
+    important?: boolean
 }

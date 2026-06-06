@@ -1,8 +1,8 @@
 # Utils JIT
 
-**Utils JIT** — Vite-плагин для генерации CSS-утилит в JIT-режиме.
+`@vueland/utils-jit` — Vite-плагин для генерации CSS-утилит в JIT-режиме.
 
-Плагин сканирует исходники проекта, находит используемые arbitrary utility classes и генерирует CSS только для реально найденных классов. Это удобно для точечных значений, которые не хочется заранее описывать в теме или держать в большом наборе готовых классов.
+Плагин сканирует исходники проекта, находит используемые arbitrary utility classes и генерирует CSS только для реально найденных классов. Это удобно для точечных CSS-значений, которые не хочется заранее описывать в теме, preset-ах или большом наборе готовых классов.
 
 ```vue
 <template>
@@ -11,8 +11,6 @@
   </div>
 </template>
 ```
-
-В результате будет создан CSS только для этих utility-классов.
 
 ## Когда использовать
 
@@ -33,8 +31,11 @@ Utils JIT полезен, когда нужно быстро применить 
 - радиусов;
 - позиционирования;
 - z-index;
+- opacity;
+- цветов;
 - responsive-вариантов;
-- hover / focus / active-состояний;
+- pseudo-состояний;
+- selector и attribute variants;
 - кастомных utility-правил через `defineRule`.
 
 ## Установка
@@ -105,7 +106,7 @@ import './.generated/utils-jit.css'
 .z-\[10\]{z-index: 10 !important;}
 ```
 
-Порядок правил в итоговом файле сортируется по имени utility-токена, поэтому не стоит завязывать поведение на порядок объявления классов.
+Порядок правил в итоговом файле сортируется по имени utility-токена, поэтому не стоит завязывать поведение на порядок объявления классов в шаблоне.
 
 ## Поддерживаемые utilities
 
@@ -142,6 +143,9 @@ import './.generated/utils-jit.css'
 | `radius-bl-[value]` | `border-bottom-left-radius` | `radius-bl-[8px]` |
 | `radius-br-[value]` | `border-bottom-right-radius` | `radius-br-[8px]` |
 | `z-[value]` | `z-index` | `z-[100]` |
+| `opacity-[value]` | `opacity` | `opacity-[0.64]` |
+| `color-[value]` | `color` | `color-[#111]` |
+| `bg-[value]` | `background-color` | `bg-[#fff]` |
 
 Все встроенные правила генерируются с `!important`.
 
@@ -167,7 +171,7 @@ import './.generated/utils-jit.css'
 Поддерживаемые единицы:
 
 ```txt
-px, em, rem, %, vw, vh, vmin, vmax, ch, ex, cm, mm, in, pt, pc
+px, em, rem, %, vw, vh, svw, svh, lvw, lvh, dvw, dvh, vmin, vmax, ch, ex, cm, mm, in, pt, pc
 ```
 
 Также поддерживаются функции:
@@ -185,6 +189,29 @@ calc(), min(), max(), clamp(), var()
 <div class="mx-[auto]"></div>
 <div class="mt-[2rem]"></div>
 <div class="mb-[calc(100%-20px)]"></div>
+<div class="ma-[10px 20px]"></div>
+```
+
+### Padding
+
+Для padding-утилит поддерживаются length-like значения:
+
+```html
+<div class="pa-[16px]"></div>
+<div class="px-[12px]"></div>
+<div class="py-[8px 12px]"></div>
+```
+
+`auto` для padding невалиден и будет проигнорирован.
+
+### Radius
+
+Для radius-утилит поддерживаются length-like значения:
+
+```html
+<div class="radius-[8px]"></div>
+<div class="radius-[8px 12px]"></div>
+<div class="radius-tl-[16px]"></div>
 ```
 
 ### Z-index
@@ -198,6 +225,30 @@ calc(), min(), max(), clamp(), var()
 <div class="z-[var(--z-modal)]"></div>
 ```
 
+### Opacity
+
+Для `opacity-[value]` поддерживаются значения от `0` до `1`, CSS-переменные и global CSS values:
+
+```html
+<div class="opacity-[0]"></div>
+<div class="opacity-[0.64]"></div>
+<div class="opacity-[1]"></div>
+<div class="opacity-[var(--opacity)]"></div>
+```
+
+### Color и background-color
+
+Для `color-[value]` и `bg-[value]` поддерживаются hex, CSS color functions, CSS-переменные и некоторые ключевые значения:
+
+```html
+<div class="color-[#111]"></div>
+<div class="bg-[#fff]"></div>
+<div class="bg-[rgb(255,255,255)]"></div>
+<div class="color-[oklch(60% 0.2 20)]"></div>
+<div class="bg-[var(--vl-surface)]"></div>
+<div class="color-[currentColor]"></div>
+```
+
 Некорректные значения игнорируются:
 
 ```html
@@ -205,16 +256,34 @@ calc(), min(), max(), clamp(), var()
 <div class="radius-[.]"></div>
 <div class="px-[auto]"></div>
 <div class="z-[10px]"></div>
+<div class="opacity-[2]"></div>
 ```
 
-## Псевдоклассы
+## Variants
 
-Поддерживаются варианты:
+Variants добавляются перед utility через `:`.
+
+```html
+<div class="hover:w-[320px] md:px-[24px] focus-visible:bg-[#eee]"></div>
+```
+
+### Псевдоклассы
+
+По умолчанию доступны:
 
 ```txt
 hover
 focus
+focus-visible
+focus-within
 active
+disabled
+checked
+visited
+first
+last
+odd
+even
 ```
 
 Пример:
@@ -235,6 +304,62 @@ active
 .active\:radius-\[10px\]:active{border-radius: 10px !important;}
 ```
 
+### Theme variants
+Dark mode — это часть стратегии темизации приложения. В разных проектах она может быть реализована через `.dark`, `data-theme`, CSS variables, provider или собственный theme layer. Поэтому плагин не навязывает конкретную модель.
+
+Если нужен `dark:` variant, добавьте его явно через `variants`.
+
+#### Через `data-theme`
+
+```ts
+utilsJIT({
+  variants: {
+    dark: {
+      kind: 'selector',
+      value: '[data-theme="dark"] &',
+    },
+  },
+})
+```
+
+Использование:
+
+```html
+<div class="bg-[#fff] dark:bg-[#111] color-[#111] dark:color-[#fff]"></div>
+```
+
+Результат:
+
+```css
+[data-theme="dark"] .dark\:bg-\[\#111\]{background-color: #111 !important;}
+[data-theme="dark"] .dark\:color-\[\#fff\]{color: #fff !important;}
+```
+
+#### Через `.dark`
+
+```ts
+utilsJIT({
+  variants: {
+    dark: {
+      kind: 'selector',
+      value: '.dark &',
+    },
+  },
+})
+```
+
+Использование:
+
+```html
+<div class="dark:bg-[#111]"></div>
+```
+
+Результат:
+
+```css
+.dark .dark\:bg-\[\#111\]{background-color: #111 !important;}
+```
+
 ## Responsive-варианты
 
 По умолчанию доступны breakpoints:
@@ -244,7 +369,8 @@ active
   sm: 640,
   md: 768,
   lg: 1024,
-  xl: 1440,
+  xl: 1280,
+  '2xl': 1536,
 }
 ```
 
@@ -252,7 +378,7 @@ active
 
 ```vue
 <template>
-  <div class="w-[100%] md:w-[720px] lg:w-[960px] xl:w-[1200px]">
+  <div class="w-[100%] md:w-[720px] lg:w-[960px] xl:w-[1200px] 2xl:w-[1440px]">
     Container
   </div>
 </template>
@@ -263,16 +389,27 @@ active
 ```css
 @media (min-width: 768px) { .md\:w-\[720px\]{width: 720px !important;} }
 @media (min-width: 1024px) { .lg\:w-\[960px\]{width: 960px !important;} }
-@media (min-width: 1440px) { .xl\:w-\[1200px\]{width: 1200px !important;} }
+@media (min-width: 1280px) { .xl\:w-\[1200px\]{width: 1200px !important;} }
+@media (min-width: 1536px) { .2xl\:w-\[1440px\]{width: 1440px !important;} }
 ```
 
-## Комбинирование вариантов
+## Комбинирование variants
 
-Псевдоклассы и responsive-варианты можно комбинировать:
+Псевдоклассы, selector variants и responsive-варианты можно комбинировать:
 
+```ts
+utilsJIT({
+  variants: {
+    hocus: {
+      kind: 'selector',
+      value: '&:hover,&:focus',
+    },
+  },
+})
+```
 ```vue
 <template>
-  <button class="hover:md:w-[240px] focus:lg:px-[32px]">
+  <button class="hover:md:w-[240px] focus:lg:px-[32px] hocus:xl:bg-[#eee]">
     Responsive button
   </button>
 </template>
@@ -283,7 +420,10 @@ active
 ```css
 @media (min-width: 768px) { .hover\:md\:w-\[240px\]:hover{width: 240px !important;} }
 @media (min-width: 1024px) { .focus\:lg\:px-\[32px\]:focus{padding-left: 32px !important;padding-right: 32px !important;} }
+@media (min-width: 1280px) { .hocus\:xl\:bg-\[\#eee\]:hover,.hocus\:xl\:bg-\[\#eee\]:focus{background-color: #eee !important;} }
 ```
+
+В примере `hocus` должен быть добавлен в `variants` как пользовательский selector variant.
 
 ## Конфигурация
 
@@ -299,18 +439,35 @@ export default defineConfig({
     vue(),
     utilsJIT({
       outFile: 'src/.generated/utils-jit.css',
-      include: [/\.(vue|js|ts|html)$/],
+      include: [/\.(vue|js|ts|jsx|tsx|html)$/],
+      exclude: [/src\/fixtures/],
       breakpoints: {
         xs: 480,
         sm: 640,
         md: 768,
         lg: 1024,
-        xl: 1440,
+        xl: 1280,
+        '2xl': 1536,
       },
+      debug: false,
     }),
   ],
 })
 ```
+
+## Options
+
+| Option | Тип | По умолчанию | Описание |
+| --- | --- | --- | --- |
+| `include` | `Array<string \| RegExp>` | `[/\.(vue\|js\|ts\|jsx\|tsx\|html)$/]` | Файлы, которые нужно анализировать. |
+| `exclude` | `Array<string \| RegExp>` | Служебные директории | Файлы и директории, которые нужно исключить. |
+| `outFile` | `string` | `src/.generated/utils-jit.css` | Путь к генерируемому CSS-файлу относительно Vite root. |
+| `breakpoints` | `Record<string, number>` | `sm`, `md`, `lg`, `xl`, `2xl` | Responsive variants. |
+| `rules` | `UtilityRule[]` | `[]` | Пользовательские utility-правила. |
+| `variants` | `VariantMap` | built-in variants | Пользовательские variants. |
+| `banner` | `string` | `/* @vueland/utils-jit: generated utilities */` | Баннер в начале CSS-файла. |
+| `emitEmptyFile` | `boolean` | `true` | Создавать файл с комментарием, если utilities не найдены. |
+| `debug` | `boolean` | `false` | Выводить диагностические сообщения. |
 
 ### `outFile`
 
@@ -330,19 +487,51 @@ import './styles/generated/utils.css'
 
 ### `include`
 
-Список регулярных выражений для файлов, которые нужно анализировать.
+Список паттернов для файлов, которые нужно анализировать.
 
 По умолчанию:
 
 ```ts
-[/\.(vue|js|ts|html)$/]
+[/\.(vue|js|ts|jsx|tsx|html)$/]
 ```
 
-Пример с поддержкой JSX / TSX:
+Пример:
 
 ```ts
 utilsJIT({
-  include: [/\.(vue|js|ts|jsx|tsx|html)$/],
+  include: [/\.(vue|ts)$/],
+})
+```
+
+### `exclude`
+
+Список паттернов для файлов и директорий, которые нужно исключить из полного сканирования, `transform` и HMR.
+
+По умолчанию исключаются:
+
+```txt
+node_modules
+.git
+dist
+build
+coverage
+.output
+.nuxt
+.turbo
+.generated
+storybook-static
+playwright-report
+```
+
+Пример:
+
+```ts
+utilsJIT({
+  exclude: [
+    /src\/fixtures/,
+    /src\/legacy/,
+    'storybook-static',
+  ],
 })
 ```
 
@@ -357,8 +546,9 @@ utilsJIT({
     sm: 640,
     md: 768,
     lg: 1024,
-    xl: 1440,
-    xxl: 1600,
+    xl: 1280,
+    '2xl': 1536,
+    '3xl': 1920,
   },
 })
 ```
@@ -366,7 +556,65 @@ utilsJIT({
 После этого можно использовать:
 
 ```html
-<div class="xs:w-[320px] xxl:w-[1440px]"></div>
+<div class="xs:w-[320px] 3xl:w-[1600px]"></div>
+```
+
+### `variants`
+
+Пользовательские variants позволяют расширять синтаксис состояний.
+
+```ts
+utilsJIT({
+  variants: {
+    hocus: {
+      kind: 'selector',
+      value: '&:hover,&:focus',
+    },
+    selected: {
+      kind: 'attribute',
+      value: '[aria-selected="true"]',
+    },
+    tablet: {
+      kind: 'media',
+      value: 900,
+    },
+    dark: {
+      kind: 'selector',
+      value: '[data-theme="dark"] &',
+    },
+  },
+})
+```
+
+Использование:
+
+```html
+<div class="hocus:w-[320px] selected:bg-[#eee] tablet:px-[24px] dark:bg-[#111]"></div>
+```
+
+Результат:
+
+```css
+.hocus\:w-\[320px\]:hover,.hocus\:w-\[320px\]:focus{width: 320px !important;}
+.selected\:bg-\[\#eee\][aria-selected="true"]{background-color: #eee !important;}
+@media (min-width: 900px) { .tablet\:px-\[24px\]{padding-left: 24px !important;padding-right: 24px !important;} }
+[data-theme="dark"] .dark\:bg-\[\#111\]{background-color: #111 !important;}
+```
+
+### `emitEmptyFile`
+
+Если `emitEmptyFile: true`, при отсутствии utility-классов будет создан файл:
+
+```css
+/* @vueland/utils-jit: no utilities found */
+```
+
+Если `emitEmptyFile: false`, файл не будет создан, пока плагин не найдёт хотя бы один utility-класс.
+
+```ts
+utilsJIT({
+  emitEmptyFile: false,
+})
 ```
 
 ## Кастомные utility-правила
@@ -374,9 +622,14 @@ utilsJIT({
 Плагин можно расширять через `rules` и `defineRule`.
 
 ```ts
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { defineRule, utilsJIT } from '@vueland/utils-jit'
+import {
+  defineRule,
+  isColorValue,
+  isSizeValue,
+  utilsJIT,
+} from '@vueland/utils-jit'
 
 export default defineConfig({
   plugins: [
@@ -384,11 +637,22 @@ export default defineConfig({
     utilsJIT({
       rules: [
         defineRule({
-          name: 'translate',
-          matcher: /^translate-\[(.+)\]$/,
-          validate: (value) => !!value,
+          name: 'surface',
+          matcher: /^surface-\[(.+)\]$/,
+          validate: isColorValue,
           declaration: (value) => ({
-            transform: `translate(${value})`,
+            backgroundColor: value,
+          }),
+          important: false,
+        }),
+
+        defineRule({
+          name: 'size',
+          matcher: /^size-\[(.+)\]$/,
+          validate: isSizeValue,
+          declaration: (value) => ({
+            width: value,
+            height: value,
           }),
         }),
       ],
@@ -401,8 +665,8 @@ export default defineConfig({
 
 ```vue
 <template>
-  <div class="translate-[10px,20px] hover:translate-[0px,10px]">
-    Floating element
+  <div class="surface-[#fff] size-[40px] hover:size-[48px]">
+    Custom utilities
   </div>
 </template>
 ```
@@ -410,23 +674,106 @@ export default defineConfig({
 Сгенерированный CSS:
 
 ```css
-.translate-\[10px\,20px\]{transform: translate(10px,20px);}
-.hover\:translate-\[0px\,10px\]:hover{transform: translate(0px,10px);}
+.surface-\[\#fff\]{background-color: #fff;}
+.size-\[40px\]{width: 40px !important;height: 40px !important;}
+.hover\:size-\[48px\]:hover{width: 48px !important;height: 48px !important;}
 ```
 
-### Более строгая валидация кастомного правила
+### API `defineRule`
 
-Для production-правил лучше не использовать `validate: (value) => !!value`, а явно ограничивать допустимый формат:
+```ts
+defineRule({
+  name: 'rule-name',
+  matcher: /^rule-name-\[(.+)\]$/,
+  validate: (value) => true,
+  declaration: (value) => ({
+    cssProperty: value,
+  }),
+  important: true,
+})
+```
+
+| Поле | Тип | Описание |
+| --- | --- | --- |
+| `name` | `string` | Название правила для читаемости и отладки. |
+| `matcher` | `RegExp` | Matcher utility-части без variants. |
+| `validate` | `(value: string) => boolean` | Проверка значения внутри `[]`. |
+| `declaration` | `(value: string) => Record<string, string \| number> \| string[]` | Генерация CSS declarations. |
+| `important` | `boolean` | Добавлять ли `!important` к object-based declarations. По умолчанию `true`. |
+
+`declaration` обычно возвращает JS-style object:
+
+```ts
+defineRule({
+  name: 'bg',
+  matcher: /^bg-\[(.+)\]$/,
+  validate: isColorValue,
+  declaration: (value) => ({
+    backgroundColor: value,
+  }),
+})
+```
+
+CSS-свойства в camelCase автоматически превращаются в kebab-case:
+
+```ts
+{
+  backgroundColor: '#fff',
+  borderTopLeftRadius: '8px',
+}
+```
+
+Результат:
+
+```css
+background-color: #fff !important;
+border-top-left-radius: 8px !important;
+```
+
+CSS-переменные не изменяются:
+
+```ts
+defineRule({
+  name: 'token',
+  matcher: /^token-\[(.+)\]$/,
+  declaration: (value) => ({
+    '--vl-token': value,
+  }),
+  important: false,
+})
+```
+
+Результат:
+
+```css
+--vl-token: #fff;
+```
+
+Если `declaration` возвращает `string[]`, строки считаются готовым CSS. В этом случае `!important` автоматически не добавляется.
+
+```ts
+defineRule({
+  name: 'raw',
+  matcher: /^raw-\[(.+)\]$/,
+  declaration: (value) => [
+    `--raw-value: ${value};`,
+  ],
+})
+```
+
+### Более строгая валидация custom rule
+
+Для production-правил лучше явно ограничивать допустимый формат:
 
 ```ts
 import { defineRule } from '@vueland/utils-jit'
 
-const opacityRule = defineRule({
-  name: 'opacity',
-  matcher: /^opacity-\[(.+)\]$/,
-  validate: (value) => /^(0|1|0?\.\d+|var\(.+\))$/.test(value),
+const gridColsRule = defineRule({
+  name: 'grid-cols',
+  matcher: /^grid-cols-\[(.+)\]$/,
+  validate: (value) => /^\d+$/.test(value),
   declaration: (value) => ({
-    opacity: value,
+    gridTemplateColumns: `repeat(${value}, minmax(0, 1fr))`,
   }),
 })
 ```
@@ -434,7 +781,43 @@ const opacityRule = defineRule({
 Использование:
 
 ```html
-<div class="opacity-[0.64] hover:opacity-[1]"></div>
+<div class="grid-cols-[3]"></div>
+```
+
+Результат:
+
+```css
+.grid-cols-\[3\]{grid-template-columns: repeat(3, minmax(0, 1fr)) !important;}
+```
+
+## Validators
+
+Пакет экспортирует validators, которые можно использовать в custom rules:
+
+```ts
+import {
+  isColorValue,
+  isMarginValue,
+  isOpacityValue,
+  isPaddingValue,
+  isPositionValue,
+  isRadiusValue,
+  isSizeValue,
+  isZIndexValue,
+} from '@vueland/utils-jit'
+```
+
+Пример:
+
+```ts
+defineRule({
+  name: 'text',
+  matcher: /^text-\[(.+)\]$/,
+  validate: isColorValue,
+  declaration: (value) => ({
+    color: value,
+  }),
+})
 ```
 
 ## Работа с Vue `class` и `:class`
@@ -477,7 +860,7 @@ const width = 320
 Во время запуска Vite плагин:
 
 1. Обходит файлы проекта.
-2. Пропускает служебные директории вроде `node_modules`, `.git`, `dist`, `.output`, `.nuxt`, `.turbo`, `.generated`.
+2. Пропускает служебные директории вроде `node_modules`, `.git`, `dist`, `build`, `.generated`.
 3. Анализирует только файлы, подходящие под `include`.
 4. Извлекает utility-токены.
 5. Валидирует значения.
@@ -487,6 +870,7 @@ const width = 320
 
 - добавляет правила для новых токенов;
 - удаляет правила, если токен больше нигде не используется;
+- не удаляет правило, если такой же токен используется в другом файле;
 - переиспользует cache разбора токенов и CSS-правил;
 - уведомляет Vite watcher об изменении сгенерированного CSS.
 
@@ -495,9 +879,10 @@ const width = 320
 Чтобы не генерировать небезопасный или некорректный CSS, плагин ограничивает arbitrary-значения:
 
 - минимальная длина токена: `5`;
-- максимальная длина токена: `100`;
-- максимальная длина значения: `120`;
-- запрещены `;`, `{`, `}`;
+- максимальная длина токена: `180`;
+- максимальная длина значения: `160`;
+- запрещены `;`, `{`, `}`, `<`, `>`;
+- запрещены CSS comments внутри значения;
 - значение должно содержать хотя бы одну букву или цифру;
 - разрешены только безопасные символы для CSS-значений.
 
@@ -506,7 +891,8 @@ const width = 320
 ```html
 <div class="w-[;]"></div>
 <div class="w-[{}]"></div>
-<div class="w-[.....................................................................................................]"></div>
+<div class="w-[<script>]"></div>
+<div class="w-[...........................................]"></div>
 ```
 
 ## Рекомендации
@@ -523,16 +909,6 @@ const width = 320
 </template>
 ```
 
-Лучше вынести в компонентный API или theme token:
-
-```vue
-<template>
-  <c-button class="px-[14px] py-[7px] radius-[6px]">
-    Save
-  </c-button>
-</template>
-```
-
 Если значение повторяется по всему проекту, лучше добавить его в тему, preset или отдельный компонентный вариант.
 
 ## Troubleshooting
@@ -544,24 +920,45 @@ const width = 320
 - `utilsJIT()` добавлен в `vite.config.ts`;
 - в проекте есть хотя бы один поддерживаемый utility-класс;
 - путь `outFile` корректный;
-- приложение импортирует сгенерированный CSS.
+- приложение импортирует сгенерированный CSS;
+- файл подходит под `include`;
+- файл не попадает под `exclude`.
 
-Если utility-классы не найдены, файл всё равно будет создан с комментарием:
+Если utility-классы не найдены и `emitEmptyFile: true`, файл будет создан с комментарием:
 
 ```css
 /* @vueland/utils-jit: no utilities found */
 ```
+
+Если `emitEmptyFile: false`, файл появится только после того, как будет найден хотя бы один utility-класс.
 
 ### Класс есть, но CSS не генерируется
 
 Проверьте, что:
 
 - файл подходит под `include`;
+- файл не попадает под `exclude`;
 - класс написан статически, а не собирается в runtime;
 - значение проходит валидацию;
-- variant существует в `breakpoints` или является одним из `hover`, `focus`, `active`.
+- utility поддерживается встроенными правилами или добавлен через `rules`;
+- variant существует в `breakpoints` или `variants`.
 
-### Не работает `xs:` или `xxl:`
+### Не работает `dark:`
+
+`dark` не является built-in variant. Добавьте его явно:
+
+```ts
+utilsJIT({
+  variants: {
+    dark: {
+      kind: 'selector',
+      value: '[data-theme="dark"] &',
+    },
+  },
+})
+```
+
+### Не работает `xs:` или `3xl:`
 
 Добавьте breakpoint в конфигурацию:
 
@@ -572,44 +969,117 @@ utilsJIT({
     sm: 640,
     md: 768,
     lg: 1024,
-    xl: 1440,
-    xxl: 1600,
+    xl: 1280,
+    '2xl': 1536,
+    '3xl': 1920,
   },
+})
+```
+
+### Не работает custom rule
+
+Проверьте, что `matcher` описывает именно utility-часть без variants.
+
+Для класса:
+
+```html
+<div class="hover:surface-[#fff]"></div>
+```
+
+`matcher` должен матчить:
+
+```txt
+surface-[#fff]
+```
+
+Пример:
+
+```ts
+defineRule({
+  name: 'surface',
+  matcher: /^surface-\[(.+)\]$/,
+  validate: isColorValue,
+  declaration: (value) => ({
+    backgroundColor: value,
+  }),
 })
 ```
 
 ## Полный пример `vite.config.ts`
 
 ```ts
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { defineRule, utilsJIT } from '@vueland/utils-jit'
+import {
+  defineRule,
+  isColorValue,
+  isSizeValue,
+  utilsJIT,
+} from '@vueland/utils-jit'
 
 export default defineConfig({
   plugins: [
     vue(),
+
     utilsJIT({
       outFile: 'src/.generated/utils-jit.css',
-      include: [/\.(vue|js|ts|jsx|tsx|html)$/],
+
+      include: [
+        /\.(vue|js|ts|jsx|tsx|html)$/,
+      ],
+
+      exclude: [
+        /src\/fixtures/,
+      ],
+
       breakpoints: {
         xs: 480,
         sm: 640,
         md: 768,
         lg: 1024,
-        xl: 1440,
-        xxl: 1600,
+        xl: 1280,
+        '2xl': 1536,
       },
+
+      variants: {
+        hocus: {
+          kind: 'selector',
+          value: '&:hover,&:focus',
+        },
+
+        selected: {
+          kind: 'attribute',
+          value: '[aria-selected="true"]',
+        },
+
+        dark: {
+          kind: 'selector',
+          value: '[data-theme="dark"] &',
+        },
+      },
+
       rules: [
         defineRule({
-          name: 'translate',
-          matcher: /^translate-\[(.+)\]$/,
-          validate: (value) => !!value,
+          name: 'surface',
+          matcher: /^surface-\[(.+)\]$/,
+          validate: isColorValue,
           declaration: (value) => ({
-            transform: `translate(${value})`,
+            backgroundColor: value,
+          }),
+          important: false,
+        }),
+
+        defineRule({
+          name: 'size',
+          matcher: /^size-\[(.+)\]$/,
+          validate: isSizeValue,
+          declaration: (value) => ({
+            width: value,
+            height: value,
           }),
         }),
       ],
-    }) as Plugin,
+    }),
   ],
 })
 ```

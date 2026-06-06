@@ -1,293 +1,323 @@
 import { defineRule } from './core'
-
 import {
+    isColorValue,
     isMarginValue,
+    isOpacityValue,
     isPaddingValue,
     isPositionValue,
     isRadiusValue,
     isSizeValue,
-    isZIndexValue
+    isZIndexValue,
 } from './validators'
 
-export const width = defineRule({
-    name: 'width',
-    matcher: /^w-\[(.+)\]$/,
-    validate: (v: string) => isSizeValue(v),
-    declaration: (value: string) => ({
-        width: `${value} !important`,
-    })
-})
+export const defaultRules = [
+    defineRule({
+        name: 'width',
+        matcher: /^w-\[(.+)\]$/,
+        validate: isSizeValue,
+        declaration: (value) => ({
+            width: value,
+        }),
+    }),
 
-export const height = defineRule({
-    name: 'height',
-    matcher: /^h-\[(.+)\]$/,
-    validate: (v: string) => isSizeValue(v),
-    declaration: (value: string) => ({
-        height: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'height',
+        matcher: /^h-\[(.+)\]$/,
+        validate: isSizeValue,
+        declaration: (value) => ({
+            height: value,
+        }),
+    }),
 
-export const minWidth = defineRule({
-    name: 'min-width',
-    matcher: /^min-w-\[(.+)\]$/,
-    validate: (v: string) => isSizeValue(v),
-    declaration: (value: string) => ({
-        minWidth: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'min-width',
+        matcher: /^min-w-\[(.+)\]$/,
+        validate: isSizeValue,
+        declaration: (value) => ({
+            minWidth: value,
+        }),
+    }),
 
-export const maxWidth = defineRule({
-    name: 'max-width',
-    matcher: /^max-w-\[(.+)\]$/,
-    validate: (v: string) => isSizeValue(v),
-    declaration: (value: string) => ({
-        maxWidth: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'max-width',
+        matcher: /^max-w-\[(.+)\]$/,
+        validate: isSizeValue,
+        declaration: (value) => ({
+            maxWidth: value,
+        }),
+    }),
 
-export const minHeight = defineRule({
-    name: 'min-height',
-    matcher: /^min-h-\[(.+)\]$/,
-    validate: (v: string) => isSizeValue(v),
-    declaration: (value: string) => ({
-        minHeight: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'min-height',
+        matcher: /^min-h-\[(.+)\]$/,
+        validate: isSizeValue,
+        declaration: (value) => ({
+            minHeight: value,
+        }),
+    }),
 
-export const maxHeight = defineRule({
-    name: 'max-height',
-    matcher: /^max-h-\[(.+)\]$/,
-    validate: (v: string) => isSizeValue(v),
-    declaration: (value: string) => ({
-        maxHeight: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'max-height',
+        matcher: /^max-h-\[(.+)\]$/,
+        validate: isSizeValue,
+        declaration: (value) => ({
+            maxHeight: value,
+        }),
+    }),
 
-export const zIndex = defineRule({
-    name: 'z-index',
-    matcher: /^z-\[(.+)\]$/,
-    validate: (v: string) => isZIndexValue(v),
-    declaration: (value: string) => ({
-        zIndex: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'z-index',
+        matcher: /^z-\[(.+)\]$/,
+        validate: isZIndexValue,
+        declaration: (value) => ({
+            zIndex: value,
+        }),
+    }),
 
-export const margin = defineRule({
-    name: 'margin',
-    matcher: /^ma-\[(.+)\]$/,
-    validate: (v: string) => isMarginValue(v),
-    declaration: (value: string) => ({
-        margin: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'margin',
+        matcher: /^ma-\[(.+)\]$/,
+        validate: isMarginValue,
+        declaration: (value) => ({
+            margin: value,
+        }),
+    }),
 
-export const marginX = defineRule({
-    name: 'margin-x',
-    matcher: /^mx-\[(.+)\]$/,
-    validate: (v) => isMarginValue(v),
-    declaration: (value) => ({
-        marginLeft: `${value} !important`,
-        marginRight: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'margin-x',
+        matcher: /^mx-\[(.+)\]$/,
+        validate: isMarginValue,
+        declaration: (value) => ({
+            marginLeft: value,
+            marginRight: value,
+        }),
+    }),
 
-export const marginY = defineRule({
-    name: 'margin-y',
-    matcher: /^my-\[(.+)\]$/,
-    validate: (v: string) => isMarginValue(v),
-    declaration: (value: string) => ({
-        marginTop: `${value} !important`,
-        marginBottom: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'margin-y',
+        matcher: /^my-\[(.+)\]$/,
+        validate: isMarginValue,
+        declaration: (value) => ({
+            marginTop: value,
+            marginBottom: value,
+        }),
+    }),
 
-export const marginBottom = defineRule({
-    name: 'margin-bottom',
-    matcher: /^mb-\[(.+)\]$/,
-    validate: (v: string) => isMarginValue(v),
-    declaration: (value: string) => ({
-        marginBottom: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'margin-bottom',
+        matcher: /^mb-\[(.+)\]$/,
+        validate: isMarginValue,
+        declaration: (value) => ({
+            marginBottom: value,
+        }),
+    }),
 
-export const marginTop = defineRule({
-    name: 'margin-top',
-    matcher: /^mt-\[(.+)\]$/,
-    validate: (v: string) => isMarginValue(v),
-    declaration: (value: string) => ({
-        marginTop: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'margin-top',
+        matcher: /^mt-\[(.+)\]$/,
+        validate: isMarginValue,
+        declaration: (value) => ({
+            marginTop: value,
+        }),
+    }),
 
-export const marginLeft = defineRule({
-    name: 'margin-left',
-    matcher: /^ml-\[(.+)\]$/,
-    validate: (v: string) => isMarginValue(v),
-    declaration: (value: string) => ({
-        marginLeft: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'margin-left',
+        matcher: /^ml-\[(.+)\]$/,
+        validate: isMarginValue,
+        declaration: (value) => ({
+            marginLeft: value,
+        }),
+    }),
 
-export const marginRight = defineRule({
-    name: 'margin-right',
-    matcher: /^mr-\[(.+)\]$/,
-    validate: (v: string) => isMarginValue(v),
-    declaration: (value: string) => ({
-        marginRight: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'margin-right',
+        matcher: /^mr-\[(.+)\]$/,
+        validate: isMarginValue,
+        declaration: (value) => ({
+            marginRight: value,
+        }),
+    }),
 
-export const padding = defineRule({
-    name: 'padding',
-    matcher: /^pa-\[(.+)\]$/,
-    validate: (v: string) => isPaddingValue(v),
-    declaration: (value: string) => ({
-        padding: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'padding',
+        matcher: /^pa-\[(.+)\]$/,
+        validate: isPaddingValue,
+        declaration: (value) => ({
+            padding: value,
+        }),
+    }),
 
-export const paddingX = defineRule({
-    name: 'padding-x',
-    matcher: /^px-\[(.+)\]$/,
-    validate: (v: string) => isPaddingValue(v),
-    declaration: (value: string) => ({
-        paddingLeft: `${value} !important`,
-        paddingRight: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'padding-x',
+        matcher: /^px-\[(.+)\]$/,
+        validate: isPaddingValue,
+        declaration: (value) => ({
+            paddingLeft: value,
+            paddingRight: value,
+        }),
+    }),
 
-export const paddingY  = defineRule({
-    name: 'padding-y',
-    matcher: /^py-\[(.+)\]$/,
-    validate: (v: string) => isPaddingValue(v),
-    declaration: (value: string) => ({
-        paddingTop: `${value} !important`,
-        paddingBottom: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'padding-y',
+        matcher: /^py-\[(.+)\]$/,
+        validate: isPaddingValue,
+        declaration: (value) => ({
+            paddingTop: value,
+            paddingBottom: value,
+        }),
+    }),
 
-export const paddingBottom = defineRule({
-    name: 'padding-bottom',
-    matcher: /^pb-\[(.+)\]$/,
-    validate: (v: string) => isPaddingValue(v),
-    declaration: (value: string) => ({
-        paddingBottom: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'padding-bottom',
+        matcher: /^pb-\[(.+)\]$/,
+        validate: isPaddingValue,
+        declaration: (value) => ({
+            paddingBottom: value,
+        }),
+    }),
 
-export const paddingTop = defineRule({
-    name: 'padding-top',
-    matcher: /^pt-\[(.+)\]$/,
-    validate: (v: string) => isPaddingValue(v),
-    declaration: (value: string) => ({
-        paddingTop: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'padding-top',
+        matcher: /^pt-\[(.+)\]$/,
+        validate: isPaddingValue,
+        declaration: (value) => ({
+            paddingTop: value,
+        }),
+    }),
 
-export const paddingLeft = defineRule({
-    name: 'padding-left',
-    matcher: /^pl-\[(.+)\]$/,
-    validate: (v: string) => isPaddingValue(v),
-    declaration: (value: string) => ({
-        paddingLeft: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'padding-left',
+        matcher: /^pl-\[(.+)\]$/,
+        validate: isPaddingValue,
+        declaration: (value) => ({
+            paddingLeft: value,
+        }),
+    }),
 
-export const paddingRight = defineRule({
-    name: 'padding-right',
-    matcher: /^pr-\[(.+)\]$/,
-    validate: (v: string) => isPaddingValue(v),
-    declaration: (value: string) => ({
-        paddingRight: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'padding-right',
+        matcher: /^pr-\[(.+)\]$/,
+        validate: isPaddingValue,
+        declaration: (value) => ({
+            paddingRight: value,
+        }),
+    }),
 
-export const left = defineRule({
-    name: 'left',
-    matcher: /^left-\[(.+)\]$/,
-    validate: (v: string) => isPositionValue(v),
-    declaration: (value: string) => ({
-        left: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'left',
+        matcher: /^left-\[(.+)\]$/,
+        validate: isPositionValue,
+        declaration: (value) => ({
+            left: value,
+        }),
+    }),
 
-export const right = defineRule({
-    name: 'right',
-    matcher: /^right-\[(.+)\]$/,
-    validate: (v: string) => isPositionValue(v),
-    declaration: (value: string) => ({
-        right: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'right',
+        matcher: /^right-\[(.+)\]$/,
+        validate: isPositionValue,
+        declaration: (value) => ({
+            right: value,
+        }),
+    }),
 
-export const top = defineRule({
-    name: 'top',
-    matcher: /^top-\[(.+)\]$/,
-    validate: (v: string) => isPositionValue(v),
-    declaration: (value: string) => ({
-        top: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'top',
+        matcher: /^top-\[(.+)\]$/,
+        validate: isPositionValue,
+        declaration: (value) => ({
+            top: value,
+        }),
+    }),
 
-export const bottom = defineRule({
-    name: 'bottom',
-    matcher: /^bottom-\[(.+)\]$/,
-    validate: (v: string) => isPositionValue(v),
-    declaration: (value: string) => ({
-        bottom: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'bottom',
+        matcher: /^bottom-\[(.+)\]$/,
+        validate: isPositionValue,
+        declaration: (value) => ({
+            bottom: value,
+        }),
+    }),
 
-export const inset = defineRule({
-    name: 'inset',
-    matcher: /^inset-\[(.+)\]$/,
-    validate: (v: string) => isPositionValue(v),
-    declaration: (value: string) => ({
-        inset: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'inset',
+        matcher: /^inset-\[(.+)\]$/,
+        validate: isPositionValue,
+        declaration: (value) => ({
+            inset: value,
+        }),
+    }),
 
-export const radius = defineRule({
-    name: 'radius',
-    matcher: /^radius-\[(.+)\]$/,
-    validate: (v: string) => isRadiusValue(v),
-    declaration: (value: string) => ({
-        borderRadius: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'radius',
+        matcher: /^radius-\[(.+)\]$/,
+        validate: isRadiusValue,
+        declaration: (value) => ({
+            borderRadius: value,
+        }),
+    }),
 
-export const radiusTopLeft = defineRule({
-    name: 'radius-tl',
-    matcher: /^radius-tl-\[(.+)\]$/,
-    validate: (v: string) => isRadiusValue(v),
-    declaration: (value: string) => ({
-        borderTopLeftRadius: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'radius-top-left',
+        matcher: /^radius-tl-\[(.+)\]$/,
+        validate: isRadiusValue,
+        declaration: (value) => ({
+            borderTopLeftRadius: value,
+        }),
+    }),
 
-export const radiusTopRight = defineRule({
-    name: 'radius-tr',
-    matcher: /^radius-tr-\[(.+)\]$/,
-    validate: (v: string) => isRadiusValue(v),
-    declaration: (value: string) => ({
-        borderTopRightRadius: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'radius-top-right',
+        matcher: /^radius-tr-\[(.+)\]$/,
+        validate: isRadiusValue,
+        declaration: (value) => ({
+            borderTopRightRadius: value,
+        }),
+    }),
 
-export const radiusBottomLeft = defineRule({
-    name: 'radius-bl',
-    matcher: /^radius-bl-\[(.+)\]$/,
-    validate: (v: string) => isRadiusValue(v),
-    declaration: (value: string) => ({
-        borderBottomLeftRadius: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'radius-bottom-left',
+        matcher: /^radius-bl-\[(.+)\]$/,
+        validate: isRadiusValue,
+        declaration: (value) => ({
+            borderBottomLeftRadius: value,
+        }),
+    }),
 
-export const radiusBottomRight = defineRule({
-    name: 'radius-br',
-    matcher: /^radius-br-\[(.+)\]$/,
-    validate: (v: string) => isRadiusValue(v),
-    declaration: (value: string) => ({
-        borderBottomRightRadius: `${value} !important`,
-    })
-})
+    defineRule({
+        name: 'radius-bottom-right',
+        matcher: /^radius-br-\[(.+)\]$/,
+        validate: isRadiusValue,
+        declaration: (value) => ({
+            borderBottomRightRadius: value,
+        }),
+    }),
+
+    defineRule({
+        name: 'opacity',
+        matcher: /^opacity-\[(.+)\]$/,
+        validate: isOpacityValue,
+        declaration: (value) => ({
+            opacity: value,
+        }),
+    }),
+
+    defineRule({
+        name: 'color',
+        matcher: /^color-\[(.+)\]$/,
+        validate: isColorValue,
+        declaration: (value) => ({
+            color: value,
+        }),
+    }),
+
+    defineRule({
+        name: 'background-color',
+        matcher: /^bg-\[(.+)\]$/,
+        validate: isColorValue,
+        declaration: (value) => ({
+            backgroundColor: value,
+        }),
+    }),
+]

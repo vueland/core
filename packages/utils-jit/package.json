@@ -1,7 +1,7 @@
 {
   "name": "@vueland/utils-jit",
   "description": "Vite JIT utility engine for Vueland",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "type": "module",
   "private": false,
   "main": "./dist/index.cjs",
@@ -9,7 +9,7 @@
   "types": "./dist/index.d.cts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.сts",
+      "types": "./dist/index.d.cts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     }
@@ -27,7 +27,7 @@
     "lint:jit": "eslint ."
   },
   "peerDependencies": {
-    "vite": "^7.3.5"
+    "vite": "^7.0.0"
   },
   "devDependencies": {
     "@types/node": "^25.4.0",

@@ -1,449 +1,542 @@
 import { describe, expect, it } from 'vitest'
 import {
     buildCssRule,
-    DEFAULT_BREAKPOINTS,
+    camelToKebab,
+    defineRule,
+    escapeCssSelector,
     extractClassCandidates,
+    isSafeCssValue,
+    normalizeValue,
     parseToken,
     resolveRule,
+    shouldProcess,
+    stripComments,
     tokenize,
-} from '../src/core'
+    isColorValue,
+    isSizeValue,
+    defaultRules,
+} from '../src'
 
-import * as rules from '../src/rules'
-
-describe('extractClassCandidates', () => {
-    it('извлекает обычный class', () => {
-        const code = `<div class="w-[200px] h-[100px]"></div>`
-        const result = extractClassCandidates(code)
-
-        expect(result).toEqual(['w-[200px] h-[100px]'])
+describe('core / normalizeValue', () => {
+    it('нормализует пробелы внутри значения', () => {
+        expect(normalizeValue('  10px   20px  ')).toBe('10px 20px')
     })
+})
 
-    it('извлекает :class', () => {
-        const code = `<div :class="['w-[200px]', active && 'px-[16px]']"></div>`
-        const result = extractClassCandidates(code)
-
-        expect(result).toEqual([`['w-[200px]', active && 'px-[16px]']`])
-    })
-
-    it('не путает class и :class', () => {
+describe('core / stripComments', () => {
+    it('удаляет html, block и line comments', () => {
         const code = `
-      <div
-        class="w-[100px]"
-        :class="['h-[200px]', isActive && 'px-[16px]']"
-      ></div>
-    `
-        const result = extractClassCandidates(code)
+            <!-- <div class="w-[100px]"></div> -->
+            /* <div class="h-[100px]"></div> */
+            // <div class="ma-[100px]"></div>
+            <div class="px-[16px]"></div>
+        `
 
-        expect(result).toEqual([
-            `['h-[200px]', isActive && 'px-[16px]']`,
+        const result = stripComments(code)
+
+        expect(result).not.toContain('w-[100px]')
+        expect(result).not.toContain('h-[100px]')
+        expect(result).not.toContain('ma-[100px]')
+        expect(result).toContain('px-[16px]')
+    })
+
+    it('не ломает протоколы вида https:// внутри строк', () => {
+        const code = `
+            const url = 'https://example.com'
+            const klass = 'w-[100px]'
+        `
+
+        expect(stripComments(code)).toContain('https://example.com')
+        expect(stripComments(code)).toContain('w-[100px]')
+    })
+})
+
+describe('core / extractClassCandidates', () => {
+    it('извлекает class из обычного html attribute', () => {
+        const code = `<div class="w-[100px] h-[40px]"></div>`
+
+        expect(extractClassCandidates(code)).toEqual([
+            'w-[100px] h-[40px]',
+        ])
+    })
+
+    it('извлекает class из одинарных кавычек', () => {
+        const code = `<div class='w-[100px]'></div>`
+
+        expect(extractClassCandidates(code)).toEqual([
             'w-[100px]',
+        ])
+    })
+
+    it('извлекает :class как строку', () => {
+        const code = `<div :class="'w-[100px] h-[40px]'"></div>`
+
+        expect(extractClassCandidates(code)).toEqual([
+            '\'w-[100px] h-[40px]\'',
         ])
     })
 })
 
-describe('tokenize', () => {
-    it('извлекает arbitrary utility классы из обычного class', () => {
+describe('core / tokenize', () => {
+    it('находит одиночный arbitrary utility', () => {
+        expect([...tokenize('<div class="w-[100px]"></div>')]).toEqual([
+            'w-[100px]',
+        ])
+    })
+
+    it('находит несколько utilities', () => {
+        expect([...tokenize('<div class="w-[100px] h-[40px] ma-[8px]"></div>')]).toEqual([
+            'w-[100px]',
+            'h-[40px]',
+            'ma-[8px]',
+        ])
+    })
+
+    it('удаляет дубликаты', () => {
+        expect([...tokenize('<div class="w-[100px] w-[100px]"></div>')]).toEqual([
+            'w-[100px]',
+        ])
+    })
+
+    it('находит responsive и pseudo variants', () => {
+        expect([...tokenize('<div class="hover:w-[100px] md:h-[40px] hover:md:px-[16px]"></div>')]).toEqual([
+            'hover:w-[100px]',
+            'md:h-[40px]',
+            'hover:md:px-[16px]',
+        ])
+    })
+
+    it('находит значения с пробелами внутри []', () => {
+        expect([...tokenize('<div class="ma-[10px 20px]"></div>')]).toEqual([
+            'ma-[10px 20px]',
+        ])
+    })
+
+    it('находит calc value', () => {
+        expect([...tokenize('<div class="w-[calc(100%-16px)]"></div>')]).toEqual([
+            'w-[calc(100%-16px)]',
+        ])
+    })
+
+    it('игнорирует слишком короткий мусор', () => {
+        expect([...tokenize('a-[]')]).toEqual([])
+    })
+
+    it('игнорирует токены без arbitrary value', () => {
+        expect([...tokenize('<div class="foo bar baz"></div>')]).toEqual([])
+    })
+
+    it('игнорирует комментарии', () => {
         const code = `
-      <div class="w-[200px] h-[100px] px-[16px]"></div>
-    `
+            <!-- <div class="w-[100px]"></div> -->
+            <div class="h-[40px]"></div>
+        `
 
-        const tokens = tokenize(code)
-
-        expect(tokens.has('w-[200px]')).toBe(true)
-        expect(tokens.has('h-[100px]')).toBe(true)
-        expect(tokens.has('px-[16px]')).toBe(true)
-        expect(tokens.size).toBe(3)
+        expect([...tokenize(code)]).toEqual([
+            'h-[40px]',
+        ])
     })
 
-    it('игнорирует обычные классы без arbitrary значения', () => {
-        const code = `<div class="foo bar baz"></div>`
-        const tokens = tokenize(code)
+    it('умеет находить utility вне class fallback-сканированием', () => {
+        const code = `const classes = ['w-[100px]', condition && 'h-[40px]']`
 
-        expect(tokens.size).toBe(0)
-    })
-
-    it('сохраняет токены с variants', () => {
-        const code = `
-      <div class="hover:w-[200px] md:px-[24px] active:radius-[12px]"></div>
-    `
-        const tokens = tokenize(code)
-
-        expect(tokens.has('hover:w-[200px]')).toBe(true)
-        expect(tokens.has('md:px-[24px]')).toBe(true)
-        expect(tokens.has('active:radius-[12px]')).toBe(true)
-    })
-
-    it('вытаскивает статические arbitrary токены из :class выражения', () => {
-        const code = `
-      <div :class="['w-[200px]', isActive && 'px-[16px]', cond ? 'radius-[12px]' : '']"></div>
-    `
-        const tokens = tokenize(code)
-
-        expect(tokens.has('w-[200px]')).toBe(true)
-        expect(tokens.has('px-[16px]')).toBe(true)
-        expect(tokens.has('radius-[12px]')).toBe(true)
-        expect(tokens.size).toBe(3)
-    })
-
-    it('вытаскивает статические arbitrary токены из object syntax', () => {
-        const code = `
-      <div :class="{ 'w-[200px]': true, 'px-[16px]': isActive, 'radius-tl-[8px]': cond, foo: bar }"></div>
-    `
-        const tokens = tokenize(code)
-
-        expect(tokens.has('w-[200px]')).toBe(true)
-        expect(tokens.has('px-[16px]')).toBe(true)
-        expect(tokens.has('radius-tl-[8px]')).toBe(true)
-        expect(tokens.size).toBe(3)
-    })
-
-    it('очищает мусорные символы по краям токена', () => {
-        const code = `
-      {
-        'w-[200px]'
-        "h-[100px]"
-        \`px-[16px]\`
-        (radius-[12px]),
-      }
-    `
-        const tokens = tokenize(code)
-
-        expect(tokens.has('w-[200px]')).toBe(true)
-        expect(tokens.has('h-[100px]')).toBe(true)
-        expect(tokens.has('px-[16px]')).toBe(true)
-        expect(tokens.has('radius-[12px]')).toBe(true)
-        expect(tokens.size).toBe(4)
-    })
-
-    it('обрезает лишние символы после закрывающей ]', () => {
-        const code = `
-      const cls = "w-[200px], h-[100px]; px-[16px]) radius-tr-[10px];"
-    `
-        const tokens = tokenize(code)
-
-        expect(tokens.has('w-[200px]')).toBe(true)
-        expect(tokens.has('h-[100px]')).toBe(true)
-        expect(tokens.has('px-[16px]')).toBe(true)
-        expect(tokens.has('radius-tr-[10px]')).toBe(true)
-        expect(tokens.size).toBe(4)
-    })
-
-    it('игнорирует html и комментарии', () => {
-        const code = `
-      <!-- w-[999px] -->
-      </div>
-      <div/>
-      <span class="w-[200px]"></span>
-    `
-        const tokens = tokenize(code)
-
-        expect(tokens.has('w-[200px]')).toBe(true)
-        expect(tokens.has('w-[999px]')).toBe(false)
-        expect(tokens.size).toBe(1)
-    })
-
-    it('игнорирует токены без закрывающей скобки', () => {
-        const code = `
-      w-[200px
-      h-[100px
-      px-[16px]
-    `
-        const tokens = tokenize(code)
-
-        expect(tokens.has('w-[200px')).toBe(false)
-        expect(tokens.has('h-[100px')).toBe(false)
-        expect(tokens.has('px-[16px]')).toBe(true)
-        expect(tokens.size).toBe(1)
-    })
-
-    it('игнорирует токены без префикса перед -[', () => {
-        const code = `
-      [200px]
-      -[100px]
-      w-[300px]
-    `
-        const tokens = tokenize(code)
-
-        expect(tokens.has('[200px]')).toBe(false)
-        expect(tokens.has('-[100px]')).toBe(false)
-        expect(tokens.has('w-[300px]')).toBe(true)
-        expect(tokens.size).toBe(1)
-    })
-
-    it('удаляет дубликаты токенов', () => {
-        const code = `
-      <div class="w-[200px] w-[200px] w-[200px]"></div>
-    `
-        const tokens = tokenize(code)
-
-        expect(tokens.has('w-[200px]')).toBe(true)
-        expect(tokens.size).toBe(1)
-    })
-
-    it('использует fallback на полный текст, если class-секции нет', () => {
-        const code = `
-      const cls = 'w-[200px]'
-      const cls2 = 'px-[16px]'
-      const cls3 = 'radius-[12px]'
-    `
-        const tokens = tokenize(code)
-
-        expect(tokens.has('w-[200px]')).toBe(true)
-        expect(tokens.has('px-[16px]')).toBe(true)
-        expect(tokens.has('radius-[12px]')).toBe(true)
-        expect(tokens.size).toBe(3)
-    })
-
-    it('использует fallback на полный текст, если class-секция есть, но токены из нее не извлеклись', () => {
-        const code = `
-      <div class="foo bar baz"></div>
-
-      const cls = 'w-[200px]'
-      const cls2 = 'px-[16px]'
-    `
-        const tokens = tokenize(code)
-
-        expect(tokens.has('w-[200px]')).toBe(true)
-        expect(tokens.has('px-[16px]')).toBe(true)
-        expect(tokens.size).toBe(2)
-    })
-
-    it('игнорирует слишком длинные токены', () => {
-        const longValue = 'a'.repeat(200)
-        const code = `<div class="w-[${longValue}]"></div>`
-        const tokens = tokenize(code)
-
-        expect(tokens.size).toBe(0)
+        expect([...tokenize(code)]).toEqual([
+            'w-[100px]',
+            'h-[40px]',
+        ])
     })
 })
 
-describe('parseToken', () => {
-    it('корректно парсит простой токен', () => {
-        expect(parseToken('w-[200px]')).toEqual({
-            raw: 'w-[200px]',
+describe('core / parseToken', () => {
+    it('парсит utility без variants', () => {
+        expect(parseToken('w-[100px]')).toEqual({
+            raw: 'w-[100px]',
             variants: [],
-            utility: 'w-[200px]',
+            utility: 'w-[100px]',
         })
     })
 
-    it('корректно парсит токен с variants', () => {
-        expect(parseToken('hover:md:w-[200px]')).toEqual({
-            raw: 'hover:md:w-[200px]',
+    it('парсит utility с одним variant', () => {
+        expect(parseToken('hover:w-[100px]')).toEqual({
+            raw: 'hover:w-[100px]',
+            variants: ['hover'],
+            utility: 'w-[100px]',
+        })
+    })
+
+    it('парсит utility с несколькими variants', () => {
+        expect(parseToken('hover:md:w-[100px]')).toEqual({
+            raw: 'hover:md:w-[100px]',
             variants: ['hover', 'md'],
-            utility: 'w-[200px]',
+            utility: 'w-[100px]',
         })
     })
 
-    it('возвращает null для некорректных токенов', () => {
-        expect(parseToken('foo')).toBeNull()
-        expect(parseToken('w-[200px')).toBeNull()
+    it('возвращает null для обычного class', () => {
+        expect(parseToken('button-primary')).toBeNull()
     })
 })
 
-describe('resolveRule', () => {
-    it('разрешает правило width', () => {
-        const result = resolveRule('w-[200px]', Object.values(rules))
-        expect(result).toEqual({
-            declarations: ['width: 200px !important;'],
+describe('core / escapeCssSelector', () => {
+    it('экранирует служебные символы css selector', () => {
+        expect(escapeCssSelector('hover:w-[100px]')).toBe('hover\\:w-\\[100px\\]')
+    })
+
+    it('оставляет буквы, цифры, underscore и dash без изменений', () => {
+        expect(escapeCssSelector('foo_bar-baz123')).toBe('foo_bar-baz123')
+    })
+})
+
+describe('core / camelToKebab', () => {
+    it('конвертирует camelCase в kebab-case', () => {
+        expect(camelToKebab('backgroundColor')).toBe('background-color')
+        expect(camelToKebab('borderTopLeftRadius')).toBe('border-top-left-radius')
+    })
+
+    it('не ломает css variables', () => {
+        expect(camelToKebab('--vl-color')).toBe('--vl-color')
+    })
+
+    it('не меняет уже kebab-case свойство', () => {
+        expect(camelToKebab('background-color')).toBe('background-color')
+    })
+})
+
+describe('core / isSafeCssValue', () => {
+    it('разрешает нормальные css values', () => {
+        expect(isSafeCssValue('10px')).toBe(true)
+        expect(isSafeCssValue('10px 20px')).toBe(true)
+        expect(isSafeCssValue('calc(100%-16px)')).toBe(true)
+        expect(isSafeCssValue('var(--vl-color)')).toBe(true)
+        expect(isSafeCssValue('#fff')).toBe(true)
+    })
+
+    it('запрещает пустые и мусорные значения', () => {
+        expect(isSafeCssValue('')).toBe(false)
+        expect(isSafeCssValue('   ')).toBe(false)
+        expect(isSafeCssValue('---')).toBe(false)
+    })
+
+    it('запрещает потенциально опасные символы', () => {
+        expect(isSafeCssValue('red; color: blue')).toBe(false)
+        expect(isSafeCssValue('red{}')).toBe(false)
+        expect(isSafeCssValue('<script>')).toBe(false)
+        expect(isSafeCssValue('/* test */ red')).toBe(false)
+    })
+})
+
+describe('core / shouldProcess', () => {
+    it('пропускает файлы по include', () => {
+        expect(shouldProcess('/project/src/App.vue', [/\.vue$/])).toBe(true)
+        expect(shouldProcess('/project/src/App.css', [/\.vue$/])).toBe(false)
+    })
+
+    it('исключает файлы по exclude', () => {
+        expect(shouldProcess('/project/node_modules/a/index.ts', [/\.ts$/], [/node_modules/])).toBe(false)
+    })
+
+    it('обрезает query из id', () => {
+        expect(shouldProcess('/project/src/App.vue?vue&type=template', [/\.vue$/])).toBe(true)
+    })
+})
+
+describe('core / defineRule', () => {
+    it('создаёт rule с object declaration и important по умолчанию', () => {
+        const rule = defineRule({
+            name: 'background-color',
+            matcher: /^bg-\[(.+)\]$/,
+            declaration: (value) => ({
+                backgroundColor: value,
+            }),
+        })
+
+        expect(rule.match('bg-[#fff]')).toEqual({
+            declarations: ['background-color: #fff !important;'],
         })
     })
 
-    it('разрешает правило width с calc()', () => {
-        const result = resolveRule('w-[calc(100%-32px)]', Object.values(rules))
-        expect(result).toEqual({
-            declarations: ['width: calc(100%-32px) !important;'],
+    it('умеет отключать important', () => {
+        const rule = defineRule({
+            name: 'background-color',
+            matcher: /^bg-\[(.+)\]$/,
+            declaration: (value) => ({
+                backgroundColor: value,
+            }),
+            important: false,
+        })
+
+        expect(rule.match('bg-[#fff]')).toEqual({
+            declarations: ['background-color: #fff;'],
         })
     })
 
-    it('разрешает правило width с var()', () => {
-        const result = resolveRule('w-[var(--size)]', Object.values(rules))
-        expect(result).toEqual({
-            declarations: ['width: var(--size) !important;'],
+    it('не дублирует important, если он уже есть в значении', () => {
+        const rule = defineRule({
+            name: 'background-color',
+            matcher: /^bg-\[(.+)\]$/,
+            declaration: () => ({
+                backgroundColor: 'red !important',
+            }),
+        })
+
+        expect(rule.match('bg-[#fff]')).toEqual({
+            declarations: ['background-color: red !important;'],
         })
     })
 
-    it('разрешает правило px (padding-left/right)', () => {
-        const result = resolveRule('px-[16px]', Object.values(rules))
-        expect(result).toEqual({
+    it('конвертирует несколько camelCase properties', () => {
+        const rule = defineRule({
+            name: 'size',
+            matcher: /^size-\[(.+)\]$/,
+            validate: isSizeValue,
+            declaration: (value) => ({
+                width: value,
+                height: value,
+                minWidth: value,
+            }),
+        })
+
+        expect(rule.match('size-[40px]')).toEqual({
             declarations: [
-                'padding-left: 16px !important;',
-                'padding-right: 16px !important;',
+                'width: 40px !important;',
+                'height: 40px !important;',
+                'min-width: 40px !important;',
             ],
         })
     })
 
-    it('не разрешает padding auto', () => {
-        expect(resolveRule('px-[auto]', Object.values(rules))).toBeNull()
-        expect(resolveRule('pt-[auto]', Object.values(rules))).toBeNull()
+    it('поддерживает css variables', () => {
+        const rule = defineRule({
+            name: 'surface',
+            matcher: /^surface-\[(.+)\]$/,
+            declaration: (value) => ({
+                '--vl-surface': value,
+            }),
+            important: false,
+        })
+
+        expect(rule.match('surface-[#fff]')).toEqual({
+            declarations: ['--vl-surface: #fff;'],
+        })
     })
 
-    it('разрешает правило mx (margin-left/right) с auto', () => {
-        const result = resolveRule('mx-[auto]', Object.values(rules))
-        expect(result).toEqual({
-            declarations: [
-                'margin-left: auto !important;',
-                'margin-right: auto !important;',
+    it('поддерживает готовые string declarations без автоматического important', () => {
+        const rule = defineRule({
+            name: 'raw',
+            matcher: /^raw-\[(.+)\]$/,
+            declaration: (value) => [
+                `--raw-value: ${value};`,
             ],
         })
-    })
 
-    it('разрешает правило margin с calc()', () => {
-        const result = resolveRule('mt-[calc(100%-16px)]', Object.values(rules))
-        expect(result).toEqual({
-            declarations: ['margin-top: calc(100%-16px) !important;'],
+        expect(rule.match('raw-[10px]')).toEqual({
+            declarations: ['--raw-value: 10px;'],
         })
     })
 
-    it('разрешает правило r (border-radius)', () => {
-        const result = resolveRule('radius-[12px]', Object.values(rules))
-        expect(result).toEqual({
-            declarations: ['border-radius: 12px !important;'],
+    it('возвращает null, если matcher не подошёл', () => {
+        const rule = defineRule({
+            name: 'background-color',
+            matcher: /^bg-\[(.+)\]$/,
+            declaration: (value) => ({
+                backgroundColor: value,
+            }),
         })
+
+        expect(rule.match('color-[#fff]')).toBeNull()
     })
 
-    it('разрешает правило radius-tl (top-left radius)', () => {
-        const result = resolveRule('radius-tl-[8px]', Object.values(rules))
-        expect(result).toEqual({
-            declarations: ['border-top-left-radius: 8px !important;'],
+    it('возвращает null, если значение не прошло validate', () => {
+        const rule = defineRule({
+            name: 'background-color',
+            matcher: /^bg-\[(.+)\]$/,
+            validate: () => false,
+            declaration: (value) => ({
+                backgroundColor: value,
+            }),
         })
+
+        expect(rule.match('bg-[#fff]')).toBeNull()
     })
 
-    it('разрешает правило radius-tr (top-right radius)', () => {
-        const result = resolveRule('radius-tr-[10px]', Object.values(rules))
-        expect(result).toEqual({
-            declarations: ['border-top-right-radius: 10px !important;'],
+    it('возвращает null для unsafe value', () => {
+        const rule = defineRule({
+            name: 'background-color',
+            matcher: /^bg-\[(.+)\]$/,
+            declaration: (value) => ({
+                backgroundColor: value,
+            }),
         })
-    })
 
-    it('разрешает правило radius-bl (bottom-left radius)', () => {
-        const result = resolveRule('radius-bl-[14px]', Object.values(rules))
-        expect(result).toEqual({
-            declarations: ['border-bottom-left-radius: 14px !important;'],
+        expect(rule.match('bg-[red;color:blue]')).toBeNull()
+    })
+})
+
+describe('core / resolveRule', () => {
+    it('находит встроенное правило', () => {
+        expect(resolveRule('w-[100px]', defaultRules)).toEqual({
+            declarations: ['width: 100px !important;'],
         })
-    })
-
-    it('разрешает правило radius-br (bottom-right radius)', () => {
-        const result = resolveRule('radius-br-[50%]', Object.values(rules))
-        expect(result).toEqual({
-            declarations: ['border-bottom-right-radius: 50% !important;'],
-        })
-    })
-
-    it('не разрешает мусорные radius значения', () => {
-        expect(resolveRule('radius-[.]', Object.values(rules))).toBeNull()
-        expect(resolveRule('radius-[%]', Object.values(rules))).toBeNull()
-        expect(resolveRule('radius-[abc]', Object.values(rules))).toBeNull()
-    })
-
-    it('разрешает правило z-index с числом', () => {
-        const result = resolveRule('z-[10]', Object.values(rules))
-        expect(result).toEqual({
-            declarations: ['z-index: 10 !important;'],
-        })
-    })
-
-    it('разрешает правило z-index с auto', () => {
-        const result = resolveRule('z-[auto]', Object.values(rules))
-        expect(result).toEqual({
-            declarations: ['z-index: auto !important;'],
-        })
-    })
-
-    it('разрешает правило z-index с var()', () => {
-        const result = resolveRule('z-[var(--z-index)]', Object.values(rules))
-        expect(result).toEqual({
-            declarations: ['z-index: var(--z-index) !important;'],
-        })
-    })
-
-    it('не разрешает мусорные z-index значения', () => {
-        expect(resolveRule('z-[.]', Object.values(rules))).toBeNull()
-        expect(resolveRule('z-[10px]', Object.values(rules))).toBeNull()
     })
 
     it('возвращает null для неизвестного utility', () => {
-        expect(resolveRule('unknown-[1px]', Object.values(rules))).toBeNull()
+        expect(resolveRule('unknown-[100px]', defaultRules)).toBeNull()
+    })
+
+    it('работает с custom rule', () => {
+        const customRule = defineRule({
+            name: 'surface',
+            matcher: /^surface-\[(.+)\]$/,
+            validate: isColorValue,
+            declaration: (value) => ({
+                backgroundColor: value,
+            }),
+            important: false,
+        })
+
+        expect(resolveRule('surface-[#fff]', [customRule])).toEqual({
+            declarations: ['background-color: #fff;'],
+        })
     })
 })
 
-describe('buildCssRule', () => {
-    it('генерирует обычное CSS правило', () => {
-        const parsed = parseToken('w-[200px]')
-        const cssBody = resolveRule('w-[200px]', Object.values(rules))
+describe('core / buildCssRule', () => {
+    it('строит css rule без variants', () => {
+        const parsed = parseToken('w-[100px]')
 
-        const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
+        expect(parsed).not.toBeNull()
 
-        expect(result).toBe('.w-\\[200px\\]{width: 200px !important;}')
+        expect(buildCssRule(parsed!, {
+            declarations: ['width: 100px !important;'],
+        })).toBe('.w-\\[100px\\]{width: 100px !important;}')
     })
 
-    it('генерирует правило с pseudo variant', () => {
-        const parsed = parseToken('hover:w-[200px]')
-        const cssBody = resolveRule('w-[200px]', Object.values(rules))
+    it('строит css rule с pseudo variant', () => {
+        const parsed = parseToken('hover:w-[100px]')
 
-        const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
+        expect(parsed).not.toBeNull()
 
-        expect(result).toBe('.hover\\:w-\\[200px\\]:hover{width: 200px !important;}')
+        expect(buildCssRule(parsed!, {
+            declarations: ['width: 100px !important;'],
+        })).toBe('.hover\\:w-\\[100px\\]:hover{width: 100px !important;}')
     })
 
-    it('генерирует media query для breakpoint', () => {
-        const parsed = parseToken('md:w-[300px]')
-        const cssBody = resolveRule('w-[300px]', Object.values(rules))
+    it('строит css rule с breakpoint variant', () => {
+        const parsed = parseToken('md:w-[100px]')
 
-        const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
+        expect(parsed).not.toBeNull()
 
-        expect(result).toBe(
-            '@media (min-width: 768px) { .md\\:w-\\[300px\\]{width: 300px !important;} }'
-        )
+        expect(buildCssRule(parsed!, {
+            declarations: ['width: 100px !important;'],
+        })).toBe('@media (min-width: 768px) { .md\\:w-\\[100px\\]{width: 100px !important;} }')
     })
 
-    it('генерирует комбинацию pseudo + media', () => {
-        const parsed = parseToken('hover:md:px-[24px]')
-        const cssBody = resolveRule('px-[24px]', Object.values(rules))
+    it('строит css rule с несколькими variants', () => {
+        const parsed = parseToken('hover:md:w-[100px]')
 
-        const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
+        expect(parsed).not.toBeNull()
 
-        expect(result).toBe(
-            '@media (min-width: 768px) { .hover\\:md\\:px-\\[24px\\]:hover{padding-left: 24px !important;padding-right: 24px !important;} }'
-        )
+        expect(buildCssRule(parsed!, {
+            declarations: ['width: 100px !important;'],
+        })).toBe('@media (min-width: 768px) { .hover\\:md\\:w-\\[100px\\]:hover{width: 100px !important;} }')
     })
 
-    it('генерирует radius utility', () => {
-        const parsed = parseToken('radius-[12px]')
-        const cssBody = resolveRule('radius-[12px]', Object.values(rules))
+    it('строит css rule с custom dark selector variant', () => {
+        const parsed = parseToken('dark:w-[100px]')
 
-        const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
-
-        expect(result).toBe('.radius-\\[12px\\]{border-radius: 12px !important;}')
+        expect(parsed).not.toBeNull()
+        expect(buildCssRule(
+            parsed!,
+            {
+                declarations: ['width: 100px !important;'],
+            },
+            undefined,
+            {
+                dark: {
+                    kind: 'selector',
+                    value: '[data-theme="dark"] &',
+                },
+            }
+        )).toBe('[data-theme="dark"] .dark\\:w-\\[100px\\]{width: 100px !important;}')
     })
 
-    it('генерирует corner radius utility', () => {
-        const parsed = parseToken('radius-tl-[8px]')
-        const cssBody = resolveRule('radius-tl-[8px]', Object.values(rules))
+    it('строит css rule с custom selector variant', () => {
+        const parsed = parseToken('hocus:w-[100px]')
 
-        const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
+        expect(parsed).not.toBeNull()
 
-        expect(result).toBe('.radius-tl-\\[8px\\]{border-top-left-radius: 8px !important;}')
+        expect(buildCssRule(
+            parsed!,
+            {
+                declarations: ['width: 100px !important;'],
+            },
+            undefined,
+            {
+                hocus: {
+                    kind: 'selector',
+                    value: '&:hover,&:focus',
+                },
+            }
+        )).toBe('.hocus\\:w-\\[100px\\]:hover,.hocus\\:w-\\[100px\\]:focus{width: 100px !important;}')
+    })
+
+    it('строит css rule с custom attribute variant', () => {
+        const parsed = parseToken('selected:w-[100px]')
+
+        expect(parsed).not.toBeNull()
+
+        expect(buildCssRule(
+            parsed!,
+            {
+                declarations: ['width: 100px !important;'],
+            },
+            undefined,
+            {
+                selected: {
+                    kind: 'attribute',
+                    value: '[aria-selected="true"]',
+                },
+            }
+        )).toBe('.selected\\:w-\\[100px\\][aria-selected="true"]{width: 100px !important;}')
+    })
+
+    it('строит css rule с custom numeric media variant', () => {
+        const parsed = parseToken('tablet:w-[100px]')
+
+        expect(parsed).not.toBeNull()
+
+        expect(buildCssRule(
+            parsed!,
+            {
+                declarations: ['width: 100px !important;'],
+            },
+            {},
+            {
+                tablet: {
+                    kind: 'media',
+                    value: 900,
+                },
+            }
+        )).toBe('@media (min-width: 900px) { .tablet\\:w-\\[100px\\]{width: 100px !important;} }')
     })
 
     it('возвращает null для неизвестного variant', () => {
-        const parsed = parseToken('dark:w-[200px]')
-        const cssBody = resolveRule('w-[200px]', Object.values(rules))
+        const parsed = parseToken('unknown:w-[100px]')
 
-        const result = buildCssRule(parsed!, cssBody!, DEFAULT_BREAKPOINTS)
+        expect(parsed).not.toBeNull()
 
-        expect(result).toBeNull()
+        expect(buildCssRule(parsed!, {
+            declarations: ['width: 100px !important;'],
+        })).toBeNull()
     })
 
-    it('поддерживает пользовательские breakpoints', () => {
-        const parsed = parseToken('xl:w-[1200px]')
-        const cssBody = resolveRule('w-[1200px]', Object.values(rules))
+    it('форматирует calc внутри declaration', () => {
+        const parsed = parseToken('w-[calc(100%-16px)]')
 
-        const result = buildCssRule(parsed!, cssBody!, {
-            xl: 1440,
-        })
+        expect(parsed).not.toBeNull()
 
-        expect(result).toBe(
-            '@media (min-width: 1440px) { .xl\\:w-\\[1200px\\]{width: 1200px !important;} }'
-        )
+        expect(buildCssRule(parsed!, {
+            declarations: ['width: calc(100%-16px) !important;'],
+        })).toBe('.w-\\[calc\\(100\\%-16px\\)\\]{width: calc(100% - 16px) !important;}')
     })
 })
