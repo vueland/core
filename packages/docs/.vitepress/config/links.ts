@@ -1,76 +1,94 @@
 import type { DefaultTheme } from 'vitepress'
+import type { Locale } from './i18n'
+import { getMessages, localePrefix } from './i18n'
+import * as components from './components'
+import * as utilities from './utilities'
 
-type Locale = 'en' | 'ru'
+function link(locale: Locale, path: string): string {
+    return `${localePrefix(locale)}${path}`
+}
 
-const componentGroups = [
-  { ru: 'Структурные', en: 'Structure', items: [['c-app ✅', 'CApp']] },
-  { ru: 'Элементы', en: 'Elements', items: [['c-btn ✅', 'CBtn'], ['c-label', 'CLabel'], ['c-field ✅', 'CField'], ['c-icon ✅', 'CIcon'], ['c-img', 'CImg']] },
-  { ru: 'Обертки', en: 'Wrappers', items: [['c-main', 'CMain'], ['c-card ✅', 'CCard'], ['c-list ✅', 'CList']] },
-  { ru: 'Всплывающие', en: 'Overlays', items: [['c-menu ✅', 'CMenu'], ['c-tooltip ✅', 'CTooltip'], ['c-dialog', 'CDialog']] },
-  { ru: 'Форма и поля', en: 'Forms and fields', items: [['c-form ✅', 'CForm'], ['c-text-field', 'CTextField'], ['c-autocomplete', 'CAutocomplete'], ['c-select', 'CSelect']] },
-  { ru: 'Селекты', en: 'Selection controls', items: [['c-checkbox', 'CCheckbox'], ['c-radio', 'CRadio'], ['c-switch', 'CSwitch']] },
-  { ru: 'Grid система', en: 'Grid system', items: [['c-grid', 'CGrid'], ['c-row', 'CRow'], ['c-col', 'CCol'], ['c-spacer', 'CSpacer']] },
-  { ru: 'Headless компоненты', en: 'Headless components', items: [['c-select-control ✅', 'CSelectControl'], ['c-input ✅', 'CInput'], ['c-overlay ✅', 'COverlay']] },
-]
-
-const utilities = [
-  ['Introduction', 'Введение', ''],
-  ['Colors', 'Палитра', 'colors'],
-  ['Position', 'Position', 'position'],
-  ['Spacing', 'Spacing', 'spacing'],
-  ['Flex', 'Flex', 'flex'],
-  ['Typography', 'Typography', 'typography'],
-  ['Display', 'Display', 'display'],
-  ['Overflow', 'Overflow', 'overflow'],
-  ['Sizing', 'Sizing', 'sizing'],
-  ['Opacity', 'Opacity', 'opacity'],
-  ['Text', 'Text', 'text'],
-  ['Radius', 'Radius', 'radius'],
-  ['Elevation', 'Elevation', 'elevation'],
-]
+function item(locale: Locale, section: string, source): DefaultTheme.SidebarItem {
+    return {
+        text: source.title,
+        link: link(locale, `/${section}/${source.file}`),
+    }
+}
 
 export function createNav(locale: Locale): DefaultTheme.NavItem[] {
-  const p = `/${locale}`
-  return locale === 'en'
-    ? [
-      { text: 'Guide', link: `${p}/guide/getting-started` },
-      { text: 'Components', link: `${p}/components/` },
-      { text: 'Utilities', link: `${p}/utilities/` },
-      { text: 'Settings', link: `${p}/settings/` },
-      { text: 'JIT Plugin', link: `${p}/plugin/` },
-    ]
-    : [
-      { text: 'Руководство', link: `${p}/guide/getting-started` },
-      { text: 'Компоненты', link: `${p}/components/` },
-      { text: 'Утилиты', link: `${p}/utilities/` },
-      { text: 'Настройки', link: `${p}/settings/` },
-      { text: 'JIT плагин', link: `${p}/plugin/` },
+    const t = getMessages(locale)
+
+    return [
+        { text: t.nav.guide, link: link(locale, '/guide/getting-started') },
+        { text: t.nav.components, link: link(locale, '/components/CBtn') },
+        { text: t.nav.utilities, link: link(locale, '/utilities/') },
+        { text: t.nav.settings, link: link(locale, '/settings/') },
+        {
+            text: t.nav.plugins,
+            link: link(locale, '/plugins/')
+        },
     ]
 }
 
 export function createSidebar(locale: Locale): DefaultTheme.Sidebar {
-  const p = `/${locale}`
-  const isEn = locale === 'en'
+    const t = getMessages(locale)
+    const p = localePrefix(locale)
 
-  return {
-    [`${p}/guide/`]: [
-      { text: isEn ? 'Guide' : 'Руководство', items: [{ text: isEn ? 'Getting started' : 'Установка', link: `${p}/guide/getting-started` }] },
-    ],
-    [`${p}/components/`]: componentGroups.map((group) => ({
-      text: isEn ? group.en : group.ru,
-      items: group.items.map(([text, file]) => ({ text, link: `${p}/components/${file}` })),
-    })),
-    [`${p}/settings/`]: [
-      { text: isEn ? 'Global settings' : 'Глобальные настройки', items: [
-        { text: isEn ? 'Introduction' : 'Введение', link: `${p}/settings/` },
-        { text: isEn ? 'CSS variables' : 'CSS переменные', link: `${p}/settings/css-vars` },
-      ] },
-    ],
-    [`${p}/utilities/`]: [
-      { text: isEn ? 'Utility classes' : 'Утилитарные классы', items: utilities.map(([en, ru, file]) => ({ text: isEn ? en : ru, link: `${p}/utilities/${file}` })) },
-    ],
-    [`${p}/plugin/`]: [
-      { text: 'Utils JIT', items: [{ text: isEn ? 'Guide' : 'Инструкция', link: `${p}/plugin/` }] },
-    ],
-  }
+    return {
+        [`${p}/guide/`]: [
+            {
+                text: t.sidebar.guide.title,
+                items: [
+                    {
+                        text: t.sidebar.guide.gettingStarted,
+                        link: link(locale, '/guide/getting-started'),
+                    },
+                ],
+            },
+        ],
+
+        [`${p}/components/`]: components[locale].map((group) => ({
+            text: group.title,
+            items: group.items.map((source) => item(locale, 'components', source)),
+        })),
+
+        [`${p}/settings/`]: [
+            {
+                text: t.sidebar.settings.title,
+                items: [
+                    {
+                        text: t.sidebar.settings.introduction,
+                        link: link(locale, '/settings/'),
+                    },
+                    {
+                        text: t.sidebar.settings.cssVars,
+                        link: link(locale, '/settings/css-vars'),
+                    },
+                ],
+            },
+        ],
+
+        [`${p}/utilities/`]: [
+            {
+                text: t.sidebar.utilities.title,
+                items: utilities[locale].map((source) => item(locale, 'utilities', source)),
+            },
+        ],
+
+        [`${p}/plugins/`]: [
+            {
+                text: t.sidebar.plugins.title,
+                items: [
+                    {
+                        text: t.sidebar.plugins.guide,
+                        link: link(locale, '/plugins/'),
+                    },
+                    {
+                        text: 'Utils JIT',
+                        link: link(locale, '/plugins/utils-jit'),
+                    },
+                ],
+            },
+        ],
+    }
 }

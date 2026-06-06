@@ -11,7 +11,6 @@
 - [CDialog](./CDialog)
 - [CField](./CField)
 - [CForm](./CForm)
-- [CGrid](./CGrid)
 - [CIcon](./CIcon)
 - [CImg](./CImg)
 - [CInput](./CInput)

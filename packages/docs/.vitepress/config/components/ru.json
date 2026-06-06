@@ -1,0 +1,29 @@
+[
+  {
+    "title": "Общие",
+    "items": [
+      {
+        "file": "CApp",
+        "title": "CApp"
+      }
+    ]
+  },
+  {
+    "title": "Поля формы",
+    "items": [
+      {
+        "file": "CInput",
+        "title": "CInput"
+      }
+    ]
+  },
+  {
+    "title": "Действия",
+    "items": [
+      {
+        "file": "CBtn",
+        "title": "CBtn"
+      }
+    ]
+  }
+]

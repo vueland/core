@@ -1,39 +1,40 @@
 import { createNav, createSidebar } from './links'
+import { getMessages } from './i18n'
 import { githubLink } from './shared'
 
+const t = getMessages('ru')
+
 export const ruConfig = {
-    label: 'Русский',
-    lang: 'ru-RU',
+    label: t.label,
+    lang: t.lang,
     link: '/ru/',
-    title: 'Vueland',
-    description: 'Современная frontend-платформа для Vue 3',
+    title: t.title,
+    description: t.description,
     themeConfig: {
         logo: '/logo.png',
         siteTitle: 'Vueland',
         nav: createNav('ru'),
         sidebar: createSidebar('ru'),
         outline: {
-            label: 'Содержание страницы',
-            level: 'deep' as const,
+            label: t.theme.outline,
+            level: 'deep' as const
         },
         docFooter: {
-            prev: 'Предыдущая страница',
-            next: 'Следующая страница',
+            prev: t.theme.docFooterPrev,
+            next: t.theme.docFooterNext,
         },
-        darkModeSwitchLabel: 'Оформление',
-        lightModeSwitchTitle: 'Переключить на светлую тему',
-        darkModeSwitchTitle: 'Переключить на тёмную тему',
-        returnToTopLabel: 'Наверх',
-        sidebarMenuLabel: 'Меню',
-        langMenuLabel: 'Сменить язык',
-        socialLinks: [
-            {
-                icon: 'github' as const,
-                link: githubLink,
-            },
-        ],
+        darkModeSwitchLabel: t.theme.darkModeSwitchLabel,
+        lightModeSwitchTitle: t.theme.lightModeSwitchTitle,
+        darkModeSwitchTitle: t.theme.darkModeSwitchTitle,
+        returnToTopLabel: t.theme.returnToTopLabel,
+        sidebarMenuLabel: t.theme.sidebarMenuLabel,
+        langMenuLabel: t.theme.langMenuLabel,
+        socialLinks: [{
+            icon: 'github' as const,
+            link: githubLink
+        }],
         search: {
-            provider: 'local' as const,
+            provider: 'local' as const
         },
     },
 }

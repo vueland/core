@@ -129,8 +129,8 @@ function createHotContext(file: string, code: string) {
     } as any
 }
 
-describe('plugin / base shape', () => {
-    it('создаёт vite plugin с ожидаемыми хуками', () => {
+describe('plugins / base shape', () => {
+    it('создаёт vite plugins с ожидаемыми хуками', () => {
         const plugin = utilsJIT()
 
         expect(plugin.name).toBe('utils-jit')
@@ -144,7 +144,7 @@ describe('plugin / base shape', () => {
     })
 })
 
-describe('plugin / filesystem integration', () => {
+describe('plugins / filesystem integration', () => {
     let project: ReturnType<typeof createTempProject>
 
     beforeEach(() => {

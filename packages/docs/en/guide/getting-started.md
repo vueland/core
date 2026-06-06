@@ -35,7 +35,7 @@ Use the plugin in the application entry point.
 ```ts
 import { createApp } from 'vue'
 import App from './App.vue'
-import { vueland } from './plugin'
+import { vueland } from './plugins'
 
 const app = createApp(App)
 

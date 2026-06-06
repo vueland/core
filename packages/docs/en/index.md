@@ -20,7 +20,7 @@ and a Vite JIT plugin that generates CSS from real source usage.
 </p>
 
 <div class="vueland-hero__actions">
-<a class="vueland-button vueland-button--primary" href="/en/guide/getting-started">Get started</a>
+<a class="vueland-button vueland-button--primary" href="/vueland/en/guide/getting-started">Get started</a>
 </div>
 </div>
 </section>
