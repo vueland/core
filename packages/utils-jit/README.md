@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="logo.png" style="max-width: 100%;">
+</div>
+
 # @vueland/utils-jit
 
 A lightweight Vite JIT utility engine for generating CSS from arbitrary utility classes.
