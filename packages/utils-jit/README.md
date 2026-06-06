@@ -11,7 +11,6 @@ A lightweight Vite JIT utility engine for generating CSS from arbitrary utility 
 It is designed for Vueland and Vue 3 projects, but can be used in any Vite-based application.
 
 ## Features
-
 - JIT CSS generation for arbitrary utility classes
 - Vite plugin integration
 - Incremental updates during development
