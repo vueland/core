@@ -41,7 +41,7 @@ Add `utilsJIT()` to your `vite.config.ts`.
 
 ```ts
 import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import vue from '@vitejs/plugins-vue'
 import { utilsJIT } from '@vueland/utils-jit'
 
 export default defineConfig({
@@ -484,7 +484,7 @@ Generated CSS:
 
 ```ts
 import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import vue from '@vitejs/plugins-vue'
 import { utilsJIT } from '@vueland/utils-jit'
 
 export default defineConfig({
@@ -657,7 +657,7 @@ The plugin can be extended with custom rules through `rules` and `defineRule`.
 
 ```ts
 import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import vue from '@vitejs/plugins-vue'
 import {
   defineRule,
   isColorValue,
@@ -1026,7 +1026,7 @@ defineRule({
 
 ```ts
 import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import vue from '@vitejs/plugins-vue'
 import {
   defineRule,
   isColorValue,

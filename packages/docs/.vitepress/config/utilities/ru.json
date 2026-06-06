@@ -1,0 +1,18 @@
+[
+  {
+    "file": "",
+    "title": "Введение"
+  },
+  {
+    "file": "text",
+    "title": "Текст"
+  },
+  {
+    "file": "radius",
+    "title": "Радиусы"
+  },
+  {
+    "file": "elevation",
+    "title": "Тени"
+  }
+]

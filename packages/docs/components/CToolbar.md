@@ -1,3 +1,0 @@
-# CToolbar
-## CToolbarLogo
-## CToolbarItems

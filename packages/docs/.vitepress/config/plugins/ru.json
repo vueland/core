@@ -1,0 +1,27 @@
+[
+  {
+    "title": "Utils JIT",
+    "items": [
+      {
+        "title": "Быстрый старт",
+        "file": "utils-jit/getting-started"
+      } ,
+      {
+        "title": "Конфигурация",
+        "file": "utils-jit/configuration"
+      } ,
+      {
+        "title": "Пользовательские правила",
+        "file": "utils-jit/custom-rules"
+      },
+      {
+        "title": "Утилитарные классы",
+        "file": "utils-jit/utilities"
+      },
+      {
+        "title": "Вариативность",
+        "file": "utils-jit/variants"
+      }
+    ]
+  }
+]
