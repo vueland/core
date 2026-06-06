@@ -36,7 +36,6 @@ export type LocaleMessages = {
 
         plugins: {
             title: string
-            guide: string
         }
     }
 
@@ -88,7 +87,6 @@ export const messages: Record<Locale, LocaleMessages> = {
 
             plugins: {
                 title: 'Plugins',
-                guide: 'Guide',
             },
         },
 
@@ -139,7 +137,6 @@ export const messages: Record<Locale, LocaleMessages> = {
 
             plugins: {
                 title: 'Плагины',
-                guide: 'Инструкция',
             },
         },
 

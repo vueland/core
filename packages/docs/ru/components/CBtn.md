@@ -1,4 +1,4 @@
-# CAutocomplete
+# CBtn
 
 `CBtn` — компонент библиотеки Vueland UI.
 

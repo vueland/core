@@ -1,8 +1,10 @@
 import type { DefaultTheme } from 'vitepress'
 import type { Locale } from './i18n'
 import { getMessages, localePrefix } from './i18n'
+// Locales
 import * as components from './components'
 import * as utilities from './utilities'
+import * as plugins from './plugins'
 
 function link(locale: Locale, path: string): string {
     return `${localePrefix(locale)}${path}`
@@ -75,20 +77,9 @@ export function createSidebar(locale: Locale): DefaultTheme.Sidebar {
             },
         ],
 
-        [`${p}/plugins/`]: [
-            {
-                text: t.sidebar.plugins.title,
-                items: [
-                    {
-                        text: t.sidebar.plugins.guide,
-                        link: link(locale, '/plugins/'),
-                    },
-                    {
-                        text: 'Utils JIT',
-                        link: link(locale, '/plugins/utils-jit'),
-                    },
-                ],
-            },
-        ],
+        [`${p}/plugins/`]: plugins[locale].map((group) => ({
+            text: group.title,
+            items: group.items.map((source) => item(locale, 'plugins', source)),
+        })),
     }
 }

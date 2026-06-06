@@ -25,7 +25,13 @@ export default defineConfig({
                         transform: `translate(${value})`,
                     })
                 })
-            ]
+            ],
+            variants: {
+                tablet: {
+                    kind: 'media',
+                    value: 900,
+                },
+            }
         }) as PluginOption
     ],
     resolve: {
