@@ -39,8 +39,6 @@
     const fieldAttrs = useFieldAttrs({ props, attrs, errors, uid })
 
     const hasLabel = computed(() => !!slots.label || !!props.label)
-    const hasPrepend = computed(() => !!slots?.prepend)
-    const hasAppend = computed(() => !!slots?.append)
     const hasDetails = computed(() => !props.noDetails && (props.details || !!slots?.details))
 
     const classes = computed(() => [
@@ -51,8 +49,8 @@
             'c-input--disabled': props.disabled,
             'c-input--readonly': props.readonly,
             'c-input--has-value': state.hasValue,
-            'c-input--has-prepend': unref(hasPrepend),
-            'c-input--has-append': unref(hasAppend),
+            'c-input--has-prepend': !!slots?.prepend,
+            'c-input--has-append': !!slots?.append,
             [attrs.class as string]: !!attrs.class,
         },
         ...unref(preset).root
