@@ -22,8 +22,8 @@
     })
 
     const props = defineProps<CInputProps<T>>()
-    const slots = defineSlots<CInputSlots>()
-    const emit = defineEmits<CInputEmits>()
+    const slots = defineSlots<CInputSlots<T>>()
+    const emit = defineEmits<CInputEmits<T>>()
 
     const state = shallowReactive<InputState>({
         focused: props.focused ?? false,
@@ -31,23 +31,21 @@
         hasValue: false,
     })
 
-    const {
-        errors,
-        validate
-    } = useValidate(props, state)
-
+    const { errors, validate } = useValidate(props, state)
     const formApi = useForm()
     const attrs = useAttrs()
 
     const preset = useInputPresets({
         props,
         state,
+        slots,
         errors
     })
 
     const fieldId = `input-${props.id ?? unique(6)}`
 
     const hasLabel = computed(() => !!slots.label || !!props.label)
+
     const hasDetails = computed(() => !props.noDetails && (
         !!props.details ||
         !!slots?.details ||
@@ -56,7 +54,7 @@
 
     const normalizedAttrsMap = computed(() => Object.entries(attrs).reduce((acc, [k, v]) => {
         if (
-            (!(k in props) && FIELD_ATTRS.has(k))
+            (FIELD_ATTRS.has(k))
             || k.startsWith('aria-')
             || k.startsWith('data-')
         ) {
@@ -71,7 +69,7 @@
         ...(unref(hasLabel) ? { 'aria-labelledby': `${fieldId}-label` } : {}),
         ...(unref(hasDetails) ? { 'aria-describedby': `${fieldId}-details` } : {}),
         ...(errors.hasError ? { 'aria-invalid': 'true' } : {}),
-        ...(errors.errorMessage ? { 'aria-errormessage': `${fieldId}-details` } : {}),
+        ...(errors.errorMessage && unref(hasDetails) ? { 'aria-errormessage': `${fieldId}-details` } : {}),
         ...(props.readonly ? { 'aria-readonly': 'true' } : {}),
         ...(props.disabled ? { 'aria-disabled': 'true' } : {}),
     }))
@@ -111,8 +109,12 @@
         emit('blur', state.focused)
     }
 
-    function onInput(val: string | number) {
+    function onInput(val: T) {
         emit('input', val)
+    }
+
+    function onClear() {
+        emit('clear')
     }
 
     watch(() => props.modelValue, (value) => {
@@ -132,6 +134,7 @@
         validate,
         onFocus,
         onBlur,
+        onClear,
         onInput
     })
 </script>
@@ -147,6 +150,7 @@
             <div
                 v-if="$slots.prepend"
                 class="c-input__prepend"
+                :class="preset.prepend"
             >
                 <slot name="prepend" />
             </div>
@@ -161,13 +165,23 @@
                 :uid="fieldId"
                 :presets="preset.field"
                 :on-focus
+                :on-clear
                 :on-blur
                 :on-input
                 :attrs="fieldAttrs"
             />
             <div
+                v-if="clearable"
+                class="c-input__clear"
+            >
+                <slot name="clear">
+                    <c-icon @click="onClear" />
+                </slot>
+            </div>
+            <div
                 v-if="$slots.append"
                 class="c-input__append"
+                :class="preset.append"
             >
                 <slot name="append" />
             </div>

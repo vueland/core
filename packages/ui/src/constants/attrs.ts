@@ -1,7 +1,6 @@
 export const FIELD_ATTRS = new Set([
     'type',
     'name',
-    'id',
     'placeholder',
     'autocomplete',
     'autofocus',

@@ -2,7 +2,7 @@
 
 </script>
 <template>
-    <c-dialog>
+    <c-dialog :model-value="true">
         <c-card class="elevation-2 w-[300px]">
             <c-card-header>
                 <h2>Hello</h2>

@@ -22,7 +22,7 @@ export function createNav(locale: Locale): DefaultTheme.NavItem[] {
 
     return [
         { text: t.nav.guide, link: link(locale, '/guide/getting-started') },
-        { text: t.nav.components, link: link(locale, '/components/CBtn') },
+        { text: t.nav.components, link: link(locale, '/components/') },
         { text: t.nav.utilities, link: link(locale, '/utilities/') },
         { text: t.nav.settings, link: link(locale, '/settings/') },
         {

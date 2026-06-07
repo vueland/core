@@ -8,10 +8,13 @@
     "declaration": true,
     "emitDeclarationOnly": false,
     "declarationMap": true,
-    "outDir": "dist/temp-types",
+    "outDir": "dist/temp-types"
   },
   "include": [
     "src",
     "env.d.ts"
+  ],
+  "exclude": [
+    "**/*.spec.ts"
   ]
 }

@@ -1,17 +1,17 @@
 import { defineComponent, h, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { CMenu } from '../../src/components/CMenu'
+import { CMenu } from './index'
 
-vi.mock('../../src/utils/globals', () => ({
+vi.mock('../../utils/globals', () => ({
     IN_BROWSER: true,
 }))
 
-vi.mock('../../src/utils/throttle', () => ({
+vi.mock('../../utils/throttle', () => ({
     throttle: (fn: (...args: any[]) => any) => fn,
 }))
 
-vi.mock('../../src/composables/use-application', () => ({
+vi.mock('../../composables/use-application', () => ({
     useApplication: () => ({
         getScrollTop: () => window.pageYOffset || window.scrollY || 0,
         getScrollLeft: () => window.pageXOffset || window.scrollX || 0,
@@ -19,8 +19,8 @@ vi.mock('../../src/composables/use-application', () => ({
 }))
 
 // COverlay тянет useOverlayStack из barrel-модуля composables
-vi.mock('../../src/composables', async () => {
-    const actual = await vi.importActual<any>('../../src/composables')
+vi.mock('../../composables', async () => {
+    const actual = await vi.importActual<any>('../../composables')
 
     return {
         ...actual,

@@ -10,9 +10,10 @@ export default [
             "**/dist/**",
             "**/.vitepress/cache/**",
             "**/.vitepress/dist/**",
-            "**/tests/**",
+            "**/__tests__/**",
             "**/node_modules/**",
             "packages/playground",
+            "packages/docs",
         ],
     },
 

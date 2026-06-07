@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { computed, onBeforeUnmount, shallowRef, unref, watch } from 'vue'
+    import { computed, onBeforeUnmount, shallowRef, unref,watchEffect } from 'vue'
     import { useOverlayStack } from '../../composables'
     import type { COverlayProps, COverlaySlots } from './tyoes'
 
@@ -18,13 +18,13 @@
 
     const target = computed(() => props.to ?? 'body')
 
-    watch(model, (val) => {
-        if (val) {
+    watchEffect(() => {
+        if (unref(model)) {
             zIndex.value = register()
         } else {
             unregister()
         }
-    }, { immediate: true })
+    })
 
     onBeforeUnmount(() => {
         if (unref(model)) {

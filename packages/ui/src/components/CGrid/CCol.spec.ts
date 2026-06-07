@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { BREAKPOINTS } from '../../src/constants'
-import { CCol } from '../../src/components'
+import { BREAKPOINTS } from '../../constants'
+import { CCol } from '../index'
 
 describe('CCol', () => {
     it('рендерится как div', () => {
