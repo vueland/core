@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h, inject, nextTick } from 'vue'
-import { CApp, CBtn } from '../../src/components'
-import { $APP_API_KEY } from '../../src/constants'
+import { CApp, CBtn } from '../index'
+import { $APP_API_KEY } from '../../constants'
 
 describe('CApp', () => {
     const scrollToMock = vi.fn()

@@ -3,11 +3,11 @@ import { defineComponent, h, nextTick, reactive } from 'vue'
 import { mount } from '@vue/test-utils'
 import {
     InputEvents,
-    type InputState,
     type ValidateFn,
     type ValidateProps,
     useValidate,
-} from '../../src/composables'
+} from '../index'
+import type { InputState } from '../../components'
 
 type TestComponentVm = {
     errors: {

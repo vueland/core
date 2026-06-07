@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { defineComponent, h, inject, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 
-import { CList } from '../../src/components'
-import { $LIST_API_KEY } from '../../src/constants'
+import { CList } from '../index'
+import { $LIST_API_KEY } from '../../constants'
 
 type ListApi<T> = {
     model: { value: T | T[] | null }
@@ -14,10 +14,10 @@ type ListApi<T> = {
 
 describe('CList', () => {
     it('провайдит api по ключу $LIST_API_KEY', () => {
-        const Probe = defineComponent({
-            name: 'Probe',
+        const CProbe = defineComponent({
+            name: 'CProbe',
             setup() {
-                const api = inject<ListApi<number>>($LIST_API_KEY, null)
+                const api = inject<ListApi<number>>($LIST_API_KEY, {} as any)
                 return { api }
             },
             template: '<div />',
@@ -25,11 +25,11 @@ describe('CList', () => {
 
         const wrapper = mount(CList<number>, {
             slots: {
-                default: () => h(Probe),
+                default: () => h(CProbe),
             },
         })
 
-        const probe = wrapper.findComponent(Probe)
+        const probe = wrapper.findComponent(CProbe)
 
         expect((probe.vm as any).api).toBeTruthy()
         expect(typeof (probe.vm as any).api.select).toBe('function')
@@ -68,7 +68,7 @@ describe('CList', () => {
                 return () =>
                     h(CList<number>, {
                         modelValue: model.value,
-                        'onUpdate:modelValue': (v: number | null) => {
+                        'onUpdate:modelValue': (v: any) => {
                             model.value = v
                         },
                     }, {
@@ -98,7 +98,7 @@ describe('CList', () => {
                 return () =>
                     h(CList<number>, {
                         modelValue: model.value,
-                        'onUpdate:modelValue': (v: number | null) => {
+                        'onUpdate:modelValue': (v: any) => {
                             model.value = v
                         },
                     }, {
@@ -126,7 +126,7 @@ describe('CList', () => {
                 return () =>
                     h(CList<number>, {
                         modelValue: model.value,
-                        'onUpdate:modelValue': (v: number | null) => {
+                        'onUpdate:modelValue': (v: any) => {
                             model.value = v
                         },
                     }, {
@@ -156,7 +156,7 @@ describe('CList', () => {
                     h(CList<number>, {
                         mandatory: true,
                         modelValue: model.value,
-                        'onUpdate:modelValue': (v: number | null) => {
+                        'onUpdate:modelValue': (v: any) => {
                             model.value = v
                         },
                     }, {
@@ -186,7 +186,7 @@ describe('CList', () => {
                     h(CList<number>, {
                         multiple: true,
                         modelValue: model.value,
-                        'onUpdate:modelValue': (v: number[]) => {
+                        'onUpdate:modelValue': (v: any) => {
                             model.value = v
                         },
                     }, {
@@ -216,7 +216,7 @@ describe('CList', () => {
                     h(CList<number>, {
                         multiple: true,
                         modelValue: model.value,
-                        'onUpdate:modelValue': (v: number[]) => {
+                        'onUpdate:modelValue': (v: any) => {
                             model.value = v
                         },
                     }, {
@@ -253,7 +253,7 @@ describe('CList', () => {
                     h(CList<number>, {
                         multiple: true,
                         modelValue: model.value,
-                        'onUpdate:modelValue': (v: number[]) => {
+                        'onUpdate:modelValue': (v: any) => {
                             model.value = v
                         },
                     }, {
@@ -284,7 +284,7 @@ describe('CList', () => {
                     h(CList<number>, {
                         multiple: true,
                         modelValue: model.value,
-                        'onUpdate:modelValue': (v: number[]) => {
+                        'onUpdate:modelValue': (v: any) => {
                             model.value = v
                         },
                     }, {
@@ -313,7 +313,7 @@ describe('CList', () => {
                     h(CList<number>, {
                         readonly: true,
                         modelValue: model.value,
-                        'onUpdate:modelValue': (v: number | null) => {
+                        'onUpdate:modelValue': (v: any) => {
                             model.value = v
                         },
                     }, {
@@ -343,7 +343,7 @@ describe('CList', () => {
                     h(CList<number>, {
                         readonly: true,
                         modelValue: model.value,
-                        'onUpdate:modelValue': (v: number | null) => {
+                        'onUpdate:modelValue': (v: any) => {
                             model.value = v
                         },
                     }, {
@@ -375,7 +375,7 @@ describe('CList', () => {
                 return () =>
                     h(CList<{ id: number }>, {
                         modelValue: model.value,
-                        'onUpdate:modelValue': (v: { id: number } | null) => {
+                        'onUpdate:modelValue': (v: any) => {
                             model.value = v as { id: number }
                         },
                     }, {
@@ -405,7 +405,7 @@ describe('CList', () => {
                     h(CList<{ id: number }>, {
                         multiple: true,
                         modelValue: model.value,
-                        'onUpdate:modelValue': (v: { id: number }[]) => {
+                        'onUpdate:modelValue': (v: any) => {
                             model.value = v
                         },
                     }, {

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import CInput from '../../src/components/CInput/CInput.vue'
+import CInput from './CInput.vue'
 
 const formMock = vi.hoisted(() => ({
     add: vi.fn(),
@@ -12,8 +12,18 @@ const formMock = vi.hoisted(() => ({
     },
 }))
 
-vi.mock('../../src/composables', async () => {
-    const actual = await vi.importActual<typeof import('../../src/composables')>('../../src/composables')
+const coreMock = vi.hoisted(() => ({
+    presets: {} as Record<string, any>,
+}))
+
+vi.mock('../../composables/use-core', () => ({
+    useCore: vi.fn(() => ({
+        presets: coreMock.presets,
+    })),
+}))
+
+vi.mock('../../composables', async () => {
+    const actual = await vi.importActual<typeof import('../../composables')>('../../composables')
 
     return {
         ...actual,
@@ -45,6 +55,8 @@ function createWrapper(
                         class="test-field"
                         :id="uid"
                         v-bind="attrs"
+                        :disabled="disabled"
+                        :readonly="readonly"
                         :data-focused="String(focused)"
                         :data-disabled="String(disabled)"
                         :data-readonly="String(readonly)"
@@ -92,6 +104,19 @@ describe('CInput', () => {
         formMock.api = {
             add: formMock.add,
             remove: formMock.remove,
+        }
+
+        coreMock.presets = {
+            input: {
+                default: {
+                    root: ['preset-root'],
+                    field: ['preset-field'],
+                    label: ['preset-label'],
+                    details: ['preset-details'],
+                    prepend: ['preset-prepend'],
+                    append: ['preset-append'],
+                },
+            },
         }
     })
 
@@ -165,6 +190,13 @@ describe('CInput', () => {
         expect(wrapper.find('.c-input__label').exists()).toBe(false)
     })
 
+    it('не добавляет aria-labelledby, если label отсутствует', () => {
+        const wrapper = createWrapper()
+
+        expect(wrapper.find('.c-input__label').exists()).toBe(false)
+        expect(wrapper.get('.test-field').attributes('aria-labelledby')).toBeUndefined()
+    })
+
     it('создает details-контейнер, если передан props.details', () => {
         const wrapper = createWrapper({
             id: 'password',
@@ -209,6 +241,15 @@ describe('CInput', () => {
         expect(wrapper.find('.c-input__details').exists()).toBe(false)
     })
 
+    it('не рендерит details, если props.details — пустая строка', () => {
+        const wrapper = createWrapper({
+            details: '',
+        })
+
+        expect(wrapper.find('.c-input__details').exists()).toBe(false)
+        expect(wrapper.get('.test-field').attributes('aria-describedby')).toBeUndefined()
+    })
+
     it('добавляет aria-describedby, если есть props.details', () => {
         const wrapper = createWrapper({
             id: 'email',
@@ -251,6 +292,30 @@ describe('CInput', () => {
 
         expect(wrapper.find('.c-input__details').exists()).toBe(false)
         expect(wrapper.get('.test-field').attributes('aria-describedby')).toBeUndefined()
+    })
+
+    it('не добавляет aria-describedby и aria-errormessage при ошибке, если noDetails=true', async () => {
+        const wrapper = createWrapper({
+            id: 'email',
+            noDetails: true,
+            modelValue: '',
+            rules: [
+                () => ({
+                    valid: false,
+                    message: 'Ошибка',
+                }),
+            ],
+        })
+
+        await (wrapper.vm as any).validate()
+        await nextTick()
+
+        const input = wrapper.get('.test-field')
+
+        expect(wrapper.find('.c-input__details').exists()).toBe(false)
+        expect(input.attributes('aria-invalid')).toBe('true')
+        expect(input.attributes('aria-describedby')).toBeUndefined()
+        expect(input.attributes('aria-errormessage')).toBeUndefined()
     })
 
     it('передает errors в details slot после неуспешной validate', async () => {
@@ -426,6 +491,67 @@ describe('CInput', () => {
         expect(input.attributes('data-test-id')).toBe('email-input')
     })
 
+    it('прокидывает validation-related attrs в field slot', () => {
+        const wrapper = createWrapper(
+            {},
+            {
+                attrs: {
+                    required: true,
+                    minlength: 3,
+                    maxlength: 10,
+                    pattern: '[a-z]+',
+                },
+            },
+        )
+
+        const input = wrapper.get('.test-field')
+
+        expect(input.attributes('required')).toBeDefined()
+        expect(input.attributes('minlength')).toBe('3')
+        expect(input.attributes('maxlength')).toBe('10')
+        expect(input.attributes('pattern')).toBe('[a-z]+')
+    })
+
+    it('прокидывает readonly и disabled из attrs в field attrs', () => {
+        const wrapper = createWrapper(
+            {},
+            {
+                attrs: {
+                    readonly: true,
+                    disabled: true,
+                },
+            },
+        )
+
+        const input = wrapper.get('.test-field')
+
+        expect(input.attributes('readonly')).toBeDefined()
+        expect(input.attributes('disabled')).toBeDefined()
+    })
+
+    it('не прокидывает id из attrs в field attrs и не ломает связку label/input', () => {
+        const wrapper = createWrapper(
+            {
+                label: 'Email',
+            },
+            {
+                attrs: {
+                    id: 'external-id',
+                },
+            },
+        )
+
+        const input = wrapper.get('.test-field')
+        const label = wrapper.get('.c-label-stub')
+        const inputId = input.attributes('id')
+
+        expect(inputId).toMatch(/^input-.+/)
+        expect(inputId).not.toBe('external-id')
+        expect(label.attributes('for')).toBe(inputId)
+        expect(label.attributes('id')).toBe(`${inputId}-label`)
+        expect(input.attributes('aria-labelledby')).toBe(label.attributes('id'))
+    })
+
     it('не прокидывает неизвестные attrs в field slot', () => {
         const wrapper = createWrapper(
             {},
@@ -509,6 +635,40 @@ describe('CInput', () => {
 
         expect(input.attributes('aria-invalid')).toBe('true')
         expect(input.attributes('aria-errormessage')).toBeUndefined()
+    })
+
+    it('controlled aria перезаписывает пользовательские aria attrs', async () => {
+        const wrapper = createWrapper(
+            {
+                id: 'email',
+                label: 'Email',
+                details: 'Введите email',
+                rules: [
+                    () => ({
+                        valid: false,
+                        message: 'Ошибка',
+                    }),
+                ],
+            },
+            {
+                attrs: {
+                    'aria-labelledby': 'external-label',
+                    'aria-describedby': 'external-details',
+                    'aria-invalid': 'false',
+                    'aria-errormessage': 'external-error',
+                },
+            },
+        )
+
+        await (wrapper.vm as any).validate()
+        await nextTick()
+
+        const input = wrapper.get('.test-field')
+
+        expect(input.attributes('aria-labelledby')).toBe('input-email-label')
+        expect(input.attributes('aria-describedby')).toBe('input-email-details')
+        expect(input.attributes('aria-invalid')).toBe('true')
+        expect(input.attributes('aria-errormessage')).toBe('input-email-details')
     })
 
     it('добавляет aria-readonly и aria-disabled из props', () => {
@@ -629,6 +789,8 @@ describe('CInput', () => {
 
         expect(input.attributes('data-disabled')).toBe('true')
         expect(input.attributes('data-readonly')).toBe('true')
+        expect(input.attributes('disabled')).toBeDefined()
+        expect(input.attributes('readonly')).toBeDefined()
     })
 
     it('ставит c-input--has-value для непустой строки', () => {
@@ -650,23 +812,10 @@ describe('CInput', () => {
     it('ставит c-input--has-value для числа 0', () => {
         const wrapper = createWrapper({
             modelValue: 0,
+            type: 'number',
         })
 
         expect(wrapper.classes()).toContain('c-input--has-value')
-    })
-
-    it('не ставит c-input--has-value для null и undefined', async () => {
-        const wrapper = createWrapper({
-            modelValue: null,
-        })
-
-        expect(wrapper.classes()).not.toContain('c-input--has-value')
-
-        await wrapper.setProps({
-            modelValue: undefined,
-        })
-
-        expect(wrapper.classes()).not.toContain('c-input--has-value')
     })
 
     it('ставит c-input--has-value для непустого массива', () => {
@@ -680,6 +829,20 @@ describe('CInput', () => {
     it('не ставит c-input--has-value для пустого массива', () => {
         const wrapper = createWrapper({
             modelValue: [],
+        })
+
+        expect(wrapper.classes()).not.toContain('c-input--has-value')
+    })
+
+    it('не ставит c-input--has-value для null и undefined', async () => {
+        const wrapper = createWrapper({
+            modelValue: null,
+        })
+
+        expect(wrapper.classes()).not.toContain('c-input--has-value')
+
+        await wrapper.setProps({
+            modelValue: undefined,
         })
 
         expect(wrapper.classes()).not.toContain('c-input--has-value')
@@ -851,5 +1014,50 @@ describe('CInput', () => {
         expect(wrapper.get('.test-field').attributes('aria-describedby')).toBe('input-email-details')
         expect(wrapper.get('.test-field').attributes('aria-errormessage')).toBe('input-email-details')
         expect(wrapper.find('.c-input__details').exists()).toBe(true)
+    })
+
+    it('применяет preset-классы к DOM-зонам CInput', () => {
+        const wrapper = createWrapper(
+            {
+                preset: 'input.default',
+                label: 'Email',
+                details: 'Введите email',
+            },
+            {
+                slots: {
+                    prepend: '<span>before</span>',
+                    append: '<span>after</span>',
+                },
+            },
+        )
+
+        expect(wrapper.classes()).toContain('preset-root')
+        expect(wrapper.get('.c-input__field').classes()).toContain('preset-field')
+        expect(wrapper.get('.c-input__label').classes()).toContain('preset-label')
+        expect(wrapper.get('.c-input__details').classes()).toContain('preset-details')
+        expect(wrapper.get('.c-input__prepend').classes()).toContain('preset-prepend')
+        expect(wrapper.get('.c-input__append').classes()).toContain('preset-append')
+    })
+
+    it('передает field preset в field slot как presets', () => {
+        const wrapper = createWrapper(
+            {
+                preset: 'input.default',
+            },
+            {
+                slots: {
+                    field: `
+                        <template #field="{ presets }">
+                            <div
+                                class="custom-field"
+                                :data-presets="presets.join(' ')"
+                            />
+                        </template>
+                    `,
+                },
+            },
+        )
+
+        expect(wrapper.get('.custom-field').attributes('data-presets')).toContain('preset-field')
     })
 })

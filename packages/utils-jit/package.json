@@ -2,6 +2,7 @@
   "name": "@vueland/utils-jit",
   "description": "Vite JIT utility engine for Vueland",
   "version": "0.2.3",
+  "license": "MIT",
   "type": "module",
   "private": false,
   "main": "./dist/index.cjs",
@@ -10,6 +11,11 @@
   "author": {
     "name": "Anar Allakhverdiev",
     "url": "https://github.com/wiseadme"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vueland/vueland.git",
+    "directory": "/"
   },
   "exports": {
     ".": {
@@ -28,7 +34,8 @@
     "clean": "rm -rf dist",
     "test:deploy": "vitest run -c vitest.config.ts",
     "test:jit": "vitest run -c vitest.config.ts",
-    "lint:jit": "eslint ."
+    "lint:jit": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
     "vite": "^7.0.0"

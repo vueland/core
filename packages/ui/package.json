@@ -3,10 +3,16 @@
   "description": "Vue 3 component library for the Vueland platform",
   "version": "0.0.1",
   "private": false,
+  "license": "MIT",
   "type": "module",
   "author": {
     "name": "Anar Allakhverdiev",
     "url": "https://github.com/wiseadme"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vueland/vueland.git",
+    "directory": "/"
   },
   "sideEffects": [
     "**/*.scss",

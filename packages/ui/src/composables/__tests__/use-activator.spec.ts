@@ -1,7 +1,7 @@
 import { defineComponent, h } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
-import { useActivator } from '../../src/composables'
+import { useActivator } from '../index'
 
 describe('useActivator', () => {
     const mountComposable = (props: Record<string, any> = {}) => {

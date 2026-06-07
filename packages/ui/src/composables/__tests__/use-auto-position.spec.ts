@@ -1,9 +1,9 @@
 import { defineComponent, h, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { useAutoPosition } from '../../src/composables'
+import { useAutoPosition } from '../index'
 
-vi.mock('../../src/composables/use-application', () => ({
+vi.mock('../../composables/use-application', () => ({
     useApplication: () => ({
         getScrollTop: () => window.pageYOffset || window.scrollY || 0,
         getScrollLeft: () => window.pageXOffset || window.scrollX || 0,

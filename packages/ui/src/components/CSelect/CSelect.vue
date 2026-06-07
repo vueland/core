@@ -36,6 +36,14 @@
 
         model.value = value
     }
+
+    function onClear() {
+        if (props.multiple) {
+            model.value = []
+        } else {
+            model.value = undefined
+        }
+    }
 </script>
 <template>
     <c-input
@@ -43,6 +51,7 @@
         ref="inputRef"
         v-model="model"
         validate-on="blur"
+        @clear="onClear"
     >
         <template #field="{onFocus, focused, presets, attrs, uid}">
             <c-menu

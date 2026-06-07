@@ -21,15 +21,17 @@ export type CInputProps<T = any> =
     readonly?: boolean
 }
 
-export type CInputEmits = {
+export type CInputEmits<T = any> = {
     focus: [boolean]
     blur: [boolean]
-    input: [string | number]
+    input: [T]
+    clear: []
 }
 
-export type CInputSlots = {
+export type CInputSlots<T = any> = {
     label?(props: { uid: string }): VNode | string
     prepend?(): VNode | string
+    clear?(): VNode | string
     append?(): VNode | string
     details?(props: {
         errorMessage: ValidateState['errorMessage']
@@ -38,9 +40,10 @@ export type CInputSlots = {
         details?: string
     }): VNode | string
     field?(props: {
-        onInput(val: string | number): void
+        onInput(val: T): void
         onFocus(): void
         onBlur(): void
+        onClear(): void
         label?: string
         readonly?: boolean
         focused?: boolean
