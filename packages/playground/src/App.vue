@@ -89,7 +89,7 @@
                 </h2>
             </c-toolbar-logo>
         </c-toolbar>
-        <c-main class="pl-5 pr-5 pb-5 pt-[80px] min-h-100">
+        <c-main class="pl-5 pr-5 pb-5 pt-[80px] min-h-100 color-[#fa5a5a] bg-[#eeeeee]">
             <c-row>
                 <c-col
                     xxl="3"

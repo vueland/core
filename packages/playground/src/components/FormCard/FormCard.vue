@@ -94,7 +94,7 @@
                     v-model="form.name"
                     label="Name"
                     :rules="nameRules"
-                    validate-on="input"
+                    validate-on="blur"
                     class="form-name"
                     :preset="currentPreset"
                     placeholder="введите текст"

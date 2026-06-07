@@ -1,75 +1,87 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h, nextTick, reactive, ref, shallowReactive } from 'vue'
 import { mount } from '@vue/test-utils'
-import { CForm, CInput } from '../../src/components'
-import { $FORM_API_KEY } from '../../src/constants'
+import { nextTick } from 'vue'
+import CInput from '../../src/components/CInput/CInput.vue'
 
-const validateMock = vi.fn(() => true)
-const onFocusMock = vi.fn()
-const onBlurMock = vi.fn()
-const onInputMock = vi.fn()
-
-const focusedRef = ref(false)
-const hasValueRef = ref(false)
-
-const errors = shallowReactive({
-    hasError: false,
-    errorMessage: undefined as string | undefined,
-})
-
-const state = shallowReactive({
-    focused: false,
-    hasValue: false,
-    isDirty: false,
-})
+const formMock = vi.hoisted(() => ({
+    add: vi.fn(),
+    remove: vi.fn(),
+    api: undefined as undefined | {
+        add: ReturnType<typeof vi.fn>
+        remove: ReturnType<typeof vi.fn>
+    },
+}))
 
 vi.mock('../../src/composables', async () => {
-    const actual = await vi.importActual<any>('../../src/composables')
+    const actual = await vi.importActual<typeof import('../../src/composables')>('../../src/composables')
 
     return {
         ...actual,
-        useValidate: vi.fn(() => ({
-            errors,
-            validate: validateMock,
-        })),
-        useInputState: vi.fn(() => ({
-            state,
-            onFocus: onFocusMock,
-            onBlur: onBlurMock,
-            onInput: onInputMock
-        }))
+        useForm: vi.fn(() => formMock.api),
     }
 })
 
-const CLabelStub = defineComponent({
-    name: 'CLabel',
-    props: {
-        tag: {
-            type: String,
-            default: 'label',
-        },
-    },
-    setup(props, { slots }) {
-        return () => h(props.tag, { class: 'c-label-stub' }, slots.default?.())
-    },
-})
+type MountOptions = {
+    attrs?: Record<string, any>
+    slots?: Record<string, any>
+}
 
-const mountComponent = (
+function createWrapper(
     props: Record<string, any> = {},
-    options: Record<string, any> = {},
-) => {
-    return mount(CInput as any, {
+    options: MountOptions = {},
+) {
+    return mount(CInput, {
         props: {
             modelValue: '',
             ...props,
         },
+
+        attrs: options.attrs,
+
+        slots: {
+            field: `
+                <template #field="{ attrs, uid, onFocus, onBlur, onInput, focused, validate, disabled, readonly }">
+                    <input
+                        class="test-field"
+                        :id="uid"
+                        v-bind="attrs"
+                        :data-focused="String(focused)"
+                        :data-disabled="String(disabled)"
+                        :data-readonly="String(readonly)"
+                        @focus="onFocus"
+                        @blur="onBlur"
+                        @input="onInput($event.target.value)"
+                    />
+
+                    <button
+                        class="validate-button"
+                        type="button"
+                        @click="validate"
+                    >
+                        validate
+                    </button>
+                </template>
+            `,
+            ...options.slots,
+        },
+
         global: {
             stubs: {
-                CLabel: CLabelStub,
+                CLabel: {
+                    props: ['id', 'tag', 'for'],
+                    template: `
+                        <component
+                            :is="tag || 'label'"
+                            :id="id"
+                            :for="$props.for"
+                            class="c-label-stub"
+                        >
+                            <slot />
+                        </component>
+                    `,
+                },
             },
-            ...(options.global ?? {}),
         },
-        ...options,
     })
 }
 
@@ -77,362 +89,767 @@ describe('CInput', () => {
     beforeEach(() => {
         vi.clearAllMocks()
 
-        focusedRef.value = false
-        hasValueRef.value = false
-
-        errors.hasError = false
-        errors.errorMessage = undefined
+        formMock.api = {
+            add: formMock.add,
+            remove: formMock.remove,
+        }
     })
 
-    it('рендерит корневой элемент и базовые классы', () => {
-        const wrapper = mountComponent()
-
-        expect(wrapper.classes()).toContain('c-input')
-        expect(wrapper.classes()).toContain('c-input--default')
-        expect(wrapper.classes()).not.toContain('c-input--has-error')
-        expect(wrapper.classes()).not.toContain('c-input--focused')
-        expect(wrapper.classes()).not.toContain('c-input--has-value')
-    })
-
-    it('добавляет внешний class из attrs', () => {
-        const wrapper = mountComponent({}, {
-            attrs: {
-                class: 'custom-class',
-            },
+    it('рендерит field slot и передает uid на основе props.id', () => {
+        const wrapper = createWrapper({
+            id: 'email',
+            label: 'Email',
         })
 
-        expect(wrapper.classes()).toContain('custom-class')
+        const input = wrapper.get('.test-field')
+
+        expect(input.attributes('id')).toBe('input-email')
+        expect(wrapper.get('.c-label-stub').attributes('id')).toBe('input-email-label')
+        expect(wrapper.get('.c-label-stub').attributes('for')).toBe('input-email')
     })
 
-    it('ставит error-классы если есть ошибка', () => {
-        errors.hasError = true
-        errors.errorMessage = 'Required'
+    it('генерирует uid, если props.id не передан, и согласованно связывает input и label', () => {
+        const wrapper = createWrapper({
+            label: 'Name',
+        })
 
-        const wrapper = mountComponent()
+        const inputId = wrapper.get('.test-field').attributes('id')
+        const labelId = wrapper.get('.c-label-stub').attributes('id')
+
+        expect(inputId).toMatch(/^input-.+/)
+        expect(labelId).toBe(`${inputId}-label`)
+        expect(wrapper.get('.c-label-stub').attributes('for')).toBe(inputId)
+        expect(wrapper.get('.test-field').attributes('aria-labelledby')).toBe(labelId)
+    })
+
+    it('рендерит label из props.label', () => {
+        const wrapper = createWrapper({
+            id: 'name',
+            label: 'User name',
+        })
+
+        expect(wrapper.find('.c-input__label').exists()).toBe(true)
+        expect(wrapper.get('.c-label-stub').text()).toBe('User name')
+    })
+
+    it('рендерит кастомный label slot и передает uid', () => {
+        const wrapper = createWrapper(
+            {
+                id: 'login',
+                label: 'Login',
+            },
+            {
+                slots: {
+                    label: `
+                        <template #label="{ uid }">
+                            <label
+                                class="custom-label"
+                                :for="uid"
+                            >
+                                Custom {{ uid }}
+                            </label>
+                        </template>
+                    `,
+                },
+            },
+        )
+
+        expect(wrapper.find('.c-label-stub').exists()).toBe(false)
+        expect(wrapper.get('.custom-label').attributes('for')).toBe('input-login')
+        expect(wrapper.get('.custom-label').text()).toBe('Custom input-login')
+    })
+
+    it('не рендерит label-блок, если нет props.label и label slot', () => {
+        const wrapper = createWrapper()
+
+        expect(wrapper.find('.c-input__label').exists()).toBe(false)
+    })
+
+    it('создает details-контейнер, если передан props.details', () => {
+        const wrapper = createWrapper({
+            id: 'password',
+            details: 'Минимум 8 символов',
+        })
+
+        const details = wrapper.get('.c-input__details')
+
+        expect(details.attributes('id')).toBe('input-password-details')
+        expect(details.text()).toBe('')
+    })
+
+    it('передает props.details в details slot', () => {
+        const wrapper = createWrapper(
+            {
+                id: 'password',
+                details: 'Минимум 8 символов',
+            },
+            {
+                slots: {
+                    details: `
+                        <template #details="{ uid, details }">
+                            <p class="custom-details">
+                                {{ uid }} / {{ details }}
+                            </p>
+                        </template>
+                    `,
+                },
+            },
+        )
+
+        expect(wrapper.get('.custom-details').text()).toBe(
+            'input-password / Минимум 8 символов',
+        )
+    })
+
+    it('не рендерит details, если нет props.details, details slot и ошибки', () => {
+        const wrapper = createWrapper({
+            id: 'email',
+        })
+
+        expect(wrapper.find('.c-input__details').exists()).toBe(false)
+    })
+
+    it('добавляет aria-describedby, если есть props.details', () => {
+        const wrapper = createWrapper({
+            id: 'email',
+            details: 'Введите email',
+        })
+
+        expect(wrapper.get('.test-field').attributes('aria-describedby')).toBe('input-email-details')
+    })
+
+    it('добавляет aria-describedby, если есть details slot', () => {
+        const wrapper = createWrapper(
+            {
+                id: 'email',
+            },
+            {
+                slots: {
+                    details: '<template #details>Описание из слота</template>',
+                },
+            },
+        )
+
+        expect(wrapper.get('.test-field').attributes('aria-describedby')).toBe('input-email-details')
+    })
+
+    it('не рендерит details и не добавляет aria-describedby, если noDetails=true', async () => {
+        const wrapper = createWrapper({
+            id: 'email',
+            noDetails: true,
+            details: 'Описание',
+            rules: [
+                () => ({
+                    valid: false,
+                    message: 'Ошибка',
+                }),
+            ],
+        })
+
+        await (wrapper.vm as any).validate()
+        await nextTick()
+
+        expect(wrapper.find('.c-input__details').exists()).toBe(false)
+        expect(wrapper.get('.test-field').attributes('aria-describedby')).toBeUndefined()
+    })
+
+    it('передает errors в details slot после неуспешной validate', async () => {
+        const wrapper = createWrapper(
+            {
+                id: 'password',
+                modelValue: '',
+                rules: [
+                    () => ({
+                        valid: false,
+                        message: 'Некорректное значение',
+                    }),
+                ],
+            },
+            {
+                slots: {
+                    details: `
+                        <template #details="{ uid, hasError, errorMessage }">
+                            <p
+                                class="custom-details"
+                                :data-uid="uid"
+                                :data-error="String(hasError)"
+                            >
+                                {{ errorMessage }}
+                            </p>
+                        </template>
+                    `,
+                },
+            },
+        )
+
+        await (wrapper.vm as any).validate()
+        await nextTick()
+
+        expect(wrapper.get('.custom-details').attributes('data-uid')).toBe('input-password')
+        expect(wrapper.get('.custom-details').attributes('data-error')).toBe('true')
+        expect(wrapper.get('.custom-details').text()).toBe('Некорректное значение')
+    })
+
+    it('передает validation state в field slot для кастомных сценариев', async () => {
+        const wrapper = createWrapper(
+            {
+                modelValue: '',
+                rules: [
+                    () => ({
+                        valid: false,
+                        message: 'Ошибка',
+                    }),
+                ],
+            },
+            {
+                slots: {
+                    field: `
+                        <template #field="{ hasError, errorMessage, validate }">
+                            <button
+                                class="custom-validate"
+                                type="button"
+                                @click="validate"
+                            >
+                                validate
+                            </button>
+
+                            <div
+                                class="custom-field"
+                                :data-error="String(hasError)"
+                                :data-message="errorMessage"
+                            />
+                        </template>
+                    `,
+                },
+            },
+        )
+
+        expect(wrapper.get('.custom-field').attributes('data-error')).toBe('false')
+        expect(wrapper.get('.custom-field').attributes('data-message')).toBeUndefined()
+
+        await wrapper.get('.custom-validate').trigger('click')
+        await nextTick()
+
+        expect(wrapper.get('.custom-field').attributes('data-error')).toBe('true')
+        expect(wrapper.get('.custom-field').attributes('data-message')).toBe('Ошибка')
+    })
+
+    it('создает details-контейнер при ошибке даже без props.details', async () => {
+        const wrapper = createWrapper({
+            id: 'email',
+            modelValue: '',
+            rules: [
+                () => ({
+                    valid: false,
+                    message: 'Поле обязательно',
+                }),
+            ],
+        })
+
+        expect(wrapper.find('.c-input__details').exists()).toBe(false)
+
+        await (wrapper.vm as any).validate()
+        await nextTick()
+
+        const details = wrapper.get('.c-input__details')
+
+        expect(details.attributes('id')).toBe('input-email-details')
+        expect(details.text()).toBe('')
+    })
+
+    it('рендерит prepend и append slots', () => {
+        const wrapper = createWrapper(
+            {},
+            {
+                slots: {
+                    prepend: '<span class="prepend-content">before</span>',
+                    append: '<span class="append-content">after</span>',
+                },
+            },
+        )
+
+        expect(wrapper.get('.c-input__prepend').text()).toBe('before')
+        expect(wrapper.get('.c-input__append').text()).toBe('after')
+    })
+
+    it('добавляет классы для prepend и append', () => {
+        const wrapper = createWrapper(
+            {},
+            {
+                slots: {
+                    prepend: '<span>before</span>',
+                    append: '<span>after</span>',
+                },
+            },
+        )
+
+        expect(wrapper.classes()).toContain('c-input--has-prepend')
+        expect(wrapper.classes()).toContain('c-input--has-append')
+    })
+
+    it('рендерит структурные блоки root, field, label и details', () => {
+        const wrapper = createWrapper({
+            label: 'Email',
+            details: 'Введите email',
+        })
+
+        expect(wrapper.classes()).toContain('c-input')
+        expect(wrapper.find('.c-input__field').exists()).toBe(true)
+        expect(wrapper.find('.c-input__label').exists()).toBe(true)
+        expect(wrapper.find('.c-input__details').exists()).toBe(true)
+    })
+
+    it('прокидывает разрешенные field attrs в slot field', () => {
+        const wrapper = createWrapper(
+            {},
+            {
+                attrs: {
+                    type: 'email',
+                    name: 'email',
+                    autocomplete: 'email',
+                    placeholder: 'Enter email',
+                    inputmode: 'email',
+                    'aria-label': 'Email field',
+                    'data-test-id': 'email-input',
+                },
+            },
+        )
+
+        const input = wrapper.get('.test-field')
+
+        expect(input.attributes('type')).toBe('email')
+        expect(input.attributes('name')).toBe('email')
+        expect(input.attributes('autocomplete')).toBe('email')
+        expect(input.attributes('placeholder')).toBe('Enter email')
+        expect(input.attributes('inputmode')).toBe('email')
+        expect(input.attributes('aria-label')).toBe('Email field')
+        expect(input.attributes('data-test-id')).toBe('email-input')
+    })
+
+    it('не прокидывает неизвестные attrs в field slot', () => {
+        const wrapper = createWrapper(
+            {},
+            {
+                attrs: {
+                    title: 'Should not be passed',
+                    role: 'textbox',
+                    random: 'value',
+                },
+            },
+        )
+
+        const input = wrapper.get('.test-field')
+
+        expect(input.attributes('title')).toBeUndefined()
+        expect(input.attributes('role')).toBeUndefined()
+        expect(input.attributes('random')).toBeUndefined()
+    })
+
+    it('добавляет class из attrs на root, но не прокидывает class в field attrs', () => {
+        const wrapper = createWrapper(
+            {},
+            {
+                attrs: {
+                    class: 'external-class',
+                },
+            },
+        )
+
+        expect(wrapper.classes()).toContain('external-class')
+        expect(wrapper.get('.test-field').classes()).not.toContain('external-class')
+    })
+
+    it('добавляет aria-labelledby, если есть label', () => {
+        const wrapper = createWrapper({
+            id: 'email',
+            label: 'Email',
+        })
+
+        expect(wrapper.get('.test-field').attributes('aria-labelledby')).toBe('input-email-label')
+    })
+
+    it('добавляет aria-invalid и aria-errormessage после ошибки валидации', async () => {
+        const wrapper = createWrapper({
+            id: 'email',
+            modelValue: '',
+            rules: [
+                () => ({
+                    valid: false,
+                    message: 'Поле обязательно',
+                }),
+            ],
+        })
+
+        await (wrapper.vm as any).validate()
+        await nextTick()
+
+        const input = wrapper.get('.test-field')
+
+        expect(input.attributes('aria-invalid')).toBe('true')
+        expect(input.attributes('aria-errormessage')).toBe('input-email-details')
+        expect(input.attributes('aria-describedby')).toBe('input-email-details')
+    })
+
+    it('добавляет aria-invalid без aria-errormessage, если сообщение ошибки пустое', async () => {
+        const wrapper = createWrapper({
+            id: 'email',
+            modelValue: '',
+            rules: [
+                () => ({
+                    valid: false,
+                    message: '',
+                }),
+            ],
+        })
+
+        await (wrapper.vm as any).validate()
+        await nextTick()
+
+        const input = wrapper.get('.test-field')
+
+        expect(input.attributes('aria-invalid')).toBe('true')
+        expect(input.attributes('aria-errormessage')).toBeUndefined()
+    })
+
+    it('добавляет aria-readonly и aria-disabled из props', () => {
+        const wrapper = createWrapper({
+            readonly: true,
+            disabled: true,
+        })
+
+        const input = wrapper.get('.test-field')
+
+        expect(input.attributes('aria-readonly')).toBe('true')
+        expect(input.attributes('aria-disabled')).toBe('true')
+    })
+
+    it('имеет default-класс без ошибки', () => {
+        const wrapper = createWrapper()
+
+        expect(wrapper.classes()).toContain('c-input--default')
+        expect(wrapper.classes()).not.toContain('c-input--has-error')
+    })
+
+    it('имеет error-класс после неуспешной validate', async () => {
+        const wrapper = createWrapper({
+            modelValue: '',
+            rules: [
+                () => ({
+                    valid: false,
+                    message: 'Ошибка',
+                }),
+            ],
+        })
+
+        await (wrapper.vm as any).validate()
+        await nextTick()
 
         expect(wrapper.classes()).toContain('c-input--has-error')
         expect(wrapper.classes()).not.toContain('c-input--default')
     })
 
-    it('ставит focused-класс из useValidate', () => {
-        state.focused = true
-
-        const wrapper = mountComponent()
-
-        expect(wrapper.classes()).toContain('c-input--focused')
-    })
-
-    it('ставит disabled/readonly/hasValue классы', () => {
-        state.hasValue = true
-
-        const wrapper = mountComponent({
+    it('добавляет disabled и readonly классы из props', () => {
+        const wrapper = createWrapper({
             disabled: true,
             readonly: true,
         })
 
         expect(wrapper.classes()).toContain('c-input--disabled')
         expect(wrapper.classes()).toContain('c-input--readonly')
+    })
+
+    it('инициализирует focused из props.focused', () => {
+        const wrapper = createWrapper({
+            focused: true,
+        })
+
+        expect(wrapper.classes()).toContain('c-input--focused')
+        expect(wrapper.get('.test-field').attributes('data-focused')).toBe('true')
+    })
+
+    it('при focus выставляет focused=true и эмитит focus', async () => {
+        const wrapper = createWrapper()
+
+        await wrapper.get('.test-field').trigger('focus')
+
+        expect(wrapper.classes()).toContain('c-input--focused')
+        expect(wrapper.emitted('focus')).toEqual([[true]])
+        expect(wrapper.get('.test-field').attributes('data-focused')).toBe('true')
+    })
+
+    it('не делает focus и не эмитит focus, если disabled=true', async () => {
+        const wrapper = createWrapper({
+            disabled: true,
+        })
+
+        await wrapper.get('.test-field').trigger('focus')
+
+        expect(wrapper.classes()).not.toContain('c-input--focused')
+        expect(wrapper.emitted('focus')).toBeUndefined()
+    })
+
+    it('не делает focus и не эмитит focus, если readonly=true', async () => {
+        const wrapper = createWrapper({
+            readonly: true,
+        })
+
+        await wrapper.get('.test-field').trigger('focus')
+
+        expect(wrapper.classes()).not.toContain('c-input--focused')
+        expect(wrapper.emitted('focus')).toBeUndefined()
+    })
+
+    it('при blur сбрасывает focused=false и эмитит blur', async () => {
+        const wrapper = createWrapper({
+            focused: true,
+        })
+
+        await wrapper.get('.test-field').trigger('blur')
+
+        expect(wrapper.classes()).not.toContain('c-input--focused')
+        expect(wrapper.emitted('blur')).toEqual([[false]])
+        expect(wrapper.get('.test-field').attributes('data-focused')).toBe('false')
+    })
+
+    it('при input эмитит input со значением', async () => {
+        const wrapper = createWrapper()
+
+        await wrapper.get<HTMLInputElement>('.test-field').setValue('hello')
+
+        expect(wrapper.emitted('input')).toEqual([['hello']])
+    })
+
+    it('передает disabled и readonly в field slot', () => {
+        const wrapper = createWrapper({
+            disabled: true,
+            readonly: true,
+        })
+
+        const input = wrapper.get('.test-field')
+
+        expect(input.attributes('data-disabled')).toBe('true')
+        expect(input.attributes('data-readonly')).toBe('true')
+    })
+
+    it('ставит c-input--has-value для непустой строки', () => {
+        const wrapper = createWrapper({
+            modelValue: 'hello',
+        })
+
         expect(wrapper.classes()).toContain('c-input--has-value')
     })
 
-    it('рендерит field slot и пробрасывает в него API', () => {
-        let slotProps: any
-
-        const wrapper = mountComponent({}, {
-            slots: {
-                field: (props: any) => {
-                    slotProps = props
-                    return h('input', { class: 'field-slot' })
-                },
-            },
+    it('не ставит c-input--has-value для пустой строки', () => {
+        const wrapper = createWrapper({
+            modelValue: '',
         })
 
-        expect(wrapper.find('.field-slot').exists()).toBe(true)
-
-        expect(slotProps).toBeTruthy()
-        expect(slotProps.validate).toBe(validateMock)
-        expect(slotProps.onFocus).toBe(onFocusMock)
-        expect(slotProps.onBlur).toBe(onBlurMock)
-        expect(slotProps.onInput).toBe(onInputMock)
-        expect(slotProps.focused).toBe(state.focused)
-        expect(slotProps.hasError).toBe(false)
-        expect(slotProps.errorMessage).toBeUndefined()
+        expect(wrapper.classes()).not.toContain('c-input--has-value')
     })
 
-    it('передает актуальные errors в field slot', () => {
-        errors.hasError = true
-        errors.errorMessage = 'Invalid value'
-
-        let slotProps: any
-
-        mountComponent({}, {
-            slots: {
-                field: (props: any) => {
-                    slotProps = props
-                    return h('input')
-                },
-            },
+    it('ставит c-input--has-value для числа 0', () => {
+        const wrapper = createWrapper({
+            modelValue: 0,
         })
 
-        expect(slotProps.hasError).toBe(true)
-        expect(slotProps.errorMessage).toBe('Invalid value')
+        expect(wrapper.classes()).toContain('c-input--has-value')
     })
 
-    it('рендерит label через prop', () => {
-        const wrapper = mountComponent({
-            label: 'Email',
-        }, {
-            slots: {
-                field: () => h('input'),
-            },
+    it('не ставит c-input--has-value для null и undefined', async () => {
+        const wrapper = createWrapper({
+            modelValue: null,
         })
 
-        expect(wrapper.find('.c-input__label').exists()).toBe(true)
-        expect(wrapper.find('.c-label-stub').exists()).toBe(true)
-        expect(wrapper.find('.c-input__label').text()).toContain('Email')
+        expect(wrapper.classes()).not.toContain('c-input--has-value')
+
+        await wrapper.setProps({
+            modelValue: undefined,
+        })
+
+        expect(wrapper.classes()).not.toContain('c-input--has-value')
     })
 
-    it('рендерит label slot вместо fallback label', () => {
-        const wrapper = mountComponent({
-            label: 'Fallback label',
-        }, {
-            slots: {
-                field: () => h('input'),
-                label: () => h('div', { class: 'label-slot' }, 'Custom label'),
-            },
+    it('ставит c-input--has-value для непустого массива', () => {
+        const wrapper = createWrapper({
+            modelValue: ['one'],
         })
 
-        expect(wrapper.find('.c-input__label').exists()).toBe(true)
-        expect(wrapper.find('.label-slot').exists()).toBe(true)
-        expect(wrapper.find('.c-label-stub').exists()).toBe(false)
+        expect(wrapper.classes()).toContain('c-input--has-value')
     })
 
-    it('не рендерит label блок если нет ni label prop ni label slot', () => {
-        const wrapper = mountComponent({}, {
-            slots: {
-                field: () => h('input'),
-            },
+    it('не ставит c-input--has-value для пустого массива', () => {
+        const wrapper = createWrapper({
+            modelValue: [],
         })
 
-        expect(wrapper.find('.c-input__label').exists()).toBe(false)
+        expect(wrapper.classes()).not.toContain('c-input--has-value')
     })
 
-    it('рендерит prepend slot и класс c-input--has-prepend', () => {
-        const wrapper = mountComponent({}, {
-            slots: {
-                field: () => h('input'),
-                prepend: () => h('span', { class: 'prepend-slot' }, 'P'),
-            },
+    it('обновляет c-input--has-value при изменении modelValue', async () => {
+        const wrapper = createWrapper({
+            modelValue: '',
         })
 
-        expect(wrapper.find('.c-input__prepend').exists()).toBe(true)
-        expect(wrapper.find('.prepend-slot').exists()).toBe(true)
-        expect(wrapper.classes()).toContain('c-input--has-prepend')
+        expect(wrapper.classes()).not.toContain('c-input--has-value')
+
+        await wrapper.setProps({
+            modelValue: 'new value',
+        })
+
+        expect(wrapper.classes()).toContain('c-input--has-value')
+
+        await wrapper.setProps({
+            modelValue: '',
+        })
+
+        expect(wrapper.classes()).not.toContain('c-input--has-value')
     })
 
-    it('рендерит append slot и класс c-input--has-append', () => {
-        const wrapper = mountComponent({}, {
-            slots: {
-                field: () => h('input'),
-                append: () => h('span', { class: 'append-slot' }, 'A'),
-            },
-        })
+    it('регистрирует validate в formApi при mount', () => {
+        createWrapper()
 
-        expect(wrapper.find('.c-input__append').exists()).toBe(true)
-        expect(wrapper.find('.append-slot').exists()).toBe(true)
-        expect(wrapper.classes()).toContain('c-input--has-append')
+        expect(formMock.add).toHaveBeenCalledTimes(1)
+        expect(formMock.add).toHaveBeenCalledWith(expect.any(Function))
     })
 
-    it('рендерит details через prop details', () => {
-        const wrapper = mountComponent({
-            details: 'Helper text',
-        }, {
-            slots: {
-                field: () => h('input'),
-            },
-        })
-
-        expect(wrapper.find('.c-input__details').exists()).toBe(true)
-        expect(wrapper.find('.c-input__details').text()).toContain('Helper text')
-    })
-
-    it('рендерит details slot и пробрасывает errors', () => {
-        errors.hasError = true
-        errors.errorMessage = 'Some error'
-
-        let slotProps: any
-
-        const wrapper = mountComponent({}, {
-            slots: {
-                field: () => h('input'),
-                details: (props: any) => {
-                    slotProps = props
-                    return h('div', { class: 'details-slot' }, props.errorMessage)
-                },
-            },
-        })
-
-        expect(wrapper.find('.c-input__details').exists()).toBe(true)
-        expect(wrapper.find('.details-slot').exists()).toBe(true)
-        expect(wrapper.find('.details-slot').text()).toBe('Some error')
-        expect(slotProps).toEqual({
-            hasError: true,
-            errorMessage: 'Some error',
-            uid: slotProps.uid
-        })
-    })
-
-    it('не рендерит details если noDetails=true', () => {
-        const wrapper = mountComponent({
-            details: 'Helper text',
-            noDetails: true,
-        }, {
-            slots: {
-                field: () => h('input'),
-            },
-        })
-
-        expect(wrapper.find('.c-input__details').exists()).toBe(false)
-    })
-
-    it('регистрирует validate в form api при mount', () => {
-        const add = vi.fn()
-        const remove = vi.fn()
-
-        mountComponent({}, {
-            slots: {
-                field: () => h('input'),
-            },
-            global: {
-                provide: {
-                    [$FORM_API_KEY as symbol]: {
-                        add,
-                        remove,
-                    },
-                },
-            },
-        })
-
-        expect(add).toHaveBeenCalledTimes(1)
-        expect(add).toHaveBeenCalledWith(validateMock)
-        expect(remove).not.toHaveBeenCalled()
-    })
-
-    it('удаляет validate из form api при unmount', () => {
-        const add = vi.fn()
-        const remove = vi.fn()
-
-        const wrapper = mountComponent({}, {
-            slots: {
-                field: () => h('input'),
-            },
-            global: {
-                provide: {
-                    [$FORM_API_KEY as symbol]: {
-                        add,
-                        remove,
-                    },
-                },
-            },
-        })
+    it('удаляет validate из formApi при unmount', () => {
+        const wrapper = createWrapper()
 
         wrapper.unmount()
 
-        expect(add).toHaveBeenCalledWith(validateMock)
-        expect(remove).toHaveBeenCalledTimes(1)
-        expect(remove).toHaveBeenCalledWith(validateMock)
+        expect(formMock.remove).toHaveBeenCalledTimes(1)
+        expect(formMock.remove).toHaveBeenCalledWith(expect.any(Function))
     })
 
-    it('работает внутри реального CForm: форма регистрирует валидатор и вызывает его через expose.validate()', async () => {
-        const form = ref()
-        const value = ref('')
+    it('передает в formApi.add и formApi.remove одну и ту же validate-функцию', () => {
+        const wrapper = createWrapper()
 
-        const wrapper = mount({
-            components: { CForm, CInput },
-            setup() {
-                return () => h(CForm, { ref: form }, {
-                    default: () => [
-                        h(CInput as any, { modelValue: value }, {
-                            field: () => h('input'),
-                        }),
-                    ],
-                })
-            },
-        }, {
-            global: {
-                stubs: {
-                    CLabel: CLabelStub,
-                },
-            },
-        }) as any
+        const registeredValidate = formMock.add.mock.calls[0][0]
 
-        expect(validateMock).not.toHaveBeenCalled()
+        wrapper.unmount()
 
-        const result = await form.value.validate()
-
-        expect(result).toBe(true)
-        expect(validateMock).toHaveBeenCalledTimes(1)
+        expect(formMock.remove).toHaveBeenCalledWith(registeredValidate)
     })
 
-    it('внутри CForm после unmount input валидатор удаляется и больше не вызывается', async () => {
-        const form = ref()
-        const value = ref('')
-        const show = ref(true)
+    it('не падает, если useForm вернул undefined', () => {
+        formMock.api = undefined
 
-        const Host = defineComponent({
-            components: { CForm, CInput },
-            setup() {
-                return () => h(CForm, { ref: form }, {
-                    default: () => show.value
-                        ? [h(CInput as any, { modelValue: value.value }, { field: () => h('input') })]
-                        : [],
-                })
-            },
-        })
+        const wrapper = createWrapper()
 
-        mount(Host, {
-            global: {
-                stubs: {
-                    CLabel: CLabelStub,
-                },
-            },
-        }) as any
-
-        await form.value.validate()
-        expect(validateMock).toHaveBeenCalledTimes(1)
-
-        show.value = false
-        await nextTick()
-
-        validateMock.mockClear()
-
-        const result = await form.value.validate()
-
-        expect(result).toBe(true)
-        expect(validateMock).not.toHaveBeenCalled()
-    })
-
-    it('не падает без form api', () => {
-        const wrapper = mountComponent({}, {
-            slots: {
-                field: () => h('input'),
-            },
-        })
-
-        expect(wrapper.exists()).toBe(true)
         expect(() => wrapper.unmount()).not.toThrow()
     })
 
-    it('expose пробрасывает validate/onFocus/onBlur/onInput', () => {
-        const wrapper = mountComponent({}, {
-            slots: {
-                field: () => h('input'),
-            },
-        }) as any
+    it('expose validate запускает правила валидации', async () => {
+        const rule = vi.fn(() => ({
+            valid: true,
+            message: '',
+        }))
 
-        expect(wrapper.vm.validate).toBe(validateMock)
-        expect(wrapper.vm.onFocus).toBe(onFocusMock)
-        expect(wrapper.vm.onBlur).toBe(onBlurMock)
-        expect(wrapper.vm.onInput).toBe(onInputMock)
+        const wrapper = createWrapper({
+            modelValue: 'hello',
+            rules: [rule],
+        })
+
+        await (wrapper.vm as any).validate()
+
+        expect(rule).toHaveBeenCalledTimes(1)
+        expect(rule).toHaveBeenCalledWith('hello')
+    })
+
+    it('field slot получает validate и может вызвать его', async () => {
+        const rule = vi.fn(() => ({
+            valid: true,
+            message: '',
+        }))
+
+        const wrapper = createWrapper({
+            modelValue: 'hello',
+            rules: [rule],
+        })
+
+        await wrapper.get('.validate-button').trigger('click')
+
+        expect(rule).toHaveBeenCalledTimes(1)
+        expect(rule).toHaveBeenCalledWith('hello')
+    })
+
+    it('expose onFocus работает как публичный метод', async () => {
+        const wrapper = createWrapper()
+
+        ;(wrapper.vm as any).onFocus()
+        await nextTick()
+
+        expect(wrapper.classes()).toContain('c-input--focused')
+        expect(wrapper.emitted('focus')).toEqual([[true]])
+    })
+
+    it('expose onFocus ничего не делает при disabled=true', async () => {
+        const wrapper = createWrapper({
+                disabled: true,
+            })
+
+        ;(wrapper.vm as any).onFocus()
+        await nextTick()
+
+        expect(wrapper.classes()).not.toContain('c-input--focused')
+        expect(wrapper.emitted('focus')).toBeUndefined()
+    })
+
+    it('expose onFocus ничего не делает при readonly=true', async () => {
+        const wrapper = createWrapper({
+                readonly: true,
+            })
+
+        ;(wrapper.vm as any).onFocus()
+        await nextTick()
+
+        expect(wrapper.classes()).not.toContain('c-input--focused')
+        expect(wrapper.emitted('focus')).toBeUndefined()
+    })
+
+    it('expose onBlur работает как публичный метод', async () => {
+        const wrapper = createWrapper({
+                focused: true,
+            })
+
+        ;(wrapper.vm as any).onBlur()
+        await nextTick()
+
+        expect(wrapper.classes()).not.toContain('c-input--focused')
+        expect(wrapper.emitted('blur')).toEqual([[false]])
+    })
+
+    it('expose onInput эмитит input', () => {
+        const wrapper = createWrapper()
+
+        ;(wrapper.vm as any).onInput(123)
+
+        expect(wrapper.emitted('input')).toEqual([[123]])
+    })
+
+    it('обновляет aria, details и классы после ошибки валидации', async () => {
+        const wrapper = createWrapper({
+            id: 'email',
+            modelValue: '',
+            rules: [
+                () => ({
+                    valid: false,
+                    message: 'Ошибка',
+                }),
+            ],
+        })
+
+        expect(wrapper.classes()).toContain('c-input--default')
+        expect(wrapper.get('.test-field').attributes('aria-invalid')).toBeUndefined()
+        expect(wrapper.find('.c-input__details').exists()).toBe(false)
+
+        await (wrapper.vm as any).validate()
+        await nextTick()
+
+        expect(wrapper.classes()).toContain('c-input--has-error')
+        expect(wrapper.get('.test-field').attributes('aria-invalid')).toBe('true')
+        expect(wrapper.get('.test-field').attributes('aria-describedby')).toBe('input-email-details')
+        expect(wrapper.get('.test-field').attributes('aria-errormessage')).toBe('input-email-details')
+        expect(wrapper.find('.c-input__details').exists()).toBe(true)
     })
 })

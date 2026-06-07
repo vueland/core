@@ -1,6 +1,6 @@
 import { computed, onBeforeMount, type Reactive, reactive, toRefs, unref, watch } from 'vue'
 import type { Maybe } from '../types'
-import { type InputState } from './use-input-state'
+import { type InputState } from '../components'
 import { isDef } from '../helpers'
 
 export type ValidateFn = (value: any) => ({

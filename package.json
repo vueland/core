@@ -2,6 +2,10 @@
   "name": "core",
   "private": true,
   "packageManager": "pnpm@10.32.0",
+  "author": {
+    "name": "Anar Allakhverdiev",
+    "url": "https://github.com/wiseadme"
+  },
   "workspaces": [
     "packages/*"
   ],

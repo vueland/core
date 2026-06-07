@@ -31,8 +31,10 @@
                 />
             </div>
         </template>
-        <template #details="{errorMessage}">
-            <span class="c-text-field__details">{{ errorMessage }}</span>
+        <template #details="{errorMessage, details}">
+            <span class="c-text-field__details">
+                {{ errorMessage || details }}
+            </span>
         </template>
         <template
             v-for="(_, slotName) in $slots"
