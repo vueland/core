@@ -60,7 +60,7 @@
         v-model="model"
         v-bind="$attrs"
     >
-        <template #field="{input, focus, focused, presets, readonly, attrs, uid}">
+        <template #field="{input, focus, focused, preset, readonly, attrs, uid}">
             <c-menu
                 :id="`${uid}-menu`"
                 bottom
@@ -77,7 +77,7 @@
                     <div
                         class="c-autocomplete"
                         v-bind="activator"
-                        :class="presets"
+                        :class="preset"
                     >
                         <c-field
                             :id="uid"

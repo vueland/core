@@ -14,10 +14,10 @@
         v-model="model"
         v-bind="$attrs"
     >
-        <template #field="{focus, input, blur, focused, presets, attrs, uid}">
+        <template #field="{focus, input, blur, focused, preset, attrs, uid}">
             <div
                 class="c-text-field"
-                :class="presets"
+                :class="preset"
             >
                 <c-field
                     :id="uid"

@@ -147,6 +147,9 @@
                 <c-checkbox v-model="checkbox" :rules="checkboxRules">
                     Check it required
                 </c-checkbox>
+                <c-radio v-model="checkbox">
+                    Radio check
+                </c-radio>
             </c-form>
         </c-card-body>
         <c-card-footer>

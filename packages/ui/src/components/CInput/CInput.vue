@@ -91,12 +91,10 @@
     ])
 
     function focus() {
-        if (props.readonly || props.disabled) {
+        if (props.disabled) {
             return
         }
-
         state.focused = true
-
         emit('focus', state.focused)
     }
 
@@ -170,7 +168,7 @@
                 :readonly
                 :focused="state.focused"
                 :uid="fieldId"
-                :presets="preset.field"
+                :preset="preset.field"
                 :focus
                 :clear
                 :blur

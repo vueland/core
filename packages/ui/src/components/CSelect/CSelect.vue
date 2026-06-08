@@ -55,7 +55,7 @@
         validate-on="blur"
         @clear="onClear"
     >
-        <template #field="{focus, focused, presets, attrs, uid}">
+        <template #field="{focus, focused, preset, attrs, uid}">
             <c-menu
                 :id="`${uid}-menu`"
                 bottom
@@ -70,7 +70,7 @@
                     <div
                         v-bind="activator"
                         class="c-select"
-                        :class="presets"
+                        :class="preset"
                     >
                         <c-field
                             :id="uid"
