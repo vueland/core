@@ -8,6 +8,7 @@ import { IN_BROWSER } from './utils'
 export type IconsOptions = {
     dir?: string,
     aliases?: Partial<Record<IconAliases, any>>,
+    sets?: Record<string, any>
 }
 
 export interface LibOptions {

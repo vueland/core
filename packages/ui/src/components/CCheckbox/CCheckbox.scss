@@ -2,11 +2,10 @@
   display: flex;
   cursor: pointer;
   user-select: none;
+  justify-content: flex-start;
+  align-items: center;
 
   &__icon {
-    margin-right: 4px;
-    border-radius: 4px;
-    border: thin solid currentColor;
     color: currentColor;
   }
 
