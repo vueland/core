@@ -4,9 +4,9 @@
 $self: '.c-menu';
 
 .c-menu {
-  --menu-bg-color: var(--global-base-color);
-  --menu-text-color: var(--global-text-color);
-  --menu-border-radius: var(--global-border-radius);
+  --menu-bg-color: var(--c-app-base-color);
+  --menu-text-color: var(--c-app-text-color);
+  --menu-border-radius: var(--c-app-border-radius);
   --menu-max-height: 300px;
 
   position: absolute;

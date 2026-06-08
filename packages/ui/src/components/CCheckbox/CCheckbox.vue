@@ -1,10 +1,12 @@
 <script setup lang="ts" generic="T">
     import { computed, onBeforeUnmount, onMounted } from 'vue'
+
+    import { useForm, useValidate } from '../../composables'
+    import { IconAliases } from '../../enums'
     import { CIcon } from '../CIcon'
     import { CLabel } from '../CLabel'
     import { CSelectControl } from '../CSelectControl'
-    import { useForm, useValidate } from '../../composables'
-    import { IconAliases } from '../../enums'
+
     import type { CCheckboxProps, CCheckboxSlots } from './types'
 
     defineOptions({

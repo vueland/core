@@ -1,6 +1,6 @@
 <script setup lang="ts">
-    import { CInput } from '../CInput'
     import { CField } from '../CField'
+    import { CInput } from '../CInput'
 
     defineOptions({
         name: 'CTextField',
@@ -14,7 +14,7 @@
         v-model="model"
         v-bind="$attrs"
     >
-        <template #field="{onFocus, onInput, onBlur, focused, presets, attrs, uid}">
+        <template #field="{focus, input, blur, focused, presets, attrs, uid}">
             <div
                 class="c-text-field"
                 :class="presets"
@@ -25,14 +25,17 @@
                     class="c-text-field__input"
                     :focused
                     v-bind="attrs"
-                    @focus="onFocus"
-                    @input="onInput"
-                    @blur="onBlur"
+                    @focus="focus"
+                    @input="input"
+                    @blur="blur"
                 />
             </div>
         </template>
         <template #details="{errorMessage, details}">
-            <span class="c-text-field__details">
+            <span
+                :key="errorMessage || details"
+                class="c-text-field__details"
+            >
                 {{ errorMessage || details }}
             </span>
         </template>

@@ -1,7 +1,9 @@
 import { computed, unref } from 'vue'
+
 import type { CBtnProps } from '../components/CBtn/types'
-import { usePresets } from './use-presets'
 import type { InputPreset } from '../types'
+
+import { usePresets } from './use-presets'
 
 export function useButtonPresets({ props }: {
     props: CBtnProps

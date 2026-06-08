@@ -8,11 +8,13 @@ import {
     unref,
     watch,
 } from 'vue'
-import { type PositionProps } from './use-position-classes'
-import { useApplication } from './use-application'
+
+import { isDef } from '../helpers'
 import type { DimensionsProps } from '../types'
 import { IN_BROWSER } from '../utils'
-import { isDef } from '../helpers'
+
+import { useApplication } from './use-application'
+import { type PositionProps } from './use-position-classes'
 
 export interface Dimensions {
     top: number

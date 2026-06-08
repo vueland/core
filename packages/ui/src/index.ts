@@ -1,5 +1,7 @@
 import { type App, type Plugin } from 'vue'
-import { VuelandUI, type LibOptions } from './library'
+
+import { type LibOptions,VuelandUI } from './library'
+
 import './styles/styles.scss'
 
 export * from './types'

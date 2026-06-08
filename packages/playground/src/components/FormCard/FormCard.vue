@@ -78,10 +78,6 @@
         currentPreset.value = 'input.E'
     }
 
-    watchEffect(() => {
-        console.log(unref(checkbox))
-    })
-
 </script>
 <template>
     <c-card class="elevation-2">
@@ -94,9 +90,10 @@
                     v-model="form.name"
                     label="Name"
                     :rules="nameRules"
-                    validate-on="blur"
+                    validate-on="input"
                     class="form-name"
                     :preset="currentPreset"
+                    details="some text"
                     placeholder="введите текст"
                     min="3"
                     max="5"

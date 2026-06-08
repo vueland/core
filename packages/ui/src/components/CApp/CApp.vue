@@ -1,7 +1,8 @@
 <script setup lang="ts">
     import { provide } from 'vue'
-    import { $APP_API_KEY } from '../../constants'
+
     import { useAppScroll } from '../../composables'
+    import { $APP_API_KEY } from '../../constants'
 
     defineOptions({
         name: 'CApp',

@@ -1,8 +1,9 @@
 import { type App, type ComponentInstance, type Directive, type FunctionalComponent } from 'vue'
+
 import { createDialogsStack, useDisplay } from './composables'
-import { IN_BROWSER } from './utils'
-import { $BREAKPOINTS_KEY, $VUELAND_UI_KEY, $DIALOGS_STACK_API_KEY } from './constants'
+import { $BREAKPOINTS_KEY, $DIALOGS_STACK_API_KEY,$VUELAND_UI_KEY } from './constants'
 import type { IconAliases } from './enums'
+import { IN_BROWSER } from './utils'
 
 export type IconsOptions = {
     dir?: string,

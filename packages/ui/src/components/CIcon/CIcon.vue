@@ -1,7 +1,9 @@
 <script setup lang="ts">
     import { computed, unref, useAttrs } from 'vue'
+
     import { useIcon } from '../../composables/use-icon'
     import { convertToUnit } from '../../utils'
+
     import type { CIconProps } from './types'
 
     defineOptions({

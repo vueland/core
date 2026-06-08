@@ -1,5 +1,6 @@
 <script setup lang="ts">
     import { computed, useAttrs } from 'vue'
+
     import { CMenu } from '../CMenu'
 
     defineOptions({

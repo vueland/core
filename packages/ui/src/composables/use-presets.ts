@@ -1,6 +1,8 @@
-import { useCore } from './use-core'
 import { computed, type ComputedRef } from 'vue'
+
 import type { Maybe } from '../types'
+
+import { useCore } from './use-core'
 
 export type PresetProps = {
     preset?: string

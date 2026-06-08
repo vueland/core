@@ -1,5 +1,6 @@
 import type { InjectionKey } from 'vue'
-import type { FormApi, ApplicationApi } from '../components'
+
+import type { ApplicationApi,FormApi } from '../components'
 import type { AppBreakpoints, DialogsStackApi } from '../composables'
 
 export const $FORM_API_KEY: InjectionKey<FormApi> = Symbol()

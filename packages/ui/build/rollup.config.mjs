@@ -1,11 +1,12 @@
-import {defineConfig} from 'rollup'
-import base from './rollup-base.config.mjs'
 import vue from '@vitejs/plugin-vue'
-import path from 'path'
-import postcss from 'rollup-plugin-postcss'
 import * as fs from 'node:fs'
+import path from 'path'
+import {defineConfig} from 'rollup'
 import {dts} from 'rollup-plugin-dts'
+import postcss from 'rollup-plugin-postcss'
 import {fileURLToPath} from 'url'
+
+import base from './rollup-base.config.mjs'
 
 const cmpMap = {}
 const __filename = fileURLToPath(import.meta.url)

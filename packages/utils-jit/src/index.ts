@@ -1,13 +1,11 @@
-export { utilsJIT } from './plugin'
-
 export {
+    buildCssRule,
+    camelToKebab,
+    createArbitraryRule,
     DEFAULT_BREAKPOINTS,
     DEFAULT_EXCLUDE,
     DEFAULT_INCLUDE,
     DEFAULT_VARIANTS,
-    buildCssRule,
-    camelToKebab,
-    createArbitraryRule,
     defineRule,
     escapeCssSelector,
     extractClassCandidates,
@@ -19,8 +17,7 @@ export {
     stripComments,
     tokenize,
 } from './core'
-
+export { utilsJIT } from './plugin'
 export { defaultRules } from './rules'
-
-export * from './validators'
 export * from './types'
+export * from './validators'

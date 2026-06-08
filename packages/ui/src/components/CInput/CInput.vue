@@ -1,20 +1,16 @@
 <script setup lang="ts" generic="T">
-    import {
-        computed,
-        onBeforeMount,
-        onBeforeUnmount, shallowReactive,
-        unref,
-        useAttrs, watch
-    } from 'vue'
-    import { CLabel } from '../CLabel'
+    import { computed, onBeforeMount, onBeforeUnmount, shallowReactive, unref, useAttrs, watch } from 'vue'
+
     import {
         useForm,
         useInputPresets,
         useValidate
     } from '../../composables'
-    import type { CInputProps, CInputSlots, CInputEmits, InputState } from './types'
-    import { isNotEmpty, unique } from '../../helpers'
     import { FIELD_ATTRS } from '../../constants'
+    import { isNotEmpty, unique } from '../../helpers'
+    import { CLabel } from '../CLabel'
+
+    import type { CInputEmits, CInputProps, CInputSlots, InputState } from './types'
 
     defineOptions({
         name: 'CInput',
@@ -31,7 +27,12 @@
         hasValue: false,
     })
 
-    const { errors, validate } = useValidate(props, state)
+    const {
+        errors,
+        resetValidate,
+        validate
+    } = useValidate(props, state)
+
     const formApi = useForm()
     const attrs = useAttrs()
 
@@ -89,7 +90,7 @@
         ...unref(preset).root
     ])
 
-    function onFocus() {
+    function focus() {
         if (props.readonly || props.disabled) {
             return
         }
@@ -99,7 +100,7 @@
         emit('focus', state.focused)
     }
 
-    function onBlur() {
+    function blur() {
         state.focused = false
 
         if (!state.isDirty) {
@@ -109,12 +110,17 @@
         emit('blur', state.focused)
     }
 
-    function onInput(val: T) {
+    function input(val: T) {
         emit('input', val)
     }
 
-    function onClear() {
+    function clear() {
         emit('clear')
+    }
+
+    function reset() {
+        resetValidate()
+        clear()
     }
 
     watch(() => props.modelValue, (value) => {
@@ -132,10 +138,11 @@
 
     defineExpose({
         validate,
-        onFocus,
-        onBlur,
-        onClear,
-        onInput
+        focus,
+        blur,
+        clear,
+        input,
+        reset
     })
 </script>
 <template>
@@ -164,10 +171,11 @@
                 :focused="state.focused"
                 :uid="fieldId"
                 :presets="preset.field"
-                :on-focus
-                :on-clear
-                :on-blur
-                :on-input
+                :focus
+                :clear
+                :blur
+                :input
+                :reset
                 :attrs="fieldAttrs"
             />
             <div
@@ -211,12 +219,17 @@
             class="c-input__details"
             :class="preset.details"
         >
-            <slot
-                name="details"
-                v-bind="errors"
-                :details
-                :uid="fieldId"
-            />
+            <transition
+                name="fade-in-down"
+                mode="out-in"
+            >
+                <slot
+                    name="details"
+                    v-bind="errors"
+                    :details
+                    :uid="fieldId"
+                />
+            </transition>
         </div>
     </div>
 </template>

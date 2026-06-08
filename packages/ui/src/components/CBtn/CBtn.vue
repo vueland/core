@@ -1,7 +1,9 @@
 <script setup lang="ts">
     import { computed, unref } from 'vue'
-    import type { CBtnProps } from './types'
+
     import { useButtonPresets } from '../../composables'
+
+    import type { CBtnProps } from './types'
 
     defineOptions({
         name: 'CBtn',

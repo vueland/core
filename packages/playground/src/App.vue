@@ -10,7 +10,7 @@
     const textColor = computed(() => unref(isLightMode) ? '#343434' : '#ffffff')
 
     const toggleMode = () => {
-        // isLightMode.value = !isLightMode.value
+        isLightMode.value = !isLightMode.value
     }
 
     const { openDialog, closeDialog } = useDialogsStack()
@@ -54,7 +54,7 @@
 
 </script>
 <template>
-    <c-app :style="{'--global-base-color': bgColor, '--global-text-color': textColor}">
+    <c-app :style="{'--c-app-base-color': bgColor, '--c-app-text-color': textColor}">
         <c-menu
             close-on-click-outside
             :position-x="xPos"
@@ -79,7 +79,7 @@
         </c-dialog>
         <c-toolbar
             fixed
-            class="bg-white elevation-2"
+            class="elevation-2"
             @click="toggleMode"
             @contextmenu.prevent="onContextMenu"
         >
@@ -89,7 +89,7 @@
                 </h2>
             </c-toolbar-logo>
         </c-toolbar>
-        <c-main class="pl-5 pr-5 pb-5 pt-[80px] min-h-100 color-[#fa5a5a] bg-[#eeeeee]">
+        <c-main class="pl-5 pr-5 pb-5 pt-[80px] min-h-100 color-[#fa5a5a]">
             <c-row>
                 <c-col
                     xxl="3"

@@ -1,4 +1,5 @@
 import { inject } from 'vue'
+
 import { $VUELAND_UI_KEY } from '../constants'
 import type { VuelandUI } from '../library'
 

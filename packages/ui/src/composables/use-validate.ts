@@ -1,15 +1,8 @@
-import {
-    computed,
-    onBeforeMount,
-    type Reactive,
-    shallowReactive,
-    toRefs,
-    unref,
-    watch
-} from 'vue'
-import type { Maybe } from '../types'
+import { computed, onBeforeMount, type Reactive, shallowReactive, toRefs, unref, watch } from 'vue'
+
 import { type InputState } from '../components'
 import { isDef } from '../helpers'
+import type { Maybe } from '../types'
 
 export type ValidateFn = (value: any) => ({
     valid: boolean,
@@ -44,7 +37,7 @@ export function useValidate(props: ValidateProps & { modelValue: any }, state: R
     const hasRules = computed(() => (props.rules?.length ?? 0) > 0)
     const isOnBlur = computed(() => unref(validateOn) === InputEvents.BLUR)
 
-    function reset() {
+    function resetValidate() {
         errors.errorMessage = ''
         errors.hasError = false
     }
@@ -76,25 +69,29 @@ export function useValidate(props: ValidateProps & { modelValue: any }, state: R
         }
 
         watch(modelValue!, (value) => {
-            if (isDef(value) && !unref(isOnBlur)) validate()
-            //
-            // else if (unref(isOnBlur)) {
-            //     const unwatch = watch(() => state.focused, (val) => {
-            //         if (!val) validate()
-            //         unwatch()
-            //     })
-            // }
+            if (isDef(value) && !unref(isOnBlur)) {
+                validate()
+            }
+        })
+
+        const unwatch = watch(() => state.isDirty, () => {
+            if (!unref(isOnBlur)) {
+                validate()
+                unwatch()
+            }
         })
 
         watch(() => state.focused, (val) => {
-            if (!val) validate()
+            if (!val && unref(isOnBlur)) {
+                validate()
+            }
         })
     })
 
     return {
         errors,
         hasRules,
-        reset,
+        resetValidate,
         validate,
     }
 }

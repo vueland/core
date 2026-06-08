@@ -1,20 +1,21 @@
 import { describe, expect, it } from 'vitest'
+
 import {
     buildCssRule,
     camelToKebab,
+    defaultRules,
     defineRule,
     escapeCssSelector,
     extractClassCandidates,
+    isColorValue,
     isSafeCssValue,
+    isSizeValue,
     normalizeValue,
     parseToken,
     resolveRule,
     shouldProcess,
     stripComments,
     tokenize,
-    isColorValue,
-    isSizeValue,
-    defaultRules,
 } from '../src'
 
 describe('core / normalizeValue', () => {

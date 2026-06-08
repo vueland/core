@@ -1,8 +1,10 @@
 <script setup lang="ts">
     import { watch } from 'vue'
+
     import { useApplication } from '../../composables'
-    import { COverlay } from '../COverlay'
     import { vClickOutside } from '../../directives'
+    import { COverlay } from '../COverlay'
+
     import type { CDialogProps, CDialogSlots } from './types'
 
     defineOptions({

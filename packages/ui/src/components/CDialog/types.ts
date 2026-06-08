@@ -1,4 +1,5 @@
 import type { VNode } from 'vue'
+
 import type { COverlayProps } from '../COverlay'
 
 export type CDialogProps = COverlayProps & {

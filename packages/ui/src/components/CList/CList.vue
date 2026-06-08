@@ -1,6 +1,8 @@
 <script setup lang="ts" generic="T">
     import { computed, provide, toRaw, unref, useAttrs } from 'vue'
+
     import { $LIST_API_KEY } from '../../constants'
+
     import type { CListProps, CListSlots } from './types'
 
     defineOptions({

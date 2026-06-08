@@ -1,5 +1,6 @@
-import type { ValidateProps } from '../../composables'
 import type { VNode } from 'vue'
+
+import type { ValidateProps } from '../../composables'
 
 export type CCheckboxProps<T> =
     Omit<ValidateProps, 'validateOn'> & {
