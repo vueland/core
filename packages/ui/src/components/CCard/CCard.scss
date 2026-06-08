@@ -10,7 +10,7 @@ $card-border-radius: 8px;
   --card-body-padding: #{$card-body-padding};
   --card-footer-padding: #{$card-footer-padding};
   --card-border-radius: #{$card-border-radius};
-  --card-background-color: var(--c-app-base-color);
+  --card-background-color: var(--c-app-surface-color);
   --card-text-color: var(--c-app-text-color);
 
   width: var(--card-width);

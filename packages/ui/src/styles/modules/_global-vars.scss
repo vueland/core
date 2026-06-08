@@ -9,11 +9,14 @@ $primary-transition: cubic-bezier(.25, .8, .5, 1);
   --global-base-color: #ffffff;
   --global-text-color: #3d3d3d;
 
-  --c-app-border-radius: 8px;
-  --c-app-error-color: #ef231f;
-  --c-app-success-color: #43d31b;
   --c-app-primary-color: #1f77c4;
-  --c-app-secondary-color: #39638c;
-  --c-app-base-color: #ffffff;
+  --c-app-secondary-color: #213e59;
+  --c-app-success-color: #3eaf1e;
+  --c-app-error-color: #ef231f;
+  --c-app-warning-color: #f6892f;
+  --c-app-info-color: #0b86cc;
+  --c-app-accent-color: #30e40d;
+  --c-app-surface-color: #ffffff;
   --c-app-text-color: #3d3d3d;
+  --c-app-border-radius: 8px;
 }

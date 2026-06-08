@@ -54,7 +54,7 @@
 
 </script>
 <template>
-    <c-app :style="{'--c-app-base-color': bgColor, '--c-app-text-color': textColor}">
+    <c-app :style="{'--c-app-surface-color': bgColor, '--c-app-text-color': textColor}">
         <c-menu
             close-on-click-outside
             :position-x="xPos"
