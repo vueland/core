@@ -1,4 +1,12 @@
-import { computed, onBeforeMount, type Reactive, reactive, toRefs, unref, watch } from 'vue'
+import {
+    computed,
+    onBeforeMount,
+    type Reactive,
+    shallowReactive,
+    toRefs,
+    unref,
+    watch
+} from 'vue'
 import type { Maybe } from '../types'
 import { type InputState } from '../components'
 import { isDef } from '../helpers'
@@ -28,13 +36,18 @@ export enum InputEvents {
 export function useValidate(props: ValidateProps & { modelValue: any }, state: Reactive<InputState>) {
     const { validateOn = InputEvents.INPUT, modelValue } = toRefs(props)
 
-    const errors = reactive<ValidateState>({
+    const errors = shallowReactive<ValidateState>({
         errorMessage: undefined,
         hasError: false,
     })
 
     const hasRules = computed(() => (props.rules?.length ?? 0) > 0)
     const isOnBlur = computed(() => unref(validateOn) === InputEvents.BLUR)
+
+    function reset() {
+        errors.errorMessage = ''
+        errors.hasError = false
+    }
 
     function update(result: ReturnType<ValidateFn>) {
         errors.hasError = !result.valid
@@ -81,6 +94,7 @@ export function useValidate(props: ValidateProps & { modelValue: any }, state: R
     return {
         errors,
         hasRules,
-        validate
+        reset,
+        validate,
     }
 }

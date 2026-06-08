@@ -2,8 +2,6 @@
 
 `CInput` — базовый компонент для создания полей ввода во Vueland UI. Он отвечает за общий API поля: label, details, validation, состояния, ARIA, presets, prepend/append и интеграцию с формой.
 
-`CInput` не рендерит нативный `<input>` самостоятельно. Поле передаётся через слот `field`.
-
 ## Использование
 
 ```vue
@@ -15,7 +13,7 @@ const value = ref('')
 
 <template>
   <c-input
-    v-model="value"
+    :model-value="value"
     label="Email"
     details="Введите email"
     type="email"
@@ -24,6 +22,7 @@ const value = ref('')
   >
     <template #field="{ uid, attrs, focused, onFocus, onBlur, onInput }">
       <input
+        v-model="value"
         :id="uid"
         v-bind="attrs"
         :value="value"
@@ -53,7 +52,7 @@ const value = ref('')
 | `rules`        | `ValidateFn[]`      | `undefined` | Правила валидации.                                                                                                         |
 | `validateOn`   | `'input' \| 'blur'` |   `'input'` | Режим запуска валидации.                                                                                                   |
 | `preset`       | `string`            | `undefined` | Путь к preset в `core.presets`, например `input.default`.                                                                  |
-| `clearable`    | `boolean`           | `undefined` | Зарезервировано для компонентов, которые реализуют очистку значения.                                                       |
+| `clearable`    | `boolean`           | `undefined` | Включает возможность очистки значения.                                                                                     |
 | `disabled`     | `boolean`           | `undefined` | Disabled-состояние поля.                                                                                                   |
 | `readonly`     | `boolean`           | `undefined` | Readonly-состояние поля.                                                                                                   |
 | `focused`      | `boolean`           | `undefined` | Начальное focused-состояние.                                                                                               |
@@ -126,6 +125,7 @@ field?(props: {
 | `onFocus`      | `() => void`             | Обработчик focus.                                             |
 | `onBlur`       | `() => void`             | Обработчик blur.                                              |
 | `onInput`      | `(val: T) => void`       | Обработчик input.                                             |
+| `onClear`      | `() => void`             | Обработчик clear.                                             |
 
 ```vue
 <template #field="{ uid, attrs, disabled, readonly, onFocus, onBlur, onInput }">
