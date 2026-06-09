@@ -1,5 +1,6 @@
-import type { PresetProps, ValidateProps, ValidateState } from '../../composables'
 import type { VNode } from 'vue'
+
+import type { PresetProps, ValidateProps, ValidateState } from '../../composables'
 
 export interface InputState {
     focused: boolean
@@ -26,6 +27,7 @@ export type CInputEmits<T = any> = {
     blur: [boolean]
     input: [T]
     clear: []
+    'update:modelValue': [T]
 }
 
 export type CInputSlots<T = any> = {
@@ -40,15 +42,16 @@ export type CInputSlots<T = any> = {
         details?: string
     }): VNode | string
     field?(props: {
-        onInput(val: T): void
-        onFocus(): void
-        onBlur(): void
-        onClear(): void
+        input(val: T): void
+        focus(): void
+        blur(): void
+        clear(): void
+        reset(): void
         label?: string
         readonly?: boolean
         focused?: boolean
         disabled?: boolean
-        presets?: string[] | string[][]
+        preset?: string[] | string[][]
         errorMessage: ValidateState['errorMessage']
         hasError: ValidateState['hasError']
         attrs: Record<string, any>

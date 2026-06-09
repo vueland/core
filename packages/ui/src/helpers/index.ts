@@ -1,3 +1,5 @@
+export * from './preset'
+
 export const toCamelCase = (...args: string[]): string => args.reduce((res, s, i) => {
     if (i === 0) res += s
     else res += s[0].toUpperCase() + s.slice(1)

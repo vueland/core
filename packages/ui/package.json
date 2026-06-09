@@ -47,6 +47,11 @@
       "import": "./dist/directives/index.js",
       "require": "./dist/directives/index.js"
     },
+    "./resolvers": {
+      "types": "./dist/resolvers/index.d.ts",
+      "import": "./dist/resolvers/index.js",
+      "require": "./dist/resolvers/index.js"
+    },
     "./constants": {
       "types": "./dist/constants/index.d.ts",
       "import": "./dist/constants/index.js",

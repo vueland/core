@@ -1,4 +1,5 @@
 import { type MaybeRef, reactive, shallowRef, toRefs, unref, watchEffect } from 'vue'
+
 import { IN_BROWSER } from '../utils'
 
 export const breakpoints = {
@@ -66,7 +67,9 @@ export function useDisplay() {
         height.value = getClientHeight(ssr)
 
         watchEffect(() => {
-            const { xxl, xl, lg, md, sm, xs } = breakpoints
+            const {
+ xxl, xl, lg, md, sm, xs 
+} = breakpoints
             const screen = unref(width)
 
             state.xs = screen < sm

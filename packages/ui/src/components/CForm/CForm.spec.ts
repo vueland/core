@@ -1,8 +1,9 @@
+import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, inject, nextTick, ref } from 'vue'
-import { mount } from '@vue/test-utils'
-import { CForm } from '../index'
+
 import { $FORM_API_KEY } from '../../constants'
+import { CForm } from '../index'
 
 type FormApi = {
     add: (fn: () => boolean) => void

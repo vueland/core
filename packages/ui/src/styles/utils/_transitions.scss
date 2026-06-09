@@ -42,7 +42,7 @@
 
   &-enter-active,
   &-leave-active {
-    transition: .2s opacity $primary-transition, transform .2s $primary-transition;
+    transition: .15s opacity $primary-transition, transform .15s $primary-transition;
   }
 
   &-leave-active {
@@ -58,7 +58,7 @@
 
   &-enter-active,
   &-leave-active {
-    transition: .2s opacity $primary-transition, transform .2s $primary-transition;
+    transition: .15s opacity $primary-transition, transform .15s $primary-transition;
   }
 
   &-leave-active {
@@ -74,7 +74,7 @@
 
   &-enter-active,
   &-leave-active {
-    transition: .2s opacity $primary-transition, transform .2s $primary-transition;
+    transition: .15s opacity $primary-transition, transform .15s $primary-transition;
   }
 
   &-leave-active {

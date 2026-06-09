@@ -1,8 +1,7 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import type { Plugin, ViteDevServer } from 'vite'
-import type { JitOptions, ParsedToken, Pattern, ResolvedJitOptions, UtilityRule } from './types'
-import { defaultRules } from './rules'
+
 import {
     buildCssRule,
     DEFAULT_BREAKPOINTS,
@@ -14,6 +13,8 @@ import {
     shouldProcess,
     tokenize,
 } from './core'
+import { defaultRules } from './rules'
+import type { JitOptions, ParsedToken, Pattern, ResolvedJitOptions, UtilityRule } from './types'
 
 function resolveOptions(options: JitOptions = {}): ResolvedJitOptions {
     return {

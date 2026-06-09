@@ -1,4 +1,5 @@
 import { defineComponent, type FunctionalComponent, h, type SlotsType } from 'vue'
+
 import { CList, CListItem, CListItemTitle } from '../CList'
 
 export type CItemsProps = {

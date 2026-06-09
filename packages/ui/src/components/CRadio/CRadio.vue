@@ -1,4 +1,8 @@
 <script setup lang="ts" generic="T">
+    import { computed, unref } from 'vue'
+
+    import { IconAliases } from '../../enums'
+
     defineOptions({
         name: 'CRadio',
     })
@@ -8,6 +12,9 @@
     }>()
 
     const model = defineModel<T>()
+    const { RADIO_ON, RADIO_OFF } = IconAliases
+
+    const icon = computed(() => unref(model) ? RADIO_ON : RADIO_OFF)
 </script>
 <template>
     <c-select-control
@@ -24,6 +31,9 @@
             }"
             @click="toggle"
         >
+            <div class="c-radio__icon">
+                <c-icon :name="icon" />
+            </div>
             <div class="c-radio__label">
                 <slot>
                     <c-label v-memo="[label]">

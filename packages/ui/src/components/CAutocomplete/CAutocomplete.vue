@@ -1,12 +1,14 @@
 <script setup lang="ts" generic="T">
     import { shallowRef, unref, watch } from 'vue'
-    import { CInput } from '../CInput'
-    import { CMenu } from '../CMenu'
-    import { CField } from '../CField'
-    import { CItems } from '../CItems'
+
     import { useAutocomplete } from '../../composables'
-    import type { CAutocompleteProps, CAutocompleteSlots } from './types'
     import { IconAliases } from '../../enums'
+    import { CField } from '../CField'
+    import { CInput } from '../CInput'
+    import { CItems } from '../CItems'
+    import { CMenu } from '../CMenu'
+
+    import type { CAutocompleteProps, CAutocompleteSlots } from './types'
 
     defineOptions({
         name: 'CAutocomplete',
@@ -20,7 +22,7 @@
 
     defineSlots<CAutocompleteSlots<T>>()
 
-    const { input, searchItems, rollbackValue } = useAutocomplete(props)
+    const { inputValue, searchItems, rollbackValue } = useAutocomplete(props)
     const inputRef = shallowRef()
 
     const model = defineModel<T | T[]>({
@@ -28,8 +30,9 @@
         set: val => val
     })
 
-    function onCloseMenu() {
-        unref(inputRef).onBlur()
+    function closeMenu() {
+        unref(inputRef).blur()
+        rollbackValue()
     }
 
     function onSelect(value: T) {
@@ -39,10 +42,11 @@
         }
 
         model.value = value
+        closeMenu()
     }
 
-    watch(input, (val) => {
-        emit('update:search', unref(input))
+    watch(inputValue, (val) => {
+        emit('update:search', unref(inputValue))
 
         if (!val) {
             model.value = props.multiple ? [] : undefined
@@ -55,9 +59,8 @@
         ref="inputRef"
         v-model="model"
         v-bind="$attrs"
-        validate-on="blur"
     >
-        <template #field="{onInput, onFocus, focused, presets, readonly, attrs, uid}">
+        <template #field="{input, focus, focused, preset, readonly, attrs, uid}">
             <c-menu
                 :id="`${uid}-menu`"
                 bottom
@@ -67,18 +70,18 @@
                 :offset-y="2"
                 strategy="reverse"
                 :preset="options?.menuPreset"
-                @close="onCloseMenu"
+                @close="closeMenu"
                 @open="rollbackValue"
             >
                 <template #activator="{on, activator}">
                     <div
                         class="c-autocomplete"
                         v-bind="activator"
-                        :class="presets"
+                        :class="preset"
                     >
                         <c-field
                             :id="uid"
-                            v-model="input"
+                            v-model="inputValue"
                             class="c-autocomplete__field"
                             type="text"
                             :focused
@@ -87,8 +90,8 @@
                             :aria-controls="`${uid}-menu`"
                             :aria-expanded="focused"
                             v-on="on"
-                            @focus="onFocus"
-                            @input="onInput"
+                            @focus="focus"
+                            @input="input"
                         />
                     </div>
                 </template>
@@ -122,7 +125,9 @@
             />
         </template>
         <template #details="{errorMessage, details}">
-            <span>{{ errorMessage || details }}</span>
+            <span :key="errorMessage || details">
+                {{ errorMessage || details }}
+            </span>
         </template>
         <template
             v-for="(_, slotName) in $slots"

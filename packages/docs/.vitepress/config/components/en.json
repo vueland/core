@@ -5,6 +5,10 @@
       {
         "file": "CApp",
         "title": "CApp"
+      },
+      {
+        "file": "CMain",
+        "title": "CMain"
       }
     ]
   },
@@ -12,8 +16,32 @@
     "title": "Form controls",
     "items": [
       {
+        "file": "CForm",
+        "title": "CForm"
+      },
+      {
+        "file": "CAutocomplete",
+        "title": "CAutocomplete"
+      },
+      {
+        "file": "CSelect",
+        "title": "CSelect"
+      },
+      {
+        "file": "CTextField",
+        "title": "CTextField"
+      },
+      {
         "file": "CInput",
         "title": "CInput"
+      },
+      {
+        "file": "CCheckbox",
+        "title": "CCheckbox"
+      },
+      {
+        "file": "CRadio",
+        "title": "CRadio"
       }
     ]
   },

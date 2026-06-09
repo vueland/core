@@ -1,6 +1,8 @@
 <script setup lang="ts" generic="T">
     import { computed, unref } from 'vue'
+
     import { isDef } from '../../helpers'
+
     import type { CSelectControlProps, CSelectControlSlots } from './types'
 
     defineSlots<CSelectControlSlots>()

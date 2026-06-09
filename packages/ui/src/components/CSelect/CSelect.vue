@@ -1,11 +1,13 @@
 <script setup lang="ts" generic="T">
     import { shallowRef, unref } from 'vue'
-    import { CInput } from '../CInput'
-    import { CMenu } from '../CMenu'
-    import { CItems } from '../CItems'
-    import { CField } from '../CField'
+
     import { useInputValue } from '../../composables'
     import { IconAliases } from '../../enums'
+    import { CField } from '../CField'
+    import { CInput } from '../CInput'
+    import { CItems } from '../CItems'
+    import { CMenu } from '../CMenu'
+
     import type { CSelectProps, CSelectSlots } from './types'
 
     defineOptions({
@@ -24,8 +26,8 @@
 
     const inputValue = useInputValue(props)
 
-    function onCloseMenu() {
-        unref(inputRef).onBlur()
+    function closeMenu() {
+        unref(inputRef).blur()
     }
 
     function onSelect(value: T) {
@@ -53,7 +55,7 @@
         validate-on="blur"
         @clear="onClear"
     >
-        <template #field="{onFocus, focused, presets, attrs, uid}">
+        <template #field="{focus, focused, preset, attrs, uid}">
             <c-menu
                 :id="`${uid}-menu`"
                 bottom
@@ -62,13 +64,13 @@
                 :close-on-content-click="!multiple"
                 :offset-y="2"
                 strategy="reverse"
-                @close="onCloseMenu"
+                @close="closeMenu"
             >
                 <template #activator="{on, activator}">
                     <div
                         v-bind="activator"
                         class="c-select"
-                        :class="presets"
+                        :class="preset"
                     >
                         <c-field
                             :id="uid"
@@ -80,7 +82,7 @@
                             :aria-controls="`${uid}-menu`"
                             :aria-expanded="focused"
                             v-on="on"
-                            @focus="onFocus"
+                            @focus="focus"
                         />
                     </div>
                 </template>
@@ -108,7 +110,9 @@
             />
         </template>
         <template #details="{errorMessage, details}">
-            <span>{{ errorMessage || details }}</span>
+            <span :key="errorMessage || details">
+                {{ errorMessage || details }}
+            </span>
         </template>
         <template
             v-for="(_, slotName) in $slots"

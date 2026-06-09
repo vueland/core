@@ -1,6 +1,8 @@
 <script setup lang="ts">
     import { computed, onBeforeUnmount, shallowRef, unref,watchEffect } from 'vue'
+
     import { useOverlayStack } from '../../composables'
+
     import type { COverlayProps, COverlaySlots } from './tyoes'
 
     defineOptions({

@@ -1,11 +1,12 @@
-import {defineConfig} from 'rollup'
-import base from './rollup-base.config.mjs'
 import vue from '@vitejs/plugin-vue'
-import path from 'path'
-import postcss from 'rollup-plugin-postcss'
 import * as fs from 'node:fs'
+import path from 'path'
+import {defineConfig} from 'rollup'
 import {dts} from 'rollup-plugin-dts'
+import postcss from 'rollup-plugin-postcss'
 import {fileURLToPath} from 'url'
+
+import base from './rollup-base.config.mjs'
 
 const cmpMap = {}
 const __filename = fileURLToPath(import.meta.url)
@@ -33,6 +34,7 @@ const directChunks = [
     'components',
     'composables',
     'directives',
+    'resolvers',
     'utils',
     'constants',
     'enums'
@@ -68,6 +70,7 @@ export default defineConfig([
             components: 'src/components/index.ts',
             composables: 'src/composables/index.ts',
             directives: 'src/directives/index.ts',
+            resolvers: 'src/resolvers/index.ts',
             utils: 'src/utils/index.ts',
             constants: 'src/constants/index.ts',
             enums: 'src/enums/index.ts',
@@ -140,6 +143,12 @@ export default defineConfig([
     {
         input: ['dist/temp-types/src/directives/index.d.ts'],
         output: [{file: 'dist/directives/index.d.ts', format: 'es'}],
+        plugins: [dts()],
+        external: [/\.scss$/, /\.css$/, 'vue']
+    },
+    {
+        input: ['dist/temp-types/src/resolvers/index.d.ts'],
+        output: [{file: 'dist/resolvers/index.d.ts', format: 'es'}],
         plugins: [dts()],
         external: [/\.scss$/, /\.css$/, 'vue']
     },

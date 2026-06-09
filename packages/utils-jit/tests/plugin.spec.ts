@@ -1,9 +1,10 @@
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Plugin } from 'vite'
-import { defineRule, utilsJIT, isColorValue, isSizeValue } from '../src'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { defineRule, isColorValue, isSizeValue,utilsJIT } from '../src'
 
 type HookPlugin = Plugin & {
     configResolved: NonNullable<Plugin['configResolved']>

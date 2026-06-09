@@ -1,7 +1,9 @@
 <script setup lang="ts">
     import { computed, unref, useAttrs } from 'vue'
+
     import { useIcon } from '../../composables/use-icon'
     import { convertToUnit } from '../../utils'
+
     import type { CIconProps } from './types'
 
     defineOptions({
@@ -17,8 +19,8 @@
     const resolvedIcon = useIcon(props)
 
     const rootStyle = computed(() => ({
-        width: convertToUnit(unref(props.width ?? props.size ?? 16)),
-        height: convertToUnit(unref( props.height ?? props.size ?? 16)),
+        width: convertToUnit(unref(resolvedIcon).size ?? props.width ?? props.size ?? 16),
+        height: convertToUnit(unref(resolvedIcon).size ?? props.height ?? props.size ?? 16),
     }))
 </script>
 

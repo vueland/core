@@ -1,6 +1,7 @@
-import { defineComponent, h, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { defineComponent, h, nextTick, ref } from 'vue'
+
 import { CMenu } from './index'
 
 vi.mock('../../utils/globals', () => ({
@@ -436,8 +437,6 @@ describe('CMenu', () => {
             width: 120,
             height: 100,
         })
-
-        console.log('menuRoot.style.top', menuRoot.style.top)
 
         expect(parseFloat(menuRoot.style.top)).toBe(150)
     })

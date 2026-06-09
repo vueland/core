@@ -1,12 +1,14 @@
 <script setup lang="ts">
     import { computed, onBeforeUnmount, onMounted, provide, shallowRef, unref, watch } from 'vue'
+
     import { useActivator, useAutoPosition, useDelayedActions, useMenuPresets, } from '../../composables'
-    import { COverlay } from '../COverlay'
-    import { vClickOutside } from '../../directives'
     import { $MENU_API_KEY } from '../../constants'
-    import type { CMenuEvents, CMenuProps } from './types'
-    import { convertToUnit, IN_BROWSER, throttle } from '../../utils'
+    import { vClickOutside } from '../../directives'
     import { isDef } from '../../helpers'
+    import { convertToUnit, IN_BROWSER, throttle } from '../../utils'
+    import { COverlay } from '../COverlay'
+
+    import type { CMenuEvents, CMenuProps } from './types'
 
     defineOptions({
         name: 'CMenu',

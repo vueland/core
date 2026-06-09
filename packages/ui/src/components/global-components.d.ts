@@ -1,3 +1,5 @@
+import type { Component, VNode } from 'vue'
+
 import type {
     CAutocompleteProps,
     CAutocompleteSlots,
@@ -18,7 +20,6 @@ import type {
     CSelectProps,
     CSelectSlots
 } from './index'
-import type { Component, VNode } from 'vue'
 
 export {}
 declare module 'vue' {

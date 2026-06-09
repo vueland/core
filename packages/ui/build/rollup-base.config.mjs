@@ -1,10 +1,10 @@
-import path from 'node:path'
-import peerDepsExternal from 'rollup-plugin-peer-deps-external'
-import {nodeResolve} from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
+import {nodeResolve} from '@rollup/plugin-node-resolve'
 import replace from '@rollup/plugin-replace'
+import path from 'node:path'
 import esbuild from 'rollup-plugin-esbuild'
+import peerDepsExternal from 'rollup-plugin-peer-deps-external'
 
 export default {
 	external: ['vue'],

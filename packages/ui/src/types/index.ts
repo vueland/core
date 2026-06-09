@@ -1,3 +1,4 @@
-export * from './utils'
-export * from './props'
+export * from './icons'
 export * from './presets'
+export * from './props'
+export * from './utils'

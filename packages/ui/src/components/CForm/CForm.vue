@@ -1,6 +1,8 @@
 <script setup lang="ts">
     import { provide } from 'vue'
+
     import { $FORM_API_KEY } from '../../constants'
+
     import type { FormApi, ValidatorFn } from './types'
 
     defineOptions({
