@@ -4,6 +4,8 @@ $self: '.c-input';
 $input-field-height: 40px;
 $input-label-line-height: 20px;
 $input-field-border-color: #e5e5e5;
+$input-append-width: 24px;
+$input-append-height: $input-field-height;
 $input-details-height: 24px;
 $input-label-left: 5px;
 
@@ -16,8 +18,8 @@ $input-label-left: 5px;
   --c-input-error-color: var(--c-app-error-color);
   --c-input-primary-color: var(--c-app-primary-color);
   --c-input-prepend-width: #{$input-field-height};
-  --c-input-append-width: #{$input-field-height};
-  --c-input-background-color: var(--c-surface-base-color);
+  --c-input-append-width: #{$input-append-width};
+  --c-input-background-color: var(--c-app-surface-color);
   --c-input-label-padding-x: 4px;
   --c-input-label-left: #{$input-label-left};
   --c-input-label-font-size: 16px;
@@ -46,11 +48,11 @@ $input-label-left: 5px;
       border: thin solid currentColor;
     }
 
-    .c-autocomplete + #{$self}__append {
+    .c-autocomplete ~ #{$self}__append {
       transform: rotate(180deg);
     }
 
-    .c-select + #{$self}__append {
+    .c-select ~ #{$self}__append {
       transform: rotate(180deg);
     }
   }
@@ -65,6 +67,16 @@ $input-label-left: 5px;
 
   $prepended-translate-x: calc(#{var(--c-input-prepend-width)} - #{var(--c-input-label-padding-x)} * 2);
   $translate-y-down: calc(#{var(--c-input-field-height)} / 2 - (#{var(--c-input-label-font-size)} / 2));
+
+  &--clearable {
+    #{$self}__field > .c-autocomplete > input {
+      padding-right: 60px;
+    }
+
+    #{$self}__field > .c-select > input {
+      padding-right: 60px;
+    }
+  }
 
   &--has-prepend {
     #{$self}__label > .c-label {
@@ -83,7 +95,7 @@ $input-label-left: 5px;
   }
 
   &__prepend {
-    height:var(--c-input-field-height);
+    height: var(--c-input-field-height);
     width: var(--c-input-prepend-width);
     position: absolute;
     top: 0;
@@ -91,6 +103,18 @@ $input-label-left: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  &__clear {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    cursor: pointer;
+    width: var(--c-input-append-width);
+    top: 0;
+    bottom: 0;
+    right: 0;
   }
 
   &__append {
@@ -134,6 +158,14 @@ $input-label-left: 5px;
     transition-property: color, border-color;
     position: relative;
     overflow: hidden;
+
+    & > .c-select + #{$self}__clear {
+      right: var(--c-input-append-width);
+    }
+
+    & > .c-autocomplete + #{$self}__clear {
+      right: var(--c-input-append-width);
+    }
 
     & > * > input,
     & > * > textarea {

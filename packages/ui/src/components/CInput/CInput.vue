@@ -7,6 +7,7 @@
         useValidate
     } from '../../composables'
     import { FIELD_ATTRS } from '../../constants'
+    import { IconAliases } from '../../enums'
     import { isNotEmpty, unique } from '../../helpers'
     import { CLabel } from '../CLabel'
 
@@ -46,7 +47,7 @@
     const fieldId = `input-${props.id ?? unique(6)}`
 
     const hasLabel = computed(() => !!slots.label || !!props.label)
-
+    const showClearBtn = computed(() => props.clearable && state.hasValue)
     const hasDetails = computed(() => !props.noDetails && (
         !!props.details ||
         !!slots?.details ||
@@ -83,6 +84,7 @@
             'c-input--disabled': props.disabled,
             'c-input--readonly': props.readonly,
             'c-input--has-value': state.hasValue,
+            'c-input--clearable': props.clearable,
             'c-input--has-prepend': !!slots?.prepend,
             'c-input--has-append': !!slots?.append,
             [attrs.class as string]: !!attrs.class,
@@ -114,6 +116,7 @@
 
     function clear() {
         emit('clear')
+        blur()
     }
 
     function reset() {
@@ -176,14 +179,20 @@
                 :reset
                 :attrs="fieldAttrs"
             />
-            <div
-                v-if="clearable"
-                class="c-input__clear"
-            >
-                <slot name="clear">
-                    <c-icon @click="onClear" />
-                </slot>
-            </div>
+            <transition name="fade">
+                <div
+                    v-if="showClearBtn"
+                    class="c-input__clear"
+                >
+                    <slot name="clear">
+                        <c-icon
+                            :name="IconAliases.CLOSE"
+                            :size="24"
+                            @click="clear"
+                        />
+                    </slot>
+                </div>
+            </transition>
             <div
                 v-if="$slots.append"
                 class="c-input__append"

@@ -17,7 +17,7 @@
         (e: 'focus'): void
     }>()
 
-    const input = defineModel<string | number | undefined>()
+    const input = defineModel<string | number | undefined | null>()
     const inputRef = shallowRef<HTMLElement>()
     const attrs = useAttrs()
 
