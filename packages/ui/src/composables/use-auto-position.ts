@@ -263,7 +263,7 @@ export function useAutoPosition(
     }
 
     const update = async (activatorEl: Element | ComponentPublicInstance) => {
-        if (unref(activatorEl)) {
+        if (activatorEl) {
             setActivatorSizes(activatorEl)
             await nextTick()
         }

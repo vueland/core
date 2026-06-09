@@ -2,7 +2,7 @@
 
 $self: '.c-input';
 $input-field-height: 40px;
-$input-label-line-height: 20px;
+$input-label-line-height: .9;
 $input-field-border-color: #e5e5e5;
 $input-append-min-width: 24px;
 $input-append-height: $input-field-height;
@@ -20,7 +20,7 @@ $input-label-left: 5px;
   --c-input-error-color: var(--c-app-error-color);
   --c-input-primary-color: var(--c-app-primary-color);
   --c-input-prepend-min-width: #{$input-prepend-min-width};
-  --c-input-prepend-height: #{$input-prepend-height};
+  --c-input-prepend-min-height: #{$input-prepend-height};
   --c-input-append-min-width: #{$input-append-min-width};
   --c-input-append-height: #{$input-field-height};
   --c-input-background-color: var(--c-app-surface-color);
@@ -91,6 +91,7 @@ $input-label-left: 5px;
   &__prepend {
     height: var(--c-input-prepend-height);
     min-width: var(--c-input-prepend-min-width);
+    min-height: var(--c-input-prepend-min-height);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -102,12 +103,12 @@ $input-label-left: 5px;
     align-items: center;
     cursor: pointer;
     width: var(--c-input-append-min-width);
-    height: var(--c-input-append-height);
+    min-height: var(--c-input-append-min-height);
   }
 
   &__append {
-    height: var(--c-input-append-height);
     min-width: var(--c-input-append-min-width);
+    min-height: var(--c-input-append-min-height);
     transition: transform .1s linear;
     display: flex;
     align-items: center;
@@ -136,10 +137,9 @@ $input-label-left: 5px;
 
   &__field {
     display: flex;
-    height: var(--c-input-field-height);
     border: thin solid var(--c-input-field-border-color);
     border-radius: var(--c-input-field-border-radius);
-    transition: .4s $primary-transition;
+    transition: .2s $primary-transition;
     transition-property: color, border-color;
     position: relative;
     overflow: hidden;
@@ -147,7 +147,8 @@ $input-label-left: 5px;
 
     & > * > input,
     & > * > textarea {
-      color: var(--c-input-field-text-color)
+      color: var(--c-input-field-text-color);
+      padding: 4px 8px;
     }
   }
 

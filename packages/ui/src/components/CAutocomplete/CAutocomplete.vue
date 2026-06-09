@@ -22,8 +22,15 @@
 
     defineSlots<CAutocompleteSlots<T>>()
 
-    const { inputValue, searchItems, rollbackValue } = useAutocomplete(props)
+    const {
+        inputValue,
+        searchItems,
+        selectedItems,
+    } = useAutocomplete(props)
+
     const inputRef = shallowRef()
+    const fieldRef = shallowRef()
+    const menuRef = shallowRef()
 
     const model = defineModel<T | T[]>({
         get: () => props.modelValue,
@@ -32,7 +39,7 @@
 
     function closeMenu() {
         unref(inputRef).blur()
-        rollbackValue()
+        unref(menuRef).close()
     }
 
     function onSelect(value: T) {
@@ -42,32 +49,45 @@
         }
 
         model.value = value
-        closeMenu()
+        unref(inputRef).blur()
     }
 
     function clear() {
         model.value = props.multiple ? [] : undefined
     }
 
-    watch(inputValue, (val) => {
-        emit('update:search', unref(inputValue))
-
-        if (!val) {
-            clear()
+    function onKeyDown(e: KeyboardEvent) {
+        if (unref(inputValue)) {
+            return
         }
+
+        if (e.code === 'Backspace' && props.multiple) {
+            const data = unref(model) as T[]
+            model.value = data.slice(0, -1)
+        }
+    }
+
+    function focus() {
+        unref(inputRef).focus()
+        unref(fieldRef).$el.focus()
+    }
+
+    watch(inputValue, () => {
+        emit('update:search', unref(inputValue))
     })
 
 </script>
 <template>
     <c-input
         ref="inputRef"
-        v-model="model"
+        :model-value="model"
         v-bind="$attrs"
         @clear="clear"
     >
-        <template #field="{input, focus, focused, preset, readonly, attrs, uid, activator}">
+        <template #field="{input, blur, focused, preset, readonly, attrs, uid, activator}">
             <c-menu
                 :id="`${uid}-menu`"
+                ref="menuRef"
                 bottom
                 open-on-focus
                 close-on-click-outside
@@ -76,28 +96,38 @@
                 strategy="reverse"
                 :activator
                 :preset="options?.menuPreset"
-                @close="closeMenu"
-                @open="rollbackValue"
+                @close="blur"
             >
                 <template #activator="{on}">
                     <div
                         class="c-autocomplete"
                         :class="preset"
+                        @click="focus"
                     >
-                        <c-field
-                            :id="uid"
-                            v-model="inputValue"
-                            class="c-autocomplete__field"
-                            type="text"
-                            :focused
-                            v-bind="attrs"
-                            :readonly
-                            :aria-controls="`${uid}-menu`"
-                            :aria-expanded="focused"
-                            v-on="on"
-                            @focus="focus"
-                            @input="input"
-                        />
+                        <div class="c-autocomplete__box">
+                            <div
+                                v-for="it in selectedItems"
+                                :key="it"
+                                class="c-autocomplete__item"
+                            >
+                                {{ it }},
+                            </div>
+                            <c-field
+                                :id="uid"
+                                ref="fieldRef"
+                                v-model="inputValue"
+                                class="c-autocomplete__field"
+                                type="text"
+                                :focused
+                                v-bind="attrs"
+                                :readonly
+                                :aria-controls="`${uid}-menu`"
+                                :aria-expanded="focused"
+                                v-on="on"
+                                @input="input"
+                                @keydown="onKeyDown"
+                            />
+                        </div>
                     </div>
                 </template>
                 <template #default>

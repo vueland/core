@@ -51,7 +51,7 @@
     <c-input
         v-bind="$attrs"
         ref="inputRef"
-        v-model="model"
+        :model-value="model"
         validate-on="blur"
         @clear="onClear"
     >

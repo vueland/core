@@ -45,6 +45,7 @@
     })
 
     const fieldId = `input-${props.id ?? unique(6)}`
+    const fieldRef = shallowRef()
 
     const hasLabel = computed(() => !!slots.label || !!props.label)
     const showClearBtn = computed(() => props.clearable && state.hasValue && state.focused)
@@ -93,7 +94,7 @@
     ])
 
     function focus() {
-        if (props.disabled) {
+        if (props.disabled || props.readonly) {
             return
         }
         state.focused = true
@@ -116,6 +117,7 @@
 
     function clear() {
         emit('clear')
+        state.hasValue = false
         blur()
     }
 
@@ -136,9 +138,6 @@
     onBeforeUnmount(() => {
         formApi?.remove(validate)
     })
-
-
-    const fieldRef = shallowRef()
 
     defineExpose({
         validate,

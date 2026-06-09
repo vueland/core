@@ -27,7 +27,6 @@ export type CInputEmits<T = any> = {
     blur: [boolean]
     input: [T]
     clear: []
-    'update:modelValue': [T]
 }
 
 export type CInputSlots<T = any> = {

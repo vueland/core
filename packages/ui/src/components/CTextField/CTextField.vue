@@ -15,7 +15,7 @@
 
 <template>
     <c-input
-        v-model="model"
+        :model-value="model"
         v-bind="$attrs"
         @clear="onClear"
     >

@@ -1,10 +1,13 @@
 .c-text-field {
-  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   &__input {
     width: 100%;
-    height: 100%;
     outline: none;
-    padding: 10px;
   }
 }

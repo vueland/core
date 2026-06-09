@@ -1,7 +1,32 @@
 .c-autocomplete {
-  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 40px;
+  cursor: text;
 
-  &__field{
+  &__box {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    column-gap: 2px;
+    height: 100%;
+    padding: 5px 0;
+    cursor: text;
+  }
+
+  &-item {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 1 auto;
+    max-width: 100%;
+  }
+
+  &__field {
+    flex: 1 1;
     outline: none;
+    width: auto !important;
+    min-width: 20%;
   }
 }
