@@ -5,7 +5,7 @@ $toolbar-logo-padding: 0 10px;
 .c-toolbar {
   --toolbar-height: #{$toolbar-height};
   --toolbar-logo-width: #{$toolbar-logo-width};
-  --toolbar-background-color: var(--c-app-base-color);
+  --toolbar-background-color: var(--c-app-surface-color);
   --toolbar-logo-padding: #{$toolbar-logo-padding};
 
   width: 100%;

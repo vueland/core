@@ -31,7 +31,7 @@
 
     const nameRules = markRaw([
         (val: string) => ({
-            valid: val.trim().length >= 3,
+            valid: val?.trim().length >= 3,
             message: 'Не менее 3-х символов'
         })
     ])
@@ -95,6 +95,7 @@
                     :preset="currentPreset"
                     details="some text"
                     placeholder="введите текст"
+                    clearable
                     min="3"
                     max="5"
                 />
@@ -102,6 +103,7 @@
                     v-model="form.radius"
                     label="Radius"
                     validate-on="input"
+                    clearable
                     class="form-name mt-4"
                     preset="input.A"
                     :items="radiusItems"
@@ -119,6 +121,7 @@
                     placeholder="введите текст"
                     name="profession"
                     :items="professions"
+                    clearable
                     :rules="professionRules"
                     multiple
                     :options="{

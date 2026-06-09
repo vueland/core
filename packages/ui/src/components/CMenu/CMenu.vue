@@ -25,7 +25,6 @@
         activatorProps,
         genListeners,
         getActivator,
-        getActivatorElement
     } = useActivator(props)
 
     const {
@@ -73,7 +72,7 @@
                 model.value = true
             }
 
-            await update(getActivator<HTMLElement>())
+            await update(getActivator())
 
             emit('open')
         })
@@ -93,7 +92,7 @@
     const onClickOutside = (e: Event) => {
         const { closeOnClickOutside } = props
         const { target } = e
-        const activator = getActivatorElement()
+        const activator = getActivator()
 
         if (closeOnClickOutside && (!activator || !activator.contains(target as Node))) {
             close()
@@ -115,7 +114,7 @@
     })
 
     const handler = throttle(() => {
-        update(getActivator<HTMLElement>())
+        update(getActivator())
     }, THROTTLE_DELAY)
 
     defineExpose({

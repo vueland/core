@@ -36,7 +36,7 @@ export interface AutoPositionProps {
 
 const SCREEN_EDGE_OFFSET = 20
 
-const getRect = (el: HTMLElement | ComponentPublicInstance) => {
+const getRect = (el: Element | ComponentPublicInstance) => {
     const element = (el as ComponentPublicInstance)?.$el ?? el
 
     const {
@@ -89,7 +89,7 @@ export function useAutoPosition(
         frameId = 0
     }
 
-    const setActivatorSizes = (activatorEl: HTMLElement | ComponentPublicInstance) => {
+    const setActivatorSizes = (activatorEl: Element | ComponentPublicInstance) => {
         const rect = getRect(activatorEl)
 
         activator.value = {
@@ -262,7 +262,7 @@ export function useAutoPosition(
         })
     }
 
-    const update = async (activatorEl: HTMLElement | ComponentPublicInstance) => {
+    const update = async (activatorEl: Element | ComponentPublicInstance) => {
         if (unref(activatorEl)) {
             setActivatorSizes(activatorEl)
             await nextTick()

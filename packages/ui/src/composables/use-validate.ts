@@ -1,7 +1,6 @@
 import { computed, onBeforeMount, type Reactive, shallowReactive, toRefs, unref, watch } from 'vue'
 
 import { type InputState } from '../components'
-import { isDef } from '../helpers'
 import type { Maybe } from '../types'
 
 export type ValidateFn = (value: any) => ({
@@ -35,7 +34,6 @@ export function useValidate(props: ValidateProps & { modelValue: any }, state: R
     })
 
     const hasRules = computed(() => (props.rules?.length ?? 0) > 0)
-    const isOnBlur = computed(() => unref(validateOn) === InputEvents.BLUR)
 
     function resetValidate() {
         errors.errorMessage = ''
@@ -68,21 +66,14 @@ export function useValidate(props: ValidateProps & { modelValue: any }, state: R
             return
         }
 
-        watch(modelValue!, (value) => {
-            if (isDef(value) && !unref(isOnBlur)) {
+        watch(modelValue!, async (value) => {
+            if (!value || unref(validateOn) !== InputEvents.BLUR) {
                 validate()
-            }
-        })
-
-        const unwatch = watch(() => state.isDirty, () => {
-            if (!unref(isOnBlur)) {
-                validate()
-                unwatch()
             }
         })
 
         watch(() => state.focused, (val) => {
-            if (!val && unref(isOnBlur)) {
+            if (!val) {
                 validate()
             }
         })

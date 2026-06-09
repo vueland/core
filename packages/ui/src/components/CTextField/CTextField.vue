@@ -6,13 +6,18 @@
         name: 'CTextField',
     })
 
-    const model = defineModel<string | number>()
+    const model = defineModel<string | number | undefined | null>()
+
+    function onClear() {
+        model.value = undefined
+    }
 </script>
 
 <template>
     <c-input
         v-model="model"
         v-bind="$attrs"
+        @clear="onClear"
     >
         <template #field="{focus, input, blur, focused, preset, attrs, uid}">
             <div
