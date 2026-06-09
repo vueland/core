@@ -45,11 +45,15 @@
         closeMenu()
     }
 
+    function clear() {
+        model.value = props.multiple ? [] : undefined
+    }
+
     watch(inputValue, (val) => {
         emit('update:search', unref(inputValue))
 
         if (!val) {
-            model.value = props.multiple ? [] : undefined
+            clear()
         }
     })
 
@@ -59,8 +63,9 @@
         ref="inputRef"
         v-model="model"
         v-bind="$attrs"
+        @clear="clear"
     >
-        <template #field="{input, focus, focused, preset, readonly, attrs, uid}">
+        <template #field="{input, focus, focused, preset, readonly, attrs, uid, activator}">
             <c-menu
                 :id="`${uid}-menu`"
                 bottom
@@ -69,14 +74,14 @@
                 :close-on-content-click="!multiple"
                 :offset-y="2"
                 strategy="reverse"
+                :activator
                 :preset="options?.menuPreset"
                 @close="closeMenu"
                 @open="rollbackValue"
             >
-                <template #activator="{on, activator}">
+                <template #activator="{on}">
                     <div
                         class="c-autocomplete"
-                        v-bind="activator"
                         :class="preset"
                     >
                         <c-field

@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T">
-    import { computed, onBeforeMount, onBeforeUnmount, shallowReactive, unref, useAttrs, watch } from 'vue'
+    import { computed, onBeforeMount, onBeforeUnmount, shallowReactive, shallowRef, unref, useAttrs, watch } from 'vue'
 
     import {
         useForm,
@@ -47,7 +47,7 @@
     const fieldId = `input-${props.id ?? unique(6)}`
 
     const hasLabel = computed(() => !!slots.label || !!props.label)
-    const showClearBtn = computed(() => props.clearable && state.hasValue)
+    const showClearBtn = computed(() => props.clearable && state.hasValue && state.focused)
     const hasDetails = computed(() => !props.noDetails && (
         !!props.details ||
         !!slots?.details ||
@@ -137,6 +137,9 @@
         formApi?.remove(validate)
     })
 
+
+    const fieldRef = shallowRef()
+
     defineExpose({
         validate,
         focus,
@@ -152,6 +155,7 @@
         :class="classes"
     >
         <div
+            ref="fieldRef"
             class="c-input__field"
             :class="preset.field"
         >
@@ -176,6 +180,7 @@
                 :clear
                 :blur
                 :input
+                :activator="fieldRef"
                 :reset
                 :attrs="fieldAttrs"
             />

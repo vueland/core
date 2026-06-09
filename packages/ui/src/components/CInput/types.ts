@@ -51,6 +51,7 @@ export type CInputSlots<T = any> = {
         readonly?: boolean
         focused?: boolean
         disabled?: boolean
+        activator?: any
         preset?: string[] | string[][]
         errorMessage: ValidateState['errorMessage']
         hasError: ValidateState['hasError']

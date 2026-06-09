@@ -55,7 +55,7 @@
         validate-on="blur"
         @clear="onClear"
     >
-        <template #field="{focus, focused, preset, attrs, uid}">
+        <template #field="{focus, focused, preset, attrs, uid, activator}">
             <c-menu
                 :id="`${uid}-menu`"
                 bottom
@@ -64,11 +64,11 @@
                 :close-on-content-click="!multiple"
                 :offset-y="2"
                 strategy="reverse"
+                :activator
                 @close="closeMenu"
             >
-                <template #activator="{on, activator}">
+                <template #activator="{on}">
                     <div
-                        v-bind="activator"
                         class="c-select"
                         :class="preset"
                     >

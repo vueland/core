@@ -6,6 +6,7 @@ export type ActivatorProps = {
     openOnHover?: boolean
     closeOnLeave?: boolean
     openOnFocus?: boolean
+    activator?: ComponentPublicInstance | Element
 }
 
 export type ActivatorListeners = {
@@ -22,19 +23,15 @@ export type ActivatorListeners = {
 }
 
 export function useActivator(props: Partial<ActivatorProps> & Record<string, unknown>) {
-    const activatorEl = shallowRef<ComponentPublicInstance | HTMLElement>()
+    const activatorEl = shallowRef<ComponentPublicInstance | Element | undefined>(props.activator)
     const activatorProps: Record<string, any> = { ref: set }
 
-    function set(val: HTMLElement | ComponentPublicInstance) {
+    function set(val: Element | ComponentPublicInstance) {
         activatorEl.value = val
     }
 
-    function getActivator<T>() {
-        return activatorEl.value as T
-    }
-
-    function getActivatorElement(): HTMLElement {
-        return (unref(activatorEl) as ComponentPublicInstance)?.$el ?? unref(activatorEl)
+    function getActivator(): Element {
+        return props.activator ?? (unref(activatorEl) as ComponentPublicInstance)?.$el ?? unref(activatorEl)
     }
 
     function genListeners({
@@ -67,7 +64,6 @@ export function useActivator(props: Partial<ActivatorProps> & Record<string, unk
 
     return {
         activatorProps,
-        getActivatorElement,
         genListeners,
         getActivator,
     }

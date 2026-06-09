@@ -4,8 +4,10 @@ $self: '.c-input';
 $input-field-height: 40px;
 $input-label-line-height: 20px;
 $input-field-border-color: #e5e5e5;
-$input-append-width: 24px;
+$input-append-min-width: 24px;
 $input-append-height: $input-field-height;
+$input-prepend-min-width: 40px;
+$input-prepend-height: $input-field-height;
 $input-details-height: 24px;
 $input-label-left: 5px;
 
@@ -17,8 +19,10 @@ $input-label-left: 5px;
   --c-input-details-height: #{$input-details-height};
   --c-input-error-color: var(--c-app-error-color);
   --c-input-primary-color: var(--c-app-primary-color);
-  --c-input-prepend-width: #{$input-field-height};
-  --c-input-append-width: #{$input-append-width};
+  --c-input-prepend-min-width: #{$input-prepend-min-width};
+  --c-input-prepend-height: #{$input-prepend-height};
+  --c-input-append-min-width: #{$input-append-min-width};
+  --c-input-append-height: #{$input-field-height};
   --c-input-background-color: var(--c-app-surface-color);
   --c-input-label-padding-x: 4px;
   --c-input-label-left: #{$input-label-left};
@@ -45,7 +49,7 @@ $input-label-left: 5px;
 
   &--focused {
     #{$self}__field {
-      border: thin solid currentColor;
+      border-color: currentColor;
     }
 
     .c-autocomplete ~ #{$self}__append {
@@ -65,17 +69,10 @@ $input-label-left: 5px;
     color: var(--c-input-primary-color);
   }
 
-  $prepended-translate-x: calc(#{var(--c-input-prepend-width)} - #{var(--c-input-label-padding-x)} * 2);
+  $prepended-translate-x: calc(#{var(--c-input-prepend-min-width)} - #{var(--c-input-label-padding-x)} * 2);
   $translate-y-down: calc(#{var(--c-input-field-height)} / 2 - (#{var(--c-input-label-font-size)} / 2));
 
   &--clearable {
-    #{$self}__field > .c-autocomplete > input {
-      padding-right: 60px;
-    }
-
-    #{$self}__field > .c-select > input {
-      padding-right: 60px;
-    }
   }
 
   &--has-prepend {
@@ -84,22 +81,16 @@ $input-label-left: 5px;
     }
 
     #{$self}__field > * > input {
-      padding-left: var(--c-input-prepend-width);
+      padding-left: 0;
     }
   }
 
   &--has-append {
-    #{$self}__field > * > input {
-      padding-right: var(--c-input-append-width);
-    }
   }
 
   &__prepend {
-    height: var(--c-input-field-height);
-    width: var(--c-input-prepend-width);
-    position: absolute;
-    top: 0;
-    left: 0;
+    height: var(--c-input-prepend-height);
+    min-width: var(--c-input-prepend-min-width);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -109,21 +100,15 @@ $input-label-left: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: absolute;
     cursor: pointer;
-    width: var(--c-input-append-width);
-    top: 0;
-    bottom: 0;
-    right: 0;
+    width: var(--c-input-append-min-width);
+    height: var(--c-input-append-height);
   }
 
   &__append {
-    height: var(--c-input-field-height);
-    width: var(--c-input-append-width);
+    height: var(--c-input-append-height);
+    min-width: var(--c-input-append-min-width);
     transition: transform .1s linear;
-    position: absolute;
-    top: 0;
-    right: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -158,14 +143,7 @@ $input-label-left: 5px;
     transition-property: color, border-color;
     position: relative;
     overflow: hidden;
-
-    & > .c-select + #{$self}__clear {
-      right: var(--c-input-append-width);
-    }
-
-    & > .c-autocomplete + #{$self}__clear {
-      right: var(--c-input-append-width);
-    }
+    padding-right: 5px;
 
     & > * > input,
     & > * > textarea {
