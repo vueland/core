@@ -1,8 +1,9 @@
 .c-autocomplete {
   flex: 1 1 auto;
   min-width: 0;
-  min-height: 40px;
   cursor: text;
+  max-height: 100%;
+  position: relative;
 
   &__box {
     display: flex;
@@ -11,7 +12,6 @@
     flex-wrap: wrap;
     column-gap: 2px;
     height: 100%;
-    padding: 5px 0;
     cursor: text;
   }
 
@@ -23,10 +23,11 @@
     max-width: 100%;
   }
 
-  &__field {
-    flex: 1 1;
-    outline: none;
-    width: auto !important;
-    min-width: 20%;
+  & > .c-field > .c-field__append {
+    transition: transform .1s linear;
+  }
+
+  & > .c-field--focused > .c-field__append {
+    transform: rotate(180deg);
   }
 }

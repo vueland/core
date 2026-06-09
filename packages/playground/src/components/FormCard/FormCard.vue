@@ -102,12 +102,11 @@
                 <c-select
                     v-model="form.radius"
                     label="Radius"
-                    validate-on="input"
                     clearable
                     class="form-name mt-4"
                     preset="input.A"
                     :items="radiusItems"
-                    placeholder="введите текст"
+                    placeholder="выберите радиус"
                     :options="{
                         extKey: 'name'
                     }"

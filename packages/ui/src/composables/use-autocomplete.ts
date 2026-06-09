@@ -1,20 +1,21 @@
 import { computed, shallowRef, unref } from 'vue'
 
+import { useSelects } from './use-selects'
+
 
 export function useAutocomplete<T = any>(props: Record<string, any>) {
+    const {
+        items,
+        extKey,
+        hasValue,
+        select
+    } = useSelects(props)
+
     const inputValue = shallowRef()
-    const { extKey } = props.options ?? {}
-
-    const selectedItems = computed(() => {
-        if (props.multiple) {
-            return props.modelValue.map((it: T) => it[extKey] ?? it)
-        }
-
-        return [props.modelValue ? `${props.modelValue[extKey] ?? props.modelValue}` : '']
-    })
 
     const normalizedInput = computed(() => unref(inputValue)?.trim().toLowerCase() ?? '')
-    const isEqual = computed(() => unref(selectedItems).includes(unref(normalizedInput)))
+
+    const isEqual = computed(() => unref(items).includes(unref(normalizedInput)))
 
     const searchItems = computed(() => {
         if (unref(isEqual) || !unref(normalizedInput)) {
@@ -28,8 +29,10 @@ export function useAutocomplete<T = any>(props: Record<string, any>) {
     })
 
     return {
+        items,
+        hasValue,
         inputValue,
         searchItems,
-        selectedItems,
+        select
     }
 }

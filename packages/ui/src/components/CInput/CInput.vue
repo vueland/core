@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T">
-    import { computed, onBeforeMount, onBeforeUnmount, shallowReactive, shallowRef, unref, useAttrs, watch } from 'vue'
+    import { computed, onBeforeMount, onBeforeUnmount, shallowReactive, shallowRef, unref, useAttrs } from 'vue'
 
     import {
         useForm,
@@ -7,9 +7,7 @@
         useValidate
     } from '../../composables'
     import { FIELD_ATTRS } from '../../constants'
-    import { IconAliases } from '../../enums'
-    import { isNotEmpty, unique } from '../../helpers'
-    import { CLabel } from '../CLabel'
+    import { unique } from '../../helpers'
 
     import type { CInputEmits, CInputProps, CInputSlots, InputState } from './types'
 
@@ -25,7 +23,6 @@
     const state = shallowReactive<InputState>({
         focused: props.focused ?? false,
         isDirty: false,
-        hasValue: false,
     })
 
     const {
@@ -47,8 +44,6 @@
     const fieldId = `input-${props.id ?? unique(6)}`
     const fieldRef = shallowRef()
 
-    const hasLabel = computed(() => !!slots.label || !!props.label)
-    const showClearBtn = computed(() => props.clearable && state.hasValue && state.focused)
     const hasDetails = computed(() => !props.noDetails && (
         !!props.details ||
         !!slots?.details ||
@@ -69,7 +64,7 @@
 
     const fieldAttrs = computed(() => ({
         ...unref(normalizedAttrsMap),
-        ...(unref(hasLabel) ? { 'aria-labelledby': `${fieldId}-label` } : {}),
+        ...(props.label ? { 'aria-labelledby': `${fieldId}-label` } : {}),
         ...(unref(hasDetails) ? { 'aria-describedby': `${fieldId}-details` } : {}),
         ...(errors.hasError ? { 'aria-invalid': 'true' } : {}),
         ...(errors.errorMessage && unref(hasDetails) ? { 'aria-errormessage': `${fieldId}-details` } : {}),
@@ -84,7 +79,6 @@
             'c-input--focused': state.focused,
             'c-input--disabled': props.disabled,
             'c-input--readonly': props.readonly,
-            'c-input--has-value': state.hasValue,
             'c-input--clearable': props.clearable,
             'c-input--has-prepend': !!slots?.prepend,
             'c-input--has-append': !!slots?.append,
@@ -115,21 +109,9 @@
         emit('input', val)
     }
 
-    function clear() {
-        emit('clear')
-        state.hasValue = false
-        blur()
-    }
-
     function reset() {
         resetValidate()
-        clear()
     }
-
-    watch(() => props.modelValue, (value) => {
-        const isArray = Array.isArray(value)
-        state.hasValue = isArray ? !!value.length : isNotEmpty(value)
-    }, { immediate: true })
 
     onBeforeMount(() => {
         formApi?.add(validate)
@@ -143,7 +125,6 @@
         validate,
         focus,
         blur,
-        clear,
         input,
         reset
     })
@@ -158,13 +139,6 @@
             class="c-input__field"
             :class="preset.field"
         >
-            <div
-                v-if="$slots.prepend"
-                class="c-input__prepend"
-                :class="preset.prepend"
-            >
-                <slot name="prepend" />
-            </div>
             <slot
                 name="field"
                 v-bind="errors"
@@ -176,53 +150,13 @@
                 :uid="fieldId"
                 :preset="preset.field"
                 :focus
-                :clear
                 :blur
                 :input
+                :clearable
                 :activator="fieldRef"
                 :reset
                 :attrs="fieldAttrs"
             />
-            <transition name="fade">
-                <div
-                    v-if="showClearBtn"
-                    class="c-input__clear"
-                >
-                    <slot name="clear">
-                        <c-icon
-                            :name="IconAliases.CLOSE"
-                            :size="24"
-                            @click="clear"
-                        />
-                    </slot>
-                </div>
-            </transition>
-            <div
-                v-if="$slots.append"
-                class="c-input__append"
-                :class="preset.append"
-            >
-                <slot name="append" />
-            </div>
-        </div>
-        <div
-            v-if="hasLabel"
-            class="c-input__label"
-            :class="preset.label"
-        >
-            <slot
-                name="label"
-                :uid="fieldId"
-            >
-                <c-label
-                    :id="`${fieldId}-label`"
-                    v-memo="[label]"
-                    tag="label"
-                    :for="fieldId"
-                >
-                    {{ label }}
-                </c-label>
-            </slot>
         </div>
         <div
             v-if="hasDetails"

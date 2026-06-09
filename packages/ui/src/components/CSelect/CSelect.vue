@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T">
     import { shallowRef, unref } from 'vue'
 
-    import { useInputValue } from '../../composables'
+    import { useSelects } from '../../composables'
     import { IconAliases } from '../../enums'
     import { CField } from '../CField'
     import { CInput } from '../CInput'
@@ -24,19 +24,10 @@
         set: val => val
     })
 
-    const inputValue = useInputValue(props)
+    const { items: selectedItems, hasValue, select } = useSelects(props)
 
     function closeMenu() {
         unref(inputRef).blur()
-    }
-
-    function onSelect(value: T) {
-        if (props.multiple) {
-            model.value = [...model.value as T[], value]
-            return
-        }
-
-        model.value = value
     }
 
     function onClear() {
@@ -53,9 +44,8 @@
         ref="inputRef"
         :model-value="model"
         validate-on="blur"
-        @clear="onClear"
     >
-        <template #field="{focus, focused, preset, attrs, uid, activator}">
+        <template #field="{focus, focused, preset, attrs, uid, activator, label, clearable}">
             <c-menu
                 :id="`${uid}-menu`"
                 bottom
@@ -74,22 +64,46 @@
                     >
                         <c-field
                             :id="uid"
-                            class="c-select__field"
                             v-bind="attrs"
-                            :model-value="inputValue"
+                            class="c-select__field"
                             :focused
+                            :label
+                            :clearable
+                            :filled="hasValue"
                             readonly
                             :aria-controls="`${uid}-menu`"
                             :aria-expanded="focused"
                             v-on="on"
                             @focus="focus"
-                        />
+                            @clear="onClear"
+                        >
+                            <template #before>
+                                <slot
+                                    name="selects"
+                                    :items="selectedItems"
+                                >
+                                    <div
+                                        v-for="(it, i) in selectedItems"
+                                        :key="it"
+                                        class="c-selected__item"
+                                    >
+                                        {{ `${it}` + (i + 1 !== selectedItems.length ? ',' : '') }}
+                                    </div>
+                                </slot>
+                            </template>
+                            <template #append>
+                                <c-icon
+                                    :name="IconAliases.DROPDOWN"
+                                    size="20"
+                                />
+                            </template>
+                        </c-field>
                     </div>
                 </template>
                 <template #default>
                     <slot
                         name="menu"
-                        :on-select="onSelect"
+                        :on-select="select"
                         :items
                     >
                         <c-items
@@ -103,25 +117,17 @@
                 </template>
             </c-menu>
         </template>
-        <template #append>
-            <c-icon
-                :name="IconAliases.DROPDOWN"
-                size="20"
-            />
-        </template>
+
         <template #details="{errorMessage, details}">
-            <span :key="errorMessage || details">
-                {{ errorMessage || details }}
-            </span>
-        </template>
-        <template
-            v-for="(_, slotName) in $slots"
-            #[slotName]="data"
-        >
             <slot
-                :name="slotName"
-                v-bind="data"
-            />
+                name="details"
+                :error-message
+                :details
+            >
+                <span :key="errorMessage || details">
+                    {{ errorMessage || details }}
+                </span>
+            </slot>
         </template>
     </c-input>
 </template>
