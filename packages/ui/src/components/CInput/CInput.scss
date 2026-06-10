@@ -1,32 +1,18 @@
 @use "../../styles/modules/global-vars" as *;
 
 $self: '.c-input';
-$input-field-height: 40px;
-$input-label-line-height: .9;
 $input-field-border-color: #e5e5e5;
-$input-append-min-width: 24px;
-$input-append-height: $input-field-height;
-$input-prepend-min-width: 40px;
-$input-prepend-height: $input-field-height;
 $input-details-height: 24px;
-$input-label-left: 5px;
 
 .c-input {
-  --c-input-field-height: #{$input-field-height};
   --c-input-field-border-radius: var(--c-app-border-radius);
-  --c-input-field-border-color: #{$input-field-border-color};
-  --c-input-field-text-color: var(--c-app-text-color);
   --c-input-details-height: #{$input-details-height};
+  --c-input-field-border-color: #{$input-field-border-color};
+  --c-input-clear-action-min-width: 24px;
+  --c-input-field-text-color: var(--c-app-text-color);
   --c-input-error-color: var(--c-app-error-color);
   --c-input-primary-color: var(--c-app-primary-color);
-  --c-input-prepend-min-width: #{$input-prepend-min-width};
-  --c-input-prepend-min-height: #{$input-prepend-height};
-  --c-input-append-min-width: #{$input-append-min-width};
-  --c-input-append-height: #{$input-field-height};
   --c-input-background-color: var(--c-app-surface-color);
-  --c-input-label-padding-x: 4px;
-  --c-input-label-left: #{$input-label-left};
-  --c-input-label-font-size: 16px;
 
   display: flex;
   flex-direction: column;
@@ -37,27 +23,9 @@ $input-label-left: 5px;
   border-radius: var(--c-app-border-radius);
   background-color: var(--c-input-background-color);
 
-  &--focused,
-  &--has-value,
-  &--focused#{$self}--has-prepend,
-  &--has-value#{$self}--has-prepend {
-    #{$self}__label > .c-label {
-      transform: translate(0, calc(-50%)) scale(.9);
-      background-color: inherit;
-    }
-  }
-
   &--focused {
     #{$self}__field {
       border-color: currentColor;
-    }
-
-    .c-autocomplete ~ #{$self}__append {
-      transform: rotate(180deg);
-    }
-
-    .c-select ~ #{$self}__append {
-      transform: rotate(180deg);
     }
   }
 
@@ -69,70 +37,17 @@ $input-label-left: 5px;
     color: var(--c-input-primary-color);
   }
 
-  $prepended-translate-x: calc(#{var(--c-input-prepend-min-width)} - #{var(--c-input-label-padding-x)} * 2);
-  $translate-y-down: calc(#{var(--c-input-field-height)} / 2 - (#{var(--c-input-label-font-size)} / 2));
-
   &--clearable {
   }
 
-  &--has-prepend {
-    #{$self}__label > .c-label {
-      transform: translate($prepended-translate-x, $translate-y-down);
-    }
-
-    #{$self}__field > * > input {
-      padding-left: 0;
-    }
-  }
-
-  &--has-append {
-  }
-
-  &__prepend {
-    height: var(--c-input-prepend-height);
-    min-width: var(--c-input-prepend-min-width);
-    min-height: var(--c-input-prepend-min-height);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 
   &__clear {
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    width: var(--c-input-append-min-width);
+    width: var(--c-input-clear-action-min-width);
     min-height: var(--c-input-append-min-height);
-  }
-
-  &__append {
-    min-width: var(--c-input-append-min-width);
-    min-height: var(--c-input-append-min-height);
-    transition: transform .1s linear;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &__label {
-    position: absolute;
-    height: 0;
-    top: 0;
-    border-radius: var(--c-input-field-border-radius);
-    background-color: inherit;
-
-    .c-label {
-      transition: background-color, transform, .1s linear;
-      position: absolute;
-      left: var(--c-input-label-left);
-      font-size: var(--c-input-label-font-size);
-      line-height: .9;
-      pointer-events: none;
-      transform: translateY($translate-y-down) scale(1);
-      background-color: transparent;
-      padding: 0 var(--c-input-label-padding-x);
-    }
   }
 
   &__field {
@@ -142,8 +57,6 @@ $input-label-left: 5px;
     transition: .2s $primary-transition;
     transition-property: color, border-color;
     position: relative;
-    overflow: hidden;
-    padding-right: 5px;
 
     & > * > input,
     & > * > textarea {

@@ -5,7 +5,6 @@ import type { PresetProps, ValidateProps, ValidateState } from '../../composable
 export interface InputState {
     focused: boolean
     isDirty: boolean
-    hasValue: boolean
 }
 
 export type CInputProps<T = any> =
@@ -26,7 +25,6 @@ export type CInputEmits<T = any> = {
     focus: [boolean]
     blur: [boolean]
     input: [T]
-    clear: []
 }
 
 export type CInputSlots<T = any> = {
@@ -44,12 +42,12 @@ export type CInputSlots<T = any> = {
         input(val: T): void
         focus(): void
         blur(): void
-        clear(): void
         reset(): void
         label?: string
         readonly?: boolean
         focused?: boolean
         disabled?: boolean
+        clearable?: boolean
         activator?: any
         preset?: string[] | string[][]
         errorMessage: ValidateState['errorMessage']

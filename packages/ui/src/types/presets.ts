@@ -13,60 +13,64 @@ export type MenuPreset = {
     }
 }
 
-export type InputPreset = {
+export type FieldPreset = {
     root?: string[]
-    field?: string[]
     input?: string[]
     label?: string[]
-    details?: string[]
     prepend?: string[]
     append?: string[]
 
+    filled?: {
+        root?: string[]
+        input?: string[]
+        label?: string[]
+        prepend?: string[]
+        append?: string[]
+    }
+
+    prepended?: {
+        root?: string[]
+        input?: string[]
+        label?: string[]
+        prepend?: string[]
+        append?: string[]
+    }
+
+    appended?: {
+        root?: string[]
+        input?: string[]
+        label?: string[]
+        prepend?: string[]
+        append?: string[]
+    }
+}
+
+export type InputPreset = {
+    root?: string[]
+    field?: string
+    details?: string[]
+
     focused?: {
         root?: string[]
-        field?: string[]
-        label?: string[]
-        append?: string[]
+        field?: string // Название пресета филда
+        details?: string[]
     }
 
     error?: {
         root?: string[]
-        field?: string[]
-        label?: string[]
-        input?: string[]
+        field?: string // Название пресета филда
         details?: string[]
     }
 
     disabled?: {
         root?: string[]
-        field?: string[]
-        input?: string[]
-        label?: string[]
+        field?: string // Название пресета филда
+        details?: string[]
     }
 
     readonly?: {
         root?: string[]
-        field?: string[]
-        input?: string[]
-    }
-
-    hasValue?: {
-        root?: string[]
-        label?: string[]
-    }
-
-    hasPrepend?: {
-        root?: string[]
-        field?: string[]
-        input?: string[]
-        label?: string[]
-        prepend?: string[]
-    }
-
-    hasAppend?: {
-        root?: string[]
-        field?: string[]
-        input?: string[]
-        append?: string[]
+        field?: string
+        details?: string[]
     }
 }
