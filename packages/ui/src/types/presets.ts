@@ -13,36 +13,23 @@ export type MenuPreset = {
     }
 }
 
-export type FieldPreset = {
+type FieldPresetState = {
     root?: string[]
     input?: string[]
     label?: string[]
     prepend?: string[]
     append?: string[]
+}
 
-    filled?: {
-        root?: string[]
-        input?: string[]
-        label?: string[]
-        prepend?: string[]
-        append?: string[]
-    }
+export type FieldPreset = FieldPresetState & {
+    focused?: FieldPresetState
+    error?: FieldPresetState
+    disabled?: FieldPresetState
+    readonly?: FieldPresetState
 
-    prepended?: {
-        root?: string[]
-        input?: string[]
-        label?: string[]
-        prepend?: string[]
-        append?: string[]
-    }
-
-    appended?: {
-        root?: string[]
-        input?: string[]
-        label?: string[]
-        prepend?: string[]
-        append?: string[]
-    }
+    filled?: FieldPresetState
+    prepended?: FieldPresetState
+    appended?: FieldPresetState
 }
 
 export type InputPreset = {
@@ -52,19 +39,19 @@ export type InputPreset = {
 
     focused?: {
         root?: string[]
-        field?: string // Название пресета филда
+        field?: string
         details?: string[]
     }
 
     error?: {
         root?: string[]
-        field?: string // Название пресета филда
+        field?: string
         details?: string[]
     }
 
     disabled?: {
         root?: string[]
-        field?: string // Название пресета филда
+        field?: string
         details?: string[]
     }
 

@@ -2,9 +2,13 @@
     import { CField } from '../CField'
     import { CInput } from '../CInput'
 
+    import type { CTextFieldSlots } from './types'
+
     defineOptions({
         name: 'CTextField',
     })
+
+    defineSlots<CTextFieldSlots>()
 
     const model = defineModel<string | number | undefined | null>()
 
@@ -19,15 +23,13 @@
         v-bind="$attrs"
     >
         <template #field="{focus, input, blur, focused, preset, attrs, uid, label, clearable}">
-            <div
-                class="c-text-field"
-                :class="preset"
-            >
+            <div class="c-text-field">
                 <c-field
                     :id="uid"
                     v-model="model"
                     :focused
                     :label
+                    :preset
                     :clearable
                     v-bind="attrs"
                     @focus="focus"
@@ -45,7 +47,7 @@
                         v-if="$slots.append"
                         #append
                     >
-                        <slot name="prepend" />
+                        <slot name="append" />
                     </template>
                 </c-field>
             </div>

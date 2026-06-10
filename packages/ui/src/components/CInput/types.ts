@@ -49,7 +49,7 @@ export type CInputSlots<T = any> = {
         disabled?: boolean
         clearable?: boolean
         activator?: any
-        preset?: string[] | string[][]
+        preset?: string
         errorMessage: ValidateState['errorMessage']
         hasError: ValidateState['hasError']
         attrs: Record<string, any>

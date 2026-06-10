@@ -1,7 +1,11 @@
 import { computed, unref } from 'vue'
 
 import type { CInputProps, CInputSlots, InputState } from '../components'
-import { getPresetIf, getPresetOnly, type PresetCondition } from '../helpers'
+import {
+    getPresetOnly,
+    getPresetValueOnly,
+    type PresetCondition,
+} from '../helpers'
 import type { InputPreset } from '../types'
 
 import { usePresets } from './use-presets'
@@ -9,22 +13,14 @@ import type { ValidateState } from './use-validate'
 
 const EMPTY_INPUT_PRESETS = {
     root: [],
-    field: [],
-    input: [],
-    label: [],
+    field: undefined,
     details: [],
-    prepend: [],
-    append: [],
 }
 
 type InputPresetZone =
     | 'root'
     | 'field'
-    | 'input'
-    | 'label'
     | 'details'
-    | 'prepend'
-    | 'append'
 
 type InputPresetState =
     | 'focused'
@@ -32,18 +28,9 @@ type InputPresetState =
     | 'disabled'
     | 'readonly'
 
-export type PresetClassValue =
-    | string
-    | string[]
-    | string[][]
-    | undefined
-    | null
-    | false
-
 export function useInputPresets({
     props,
     errors,
-    slots,
     state,
 }: {
     props: CInputProps
@@ -61,13 +48,10 @@ export function useInputPresets({
         const preset = unref(presets)
 
         const focused = state.focused
-        const hasValue = state.hasValue
         const hasError = errors.hasError
         const hasErrorMessage = !!errors.errorMessage
         const disabled = !!props.disabled
         const readonly = !!props.readonly
-        const hasPrepend = !!slots.prepend
-        const hasAppend = !!slots.append
         const isActive = !disabled && !readonly
 
         const interactionState: PresetCondition<InputPresetState>[] = [
@@ -81,49 +65,18 @@ export function useInputPresets({
             getPresetOnly(preset, zone, interactionState)
         )
 
+        const onlyValue = <T>(zone: InputPresetZone) => (
+            getPresetValueOnly<T, InputPresetState>(preset, zone, interactionState)
+        )
+
         return {
-            root: [
-                ...only('root'),
-                ...getPresetIf(hasValue, preset?.hasValue?.root),
-                ...getPresetIf(hasPrepend, preset?.hasPrepend?.root),
-                ...getPresetIf(hasAppend, preset?.hasAppend?.root),
-            ],
+            root: only('root'),
 
-            field: [
-                ...only('field'),
-                ...getPresetIf(hasPrepend, preset?.hasPrepend?.field),
-                ...getPresetIf(hasAppend, preset?.hasAppend?.field),
-            ],
+            field: onlyValue<string>('field'),
 
-            input: [
-                ...only('input'),
-                ...getPresetIf(hasPrepend, preset?.hasPrepend?.input),
-                ...getPresetIf(hasAppend, preset?.hasAppend?.input),
-            ],
-
-            label: [
-                ...only('label'),
-                ...getPresetIf(hasValue, preset?.hasValue?.label),
-                ...getPresetIf(hasPrepend, preset?.hasPrepend?.label),
-            ],
-
-            details: [
-                ...getPresetOnly(preset, 'details', [
-                    ['error', hasErrorMessage],
-                ]),
-            ],
-
-            prepend: [
-                ...getPresetOnly(preset, 'prepend', []),
-                ...getPresetIf(hasPrepend, preset?.hasPrepend?.prepend),
-            ],
-
-            append: [
-                ...getPresetOnly(preset, 'append', [
-                    ['focused', focused && isActive],
-                ]),
-                ...getPresetIf(hasAppend, preset?.hasAppend?.append),
-            ],
+            details: getPresetOnly(preset, 'details', [
+                ['error', hasErrorMessage],
+            ]),
         }
     })
 }

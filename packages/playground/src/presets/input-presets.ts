@@ -4,24 +4,22 @@ export const A: InputPreset = {
     root: ['text-green-darken-2'],
     focused: {
         root: ['text-cyan-darken-2'],
-        label: ['text-amber-darken-2'],
+        field: 'field.base'
     },
-    label: ['text-uppercase'],
+    field: 'field.base',
     error: {
-        label: ['text-amber', ''],
-        // root: ['text-red', ''],
+        root: ['text-pink'],
+        field: 'field.error',
     },
-    disabled: {
-        label: ['text-grey-lighten-1'],
-    },
+    disabled: {},
     details: ['text-grey', 'fs-xs'],
 }
 
 export const B: InputPreset = {
     root: ['text-cyan'],
-    label: ['text-cyan'],
+    field: 'field.base',
     error: {
         root: ['text-pink'],
-        label: ['text-pink'],
+        field: 'field.error',
     }
 }

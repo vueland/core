@@ -1,5 +1,13 @@
 <script setup lang="ts" generic="T">
-    import { computed, onBeforeMount, onBeforeUnmount, shallowReactive, shallowRef, unref, useAttrs } from 'vue'
+    import {
+        computed,
+        onBeforeMount,
+        onBeforeUnmount,
+        shallowReactive,
+        shallowRef,
+        unref,
+        useAttrs,
+    } from 'vue'
 
     import {
         useForm,
@@ -41,7 +49,7 @@
         errors
     })
 
-    const fieldId = `input-${props.id ?? unique(6)}`
+    const fieldId = props.id ?? `input-${unique(6)}`
     const fieldRef = shallowRef()
 
     const hasDetails = computed(() => !props.noDetails && (
@@ -137,7 +145,6 @@
         <div
             ref="fieldRef"
             class="c-input__field"
-            :class="preset.field"
         >
             <slot
                 name="field"

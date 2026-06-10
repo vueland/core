@@ -22,9 +22,9 @@
     const THROTTLE_DELAY = 50
 
     const {
+        element,
         activatorProps,
         genListeners,
-        getActivator,
     } = useActivator(props)
 
     const {
@@ -32,7 +32,7 @@
         content,
         contentRef,
         update,
-    } = useAutoPosition(props)
+    } = useAutoPosition(props, element)
 
     const presets = useMenuPresets({ props })
 
@@ -72,7 +72,7 @@
                 model.value = true
             }
 
-            await update(getActivator())
+            await update()
 
             emit('open')
         })
@@ -92,7 +92,7 @@
     const onClickOutside = (e: Event) => {
         const { closeOnClickOutside } = props
         const { target } = e
-        const activator = getActivator()
+        const activator = unref(element) as Element
 
         if (closeOnClickOutside && (!activator || !activator.contains(target as Node))) {
             close()
@@ -107,6 +107,12 @@
         }
     }
 
+    const onKeydown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape' && unref(model)) {
+            close()
+        }
+    }
+
     const listeners = genListeners({
         open,
         close,
@@ -114,7 +120,7 @@
     })
 
     const handler = throttle(() => {
-        update(getActivator())
+        update()
     }, THROTTLE_DELAY)
 
     defineExpose({
@@ -134,9 +140,11 @@
             if (value) {
                 window.addEventListener('resize', handler, { passive: true })
                 window.addEventListener('scroll', handler, { passive: true })
+                window.addEventListener('keydown', onKeydown)
             } else {
                 window.removeEventListener('resize', handler)
                 window.removeEventListener('scroll', handler)
+                window.removeEventListener('keydown', onKeydown)
             }
         }, { immediate: true })
 
@@ -154,6 +162,7 @@
     onBeforeUnmount(() => {
         window.removeEventListener('resize', handler)
         window.removeEventListener('scroll', handler)
+        window.removeEventListener('keydown', onKeydown)
     })
 </script>
 <template>

@@ -1,26 +1,17 @@
 <script setup lang="ts">
     import { computed, onMounted, shallowRef, unref, useAttrs, useSlots } from 'vue'
 
+    import { useFieldPresets } from '../../composables/use-field-presets'
     import { IconAliases } from '../../enums'
+
+    import type { CFieldProps } from './types'
 
     defineOptions({
         name: 'CField',
         inheritAttrs: false,
     })
 
-    const {
-        tag = 'input',
-        label = '',
-        filled = false,
-        // preset,
-        clearable = false,
-    } = defineProps<{
-        tag?: 'input' | 'textarea'
-        label?: string
-        filled?: boolean
-        preset?: string
-        clearable?: boolean,
-    }>()
+    const props = defineProps<CFieldProps>()
 
     const emit = defineEmits<{
         (e: 'focus'): void
@@ -30,20 +21,24 @@
     }>()
 
     const value = defineModel<string | number | undefined | null>()
+    const focused = defineModel<boolean>('focused', { default: false })
 
     const inputRef = shallowRef<HTMLElement>()
     const attrs = useAttrs()
     const slots = useSlots()
 
-    const focused = defineModel<boolean>('focused', { default: false })
-    const hasValue = computed(() => filled || !!unref(value))
-    const showClearBtn = computed(() => clearable && focused.value && unref(hasValue))
+    const presets = useFieldPresets({ slots, props, attrs})
+    const hasValue = computed(() => props.filled || !!unref(value))
+    const showClearBtn = computed(() => props.clearable && focused.value && unref(hasValue))
 
-    const classes = computed(() => ({
-        'c-field--focused': focused.value,
-        'c-field--filled': unref(hasValue),
-        'c-field--has-prepend': !!slots.prepend,
-    }))
+    const classes = computed(() => [
+        {
+            'c-field--focused': focused.value,
+            'c-field--filled': unref(hasValue),
+            'c-field--has-prepend': !!slots.prepend,
+        },
+        ...unref(presets).root
+    ])
 
     const focus = () => {
         if (attrs.readonly || attrs.disabled) {
@@ -55,7 +50,7 @@
 
     const onClick = () => {
         focus()
-        unref(inputRef)?.focus()
+        unref(inputRef)!.focus()
     }
 
     const blur = () => {
@@ -85,6 +80,7 @@
         <div
             v-if="$slots.prepend"
             class="c-field__prepend"
+            :class="presets.prepend"
         >
             <slot name="prepend" />
         </div>
@@ -92,20 +88,21 @@
             <c-label
                 :id="`${$attrs.id}-label`"
                 class="c-field-label"
+                :class="presets.label"
             >
                 {{ label }}
             </c-label>
             <slot name="before" />
             <component
-                :is="tag"
+                :is="tag ?? 'input'"
                 v-bind="$attrs"
                 ref="inputRef"
                 v-model="value"
                 class="c-field-input"
+                :class="presets.input"
                 :value="value"
                 @input="input"
                 @blur="blur"
-                @focus="focus"
             />
             <slot name="after" />
         </div>
@@ -126,6 +123,7 @@
         <div
             v-if="$slots.append"
             class="c-field__append"
+            :class="presets.append"
         >
             <slot name="append" />
         </div>

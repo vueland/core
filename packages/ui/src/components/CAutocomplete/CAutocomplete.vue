@@ -94,10 +94,7 @@
                 @close="blur"
             >
                 <template #activator="{on}">
-                    <div
-                        class="c-autocomplete"
-                        :class="field.preset"
-                    >
+                    <div class="c-autocomplete">
                         <slot
                             name="field"
                             v-bind="field"
@@ -112,7 +109,9 @@
                                 :clearable="field.clearable"
                                 :focused="field.focused"
                                 :readonly="field.readonly"
+                                :preset="field.preset"
                                 :filled="hasValue"
+                                :error="field.hasError"
                                 :aria-controls="`${field.uid}-menu`"
                                 :aria-expanded="field.focused"
                                 v-on="on"

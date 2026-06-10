@@ -11,6 +11,7 @@ import { createFontAwesomeResolver } from '@vueland/ui/resolvers'
 import * as buttonPresets from './presets/button-presets'
 import * as inputPresets from './presets/input-presets'
 import * as menuPresets from './presets/menu-presets'
+import * as fieldPresets from './presets/field-presets'
 // Icons
 import { faUser, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
@@ -39,5 +40,6 @@ export const ui = createVuelandUI({
         button: buttonPresets,
         input: inputPresets,
         menu: menuPresets,
+        field: fieldPresets,
     }
 })

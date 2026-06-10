@@ -15,7 +15,6 @@ export function useButtonPresets({ props }: {
             ...(unref(presets)?.root ?? [])
         ] : [],
         label: props.preset ? [
-            ...(unref(presets)?.label ?? [])
         ] : []
     }))
 }

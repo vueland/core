@@ -1,3 +1,11 @@
 .c-select {
   flex: 1 1;
+
+  & > .c-field > .c-field__append {
+    transition: transform .1s linear;
+  }
+
+  & > .c-field--focused > .c-field__append {
+    transform: rotate(180deg);
+  }
 }
