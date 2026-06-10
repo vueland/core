@@ -263,7 +263,7 @@ describe('CInput', () => {
                                 message: 'Минимум 3 символа',
                             }),
                         ],
-                        onInput: (nextValue: string) => {
+                        onInput: (nextValue: any) => {
                             value.value = nextValue
                         },
                     },
