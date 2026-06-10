@@ -12,7 +12,7 @@
         tag = 'input',
         label = '',
         filled = false,
-        preset,
+        // preset,
         clearable = false,
     } = defineProps<{
         tag?: 'input' | 'textarea'
