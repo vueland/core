@@ -1,6 +1,7 @@
 import {
     type ComponentPublicInstance,
     computed,
+    type ComputedRef,
     nextTick,
     onBeforeUnmount,
     ref,
@@ -34,11 +35,27 @@ export interface AutoPositionProps {
     strategy?: 'reverse' | 'bounce'
 }
 
+type MaybeElement = Element | ComponentPublicInstance | undefined
+
+type ResolvedElement = HTMLElement | undefined
+
+type AutoPositionInputProps =
+    PositionProps &
+    CoordsProps &
+    DimensionsProps &
+    AutoPositionProps
+
 const SCREEN_EDGE_OFFSET = 20
 
-const getRect = (el: Element | ComponentPublicInstance) => {
-    const element = (el as ComponentPublicInstance)?.$el ?? el
+function resolveElement(value: MaybeElement): ResolvedElement {
+    if (!value) {
+        return undefined
+    }
 
+    return ((value as ComponentPublicInstance).$el ?? value) as HTMLElement
+}
+
+function getElementRect(element: HTMLElement): Dimensions {
     const {
         top,
         left,
@@ -54,8 +71,25 @@ const getRect = (el: Element | ComponentPublicInstance) => {
     }
 }
 
+function getObservedSize(entry: ResizeObserverEntry) {
+    const borderBoxSize = entry.borderBoxSize?.[0]
+
+    return {
+        width: borderBoxSize?.inlineSize ?? entry.contentRect.width,
+        height: borderBoxSize?.blockSize ?? entry.contentRect.height,
+    }
+}
+
+function isSameSize(current: Dimensions, width: number, height: number) {
+    return (
+        Math.round(current.width) === Math.round(width) &&
+        Math.round(current.height) === Math.round(height)
+    )
+}
+
 export function useAutoPosition(
-    props: PositionProps & CoordsProps & DimensionsProps & AutoPositionProps
+    props: AutoPositionInputProps,
+    activatorEl?: ComputedRef<MaybeElement>,
 ) {
     const { getScrollTop, getScrollLeft } = useApplication()
 
@@ -73,24 +107,39 @@ export function useAutoPosition(
         height: 0,
     })
 
-    const contentRef = shallowRef<HTMLElement | ComponentPublicInstance>()
+    const contentRef = shallowRef<MaybeElement>()
 
     const offsetX = computed(() => Number(props.offsetX) || 0)
     const offsetY = computed(() => Number(props.offsetY) || 0)
-    const isXDirection = computed(() => props.left || props.right)
-    const shouldReverse = computed(() => props.strategy === 'reverse')
+
+    const isHorizontalDirection = computed(() => props.left || props.right)
+    const isReverseStrategy = computed(() => props.strategy === 'reverse')
 
     let frameId = 0
 
-    const cancelScheduledUpdate = () => {
-        if (!IN_BROWSER || !frameId) return
-
-        cancelAnimationFrame(frameId)
-        frameId = 0
+    const getActivatorElement = () => {
+        return resolveElement(unref(activatorEl))
     }
 
-    const setActivatorSizes = (activatorEl: Element | ComponentPublicInstance) => {
-        const rect = getRect(activatorEl)
+    const getContentElement = () => {
+        return resolveElement(unref(contentRef))
+    }
+
+    const setActivatorDimensions = () => {
+        const element = getActivatorElement()
+
+        if (!element) {
+            activator.value = {
+                top: 0,
+                left: 0,
+                width: 0,
+                height: 0,
+            }
+
+            return
+        }
+
+        const rect = getElementRect(element)
 
         activator.value = {
             top: rect.top + getScrollTop(),
@@ -100,47 +149,28 @@ export function useAutoPosition(
         }
     }
 
-    const setContentSizes = (contentEl: HTMLElement | ComponentPublicInstance) => {
-        const element = (contentEl as ComponentPublicInstance)?.$el ?? contentEl
+    const setContentDimensions = () => {
+        const element = getContentElement()
+
+        if (!element) {
+            return false
+        }
 
         content.value.width = element.offsetWidth
         content.value.height = element.offsetHeight
+
+        return true
     }
 
-    const calcToBottom = () => {
-        const { top, height } = unref(activator)
-        return top + height + unref(offsetY)
+    const measure = () => {
+        setActivatorDimensions()
+
+        return setContentDimensions()
     }
 
-    const calcToTop = () => {
-        const { top } = unref(activator)
-        const { height } = unref(content)
-
-        return top - height - unref(offsetY)
-    }
-
-    const calcToLeft = () => {
-        const { left } = unref(activator)
-        const { width } = unref(content)
-        return left - width - unref(offsetX)
-    }
-
-    const calcToRight = () => {
-        const { left, width } = unref(activator)
-        return left + width + unref(offsetX)
-    }
-
-    const calcY = () => {
-        return props.positionY! + unref(offsetY)
-    }
-
-    const calcX = () => {
-        return props.positionX! + unref(offsetX)
-    }
-
-    const getScreenXBounds = (contentLeft: number) => {
+    const getViewportXBounds = (left: number) => {
         const scrollLeft = getScrollLeft()
-        const { width: cWidth } = unref(content)
+        const width = unref(content).width
 
         const leftEdge = scrollLeft + SCREEN_EDGE_OFFSET
         const rightEdge = scrollLeft + window.innerWidth - SCREEN_EDGE_OFFSET
@@ -148,14 +178,14 @@ export function useAutoPosition(
         return {
             leftEdge,
             rightEdge,
-            isBeyondLeft: contentLeft < leftEdge,
-            isBeyondRight: contentLeft + cWidth > rightEdge,
+            isBeyondLeft: left < leftEdge,
+            isBeyondRight: left + width > rightEdge,
         }
     }
 
-    const getScreenYBounds = (contentTop: number) => {
+    const getViewportYBounds = (top: number) => {
         const scrollTop = getScrollTop()
-        const { height: cHeight } = unref(content)
+        const height = unref(content).height
 
         const topEdge = scrollTop + SCREEN_EDGE_OFFSET
         const bottomEdge = scrollTop + window.innerHeight - SCREEN_EDGE_OFFSET
@@ -163,115 +193,192 @@ export function useAutoPosition(
         return {
             topEdge,
             bottomEdge,
-            isBeyondTop: contentTop < topEdge,
-            isBeyondBottom: contentTop + cHeight > bottomEdge,
+            isBeyondTop: top < topEdge,
+            isBeyondBottom: top + height > bottomEdge,
         }
     }
 
-    const alignToActivatorTop = () => {
-        const { top } = unref(activator)
-        return top + unref(offsetY)
+    const getBaseTop = () => {
+        if (isDef(props.positionY)) {
+            return props.positionY! + unref(offsetY)
+        }
+
+        if (props.top) {
+            return unref(activator).top - unref(content).height - unref(offsetY)
+        }
+
+        if (props.bottom) {
+            return unref(activator).top + unref(activator).height + unref(offsetY)
+        }
+
+        return unref(activator).top + unref(offsetY)
     }
 
-    const alignToActivatorLeft = () => {
-        const { left } = unref(activator)
-        return left + unref(offsetX)
+    const getBaseLeft = () => {
+        if (isDef(props.positionX)) {
+            return props.positionX! + unref(offsetX)
+        }
+
+        if (props.left) {
+            return unref(activator).left - unref(content).width - unref(offsetX)
+        }
+
+        if (props.right) {
+            return unref(activator).left + unref(activator).width + unref(offsetX)
+        }
+
+        return unref(activator).left + unref(offsetX)
     }
 
-    const getContentTop = () => {
-        if (props.positionY) return calcY()
-        if (props.top) return calcToTop()
-        if (props.bottom) return calcToBottom()
-        return alignToActivatorTop()
+    const getReversedTop = () => {
+        if (props.top) {
+            return unref(activator).top + unref(activator).height + unref(offsetY)
+        }
+
+        if (props.bottom) {
+            return unref(activator).top - unref(content).height - unref(offsetY)
+        }
+
+        return getBaseTop()
     }
 
-    const getContentLeft = () => {
-        if (props.positionX) return calcX()
-        if (props.left) return calcToLeft()
-        if (props.right) return calcToRight()
-        return alignToActivatorLeft()
+    const getReversedLeft = () => {
+        if (props.left) {
+            return unref(activator).left + unref(activator).width + unref(offsetX)
+        }
+
+        if (props.right) {
+            return unref(activator).left - unref(content).width - unref(offsetX)
+        }
+
+        return getBaseLeft()
     }
 
-    const calcYBounce = () => {
-        const { height: cHeight } = unref(content)
-        const cTop = getContentTop()
+    const clampTopToViewport = (top: number) => {
+        const { height } = unref(content)
 
         const {
             topEdge,
             bottomEdge,
             isBeyondTop,
             isBeyondBottom,
-        } = getScreenYBounds(cTop)
+        } = getViewportYBounds(top)
 
         if (!isBeyondTop && !isBeyondBottom) {
-            return cTop
+            return top
         }
 
-        if (unref(isXDirection) || !unref(shouldReverse)) {
-            return isBeyondBottom ? bottomEdge - cHeight : topEdge
-        }
-
-        if (isBeyondTop && props.top) {
-            return calcToBottom()
-        }
-
-        if (isBeyondBottom && props.bottom) {
-            return calcToTop()
-        }
+        return isBeyondBottom
+            ? bottomEdge - height
+            : topEdge
     }
 
-    const calcXBounce = () => {
-        const { width: cWidth } = unref(content)
-        const cLeft = getContentLeft()
+    const clampLeftToViewport = (left: number) => {
+        const { width } = unref(content)
 
         const {
             leftEdge,
             rightEdge,
             isBeyondLeft,
             isBeyondRight,
-        } = getScreenXBounds(cLeft)
+        } = getViewportXBounds(left)
 
         if (!isBeyondLeft && !isBeyondRight) {
-            return cLeft
+            return left
         }
 
-        if (!unref(isXDirection) || !unref(shouldReverse)) {
-            return isBeyondRight ? rightEdge - cWidth : leftEdge
+        return isBeyondRight
+            ? rightEdge - width
+            : leftEdge
+    }
+
+    const resolveTop = () => {
+        const top = getBaseTop()
+
+        const {
+            isBeyondTop,
+            isBeyondBottom,
+        } = getViewportYBounds(top)
+
+        if (!isBeyondTop && !isBeyondBottom) {
+            return top
         }
 
-        if (isBeyondLeft && props.left) {
-            return calcToRight()
+        if (!unref(isReverseStrategy) || unref(isHorizontalDirection)) {
+            return clampTopToViewport(top)
         }
 
-        if (isBeyondRight && props.right) {
-            return calcToLeft()
+        return getReversedTop()
+    }
+
+    const resolveLeft = () => {
+        const left = getBaseLeft()
+
+        const {
+            isBeyondLeft,
+            isBeyondRight,
+        } = getViewportXBounds(left)
+
+        if (!isBeyondLeft && !isBeyondRight) {
+            return left
         }
+
+        if (!unref(isReverseStrategy) || !unref(isHorizontalDirection)) {
+            return clampLeftToViewport(left)
+        }
+
+        return getReversedLeft()
     }
 
     const applyPosition = () => {
-        content.value.top = calcYBounce()!
-        content.value.left = calcXBounce()!
+        if (!IN_BROWSER) {
+            return
+        }
+
+        content.value.top = resolveTop()
+        content.value.left = resolveLeft()
+    }
+
+    const cancelScheduledUpdate = () => {
+        if (!IN_BROWSER || !frameId) {
+            return
+        }
+
+        cancelAnimationFrame(frameId)
+        frameId = 0
+    }
+
+    const updateNow = () => {
+        if (!measure()) {
+            return
+        }
+
+        applyPosition()
     }
 
     const scheduleUpdate = () => {
-        if (!IN_BROWSER || frameId) return
+        if (!IN_BROWSER || frameId) {
+            return
+        }
 
         frameId = requestAnimationFrame(() => {
             frameId = 0
-            applyPosition()
+            updateNow()
         })
     }
 
-    const update = async (activatorEl: Element | ComponentPublicInstance) => {
-        if (unref(activatorEl)) {
-            setActivatorSizes(activatorEl)
-            await nextTick()
-        }
+    const update = async () => {
+        setActivatorDimensions()
 
-        setContentSizes(contentRef.value!)
         await nextTick()
 
-        scheduleUpdate()
+        if (!setContentDimensions()) {
+            return
+        }
+
+        await nextTick()
+
+        applyPosition()
     }
 
     if (IN_BROWSER) {
@@ -282,40 +389,57 @@ export function useAutoPosition(
                 return
             }
 
-            const { blockSize, inlineSize } = entry!.borderBoxSize[0]
-
-            if (!blockSize || !inlineSize) {
-                return
-            }
-
+            const { width, height } = getObservedSize(entry)
             const current = unref(content)
 
-            if (current.width === inlineSize && current.height === blockSize) {
+            if (isSameSize(current, width, height)) {
                 return
             }
 
-            current.width = inlineSize
-            current.height = blockSize
+            current.width = width
+            current.height = height
 
             scheduleUpdate()
         })
 
-        watch(contentRef, (val, oldValue) => {
-            const nextEl = (val as ComponentPublicInstance)?.$el ?? val
-            const prevEl = (oldValue as ComponentPublicInstance)?.$el ?? oldValue
+        watch(
+            () => resolveElement(unref(activatorEl)),
+            (newEl, oldEl) => {
+                if (oldEl) {
+                    resizeObserver.unobserve(oldEl)
+                }
+
+                if (newEl) {
+                    resizeObserver.observe(newEl)
+                }
+            },
+            { immediate: true },
+        )
+
+        watch(contentRef, (newEl, oldEl) => {
+            const prevEl = resolveElement(oldEl)
+            const nextEl = resolveElement(newEl)
 
             if (prevEl) {
-                resizeObserver.unobserve(prevEl as Element)
+                resizeObserver.unobserve(prevEl)
             }
 
             if (nextEl) {
-                resizeObserver.observe(nextEl as Element)
+                resizeObserver.observe(nextEl)
             }
         })
 
-        if (isDef(props.positionX) || isDef(props.positionY)) {
-            watch(() => [props.positionX, props.positionY], scheduleUpdate)
-        }
+        watch(() => [
+            props.positionX,
+            props.positionY,
+            props.top,
+            props.bottom,
+            props.left,
+            props.right,
+            props.offsetX,
+            props.offsetY,
+            props.strategy,
+        ], scheduleUpdate)
 
         onBeforeUnmount(() => {
             cancelScheduledUpdate()

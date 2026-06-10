@@ -1,8 +1,11 @@
 .c-select {
-  display: flex;
-  width: 100%;
+  flex: 1 1;
 
-  &__field{
-    outline: none;
+  & > .c-field > .c-field__append {
+    transition: transform .1s linear;
+  }
+
+  & > .c-field--focused > .c-field__append {
+    transform: rotate(180deg);
   }
 }

@@ -13,60 +13,51 @@ export type MenuPreset = {
     }
 }
 
-export type InputPreset = {
+type FieldPresetState = {
     root?: string[]
-    field?: string[]
     input?: string[]
     label?: string[]
-    details?: string[]
     prepend?: string[]
     append?: string[]
+}
+
+export type FieldPreset = FieldPresetState & {
+    focused?: FieldPresetState
+    error?: FieldPresetState
+    disabled?: FieldPresetState
+    readonly?: FieldPresetState
+
+    filled?: FieldPresetState
+    prepended?: FieldPresetState
+    appended?: FieldPresetState
+}
+
+export type InputPreset = {
+    root?: string[]
+    field?: string
+    details?: string[]
 
     focused?: {
         root?: string[]
-        field?: string[]
-        label?: string[]
-        append?: string[]
+        field?: string
+        details?: string[]
     }
 
     error?: {
         root?: string[]
-        field?: string[]
-        label?: string[]
-        input?: string[]
+        field?: string
         details?: string[]
     }
 
     disabled?: {
         root?: string[]
-        field?: string[]
-        input?: string[]
-        label?: string[]
+        field?: string
+        details?: string[]
     }
 
     readonly?: {
         root?: string[]
-        field?: string[]
-        input?: string[]
-    }
-
-    hasValue?: {
-        root?: string[]
-        label?: string[]
-    }
-
-    hasPrepend?: {
-        root?: string[]
-        field?: string[]
-        input?: string[]
-        label?: string[]
-        prepend?: string[]
-    }
-
-    hasAppend?: {
-        root?: string[]
-        field?: string[]
-        input?: string[]
-        append?: string[]
+        field?: string
+        details?: string[]
     }
 }

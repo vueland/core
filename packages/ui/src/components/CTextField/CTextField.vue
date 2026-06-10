@@ -2,9 +2,13 @@
     import { CField } from '../CField'
     import { CInput } from '../CInput'
 
+    import type { CTextFieldSlots } from './types'
+
     defineOptions({
         name: 'CTextField',
     })
+
+    defineSlots<CTextFieldSlots>()
 
     const model = defineModel<string | number | undefined | null>()
 
@@ -15,43 +19,52 @@
 
 <template>
     <c-input
-        v-model="model"
+        :model-value="model"
         v-bind="$attrs"
-        @clear="onClear"
     >
-        <template #field="{focus, input, blur, focused, preset, attrs, uid}">
-            <div
-                class="c-text-field"
-                :class="preset"
-            >
+        <template #field="{focus, input, blur, focused, preset, attrs, uid, label, clearable}">
+            <div class="c-text-field">
                 <c-field
                     :id="uid"
                     v-model="model"
-                    class="c-text-field__input"
                     :focused
+                    :label
+                    :preset
+                    :clearable
                     v-bind="attrs"
                     @focus="focus"
                     @input="input"
                     @blur="blur"
-                />
+                    @clear="onClear"
+                >
+                    <template
+                        v-if="$slots.prepend"
+                        #prepend
+                    >
+                        <slot name="prepend" />
+                    </template>
+                    <template
+                        v-if="$slots.append"
+                        #append
+                    >
+                        <slot name="append" />
+                    </template>
+                </c-field>
             </div>
         </template>
         <template #details="{errorMessage, details}">
-            <span
-                :key="errorMessage || details"
-                class="c-text-field__details"
-            >
-                {{ errorMessage || details }}
-            </span>
-        </template>
-        <template
-            v-for="(_, slotName) in $slots"
-            #[slotName]="data"
-        >
             <slot
-                :name="slotName"
-                v-bind="data"
-            />
+                name="details"
+                :error-message
+                :details
+            >
+                <span
+                    :key="errorMessage || details"
+                    class="c-text-field__details"
+                >
+                    {{ errorMessage || details }}
+                </span>
+            </slot>
         </template>
     </c-input>
 </template>

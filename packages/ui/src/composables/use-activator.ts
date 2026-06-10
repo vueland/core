@@ -24,6 +24,8 @@ export type ActivatorListeners = {
 
 export function useActivator(props: Partial<ActivatorProps> & Record<string, unknown>) {
     const activatorEl = shallowRef<ComponentPublicInstance | Element | undefined>(props.activator)
+
+    const element = computed(() => getActivator())
     const activatorProps: Record<string, any> = { ref: set }
 
     function set(val: Element | ComponentPublicInstance) {
@@ -63,6 +65,7 @@ export function useActivator(props: Partial<ActivatorProps> & Record<string, unk
     }
 
     return {
+        element,
         activatorProps,
         genListeners,
         getActivator,

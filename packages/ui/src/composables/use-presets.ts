@@ -9,10 +9,10 @@ export type PresetProps = {
 }
 
 export function usePresets<T>(props: PresetProps): ComputedRef<Maybe<T>> {
+    const core = useCore()
+
     return computed<Maybe<T>>(() => {
         if (!props.preset) return undefined
-
-        const core = useCore()
 
         return props.preset.split('.').reduce((acc, it) => acc[it], core.presets) as T
     })

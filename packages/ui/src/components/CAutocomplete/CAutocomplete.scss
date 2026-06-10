@@ -1,7 +1,33 @@
 .c-autocomplete {
-  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+  cursor: text;
+  max-height: 100%;
+  position: relative;
 
-  &__field{
-    outline: none;
+  &__box {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    column-gap: 2px;
+    height: 100%;
+    cursor: text;
+  }
+
+  &-item {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 1 auto;
+    max-width: 100%;
+  }
+
+  & > .c-field > .c-field__append {
+    transition: transform .1s linear;
+  }
+
+  & > .c-field--focused > .c-field__append {
+    transform: rotate(180deg);
   }
 }

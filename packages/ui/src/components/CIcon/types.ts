@@ -1,6 +1,6 @@
 import type { Component } from 'vue'
 
-type IconMode = 'lib' | 'sprite' | 'component' | 'raw'
+import type { IconMode } from '../../composables'
 
 export type CIconProps = {
     name?: string | number

@@ -5,7 +5,7 @@ export type PresetCondition<State extends string> = [
     active: boolean
 ]
 
-export function normalizePresetClasses(value: string[]): string[] {
+export function normalizePresetClasses(value?: string[] | null | false): string[] {
     if (!value) {
         return []
     }
@@ -32,4 +32,18 @@ export function getPresetIf(
     classes: string[] = [],
 ): string[] {
     return condition ? normalizePresetClasses(classes) : []
+}
+
+export function getPresetValueOnly<T, State extends string>(
+    preset: PresetRecord | undefined,
+    zone: string,
+    conditions: PresetCondition<State>[],
+): T | undefined {
+    const state = conditions.find(([, active]) => active)?.[0]
+
+    if (!state) {
+        return preset?.[zone] as T | undefined
+    }
+
+    return preset?.[state]?.[zone] as T | undefined
 }

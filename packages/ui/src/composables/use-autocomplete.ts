@@ -1,14 +1,21 @@
-import { computed, shallowRef, unref, watchEffect } from 'vue'
+import { computed, shallowRef, unref } from 'vue'
 
-import { useInputValue } from './use-input-value'
+import { useSelects } from './use-selects'
+
 
 export function useAutocomplete<T = any>(props: Record<string, any>) {
-    const value = useInputValue(props)
+    const {
+        items,
+        extKey,
+        hasValue,
+        select
+    } = useSelects(props)
+
     const inputValue = shallowRef()
-    const { extKey } = props.options ?? {}
 
     const normalizedInput = computed(() => unref(inputValue)?.trim().toLowerCase() ?? '')
-    const isEqual = computed(() => unref(normalizedInput) === unref(value).toLowerCase())
+
+    const isEqual = computed(() => unref(items).includes(unref(normalizedInput)))
 
     const searchItems = computed(() => {
         if (unref(isEqual) || !unref(normalizedInput)) {
@@ -21,15 +28,11 @@ export function useAutocomplete<T = any>(props: Record<string, any>) {
         })
     })
 
-    function rollbackValue() {
-        inputValue.value = unref(value)
-    }
-
-    watchEffect(() => rollbackValue())
-
     return {
+        items,
+        hasValue,
         inputValue,
         searchItems,
-        rollbackValue
+        select
     }
 }

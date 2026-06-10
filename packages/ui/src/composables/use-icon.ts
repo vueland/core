@@ -2,7 +2,7 @@ import { type Component, computed, type ComputedRef } from 'vue'
 
 import { useCore } from './use-core'
 
-export type IconMode = 'lib' | 'sprite' | 'component' | 'raw'
+export type IconMode = 'sprite' | 'component' | 'raw' | 'fa' | 'md'
 
 export interface UseIconOptions {
     name?: string | number

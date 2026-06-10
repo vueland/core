@@ -5,12 +5,12 @@
 
     const core = useCore()
 
-    const professions = [
+    const professions = shallowRef([
         { title: 'Frontend' },
         { title: 'Backend' },
         { title: 'DevOPS' },
         { title: 'Security' },
-    ]
+    ])
 
     const levels = [
         { title: 'Junior' },
@@ -78,6 +78,10 @@
         currentPreset.value = 'input.E'
     }
 
+    const onSelect = () => {
+        // professions.value = professions.value.slice(0, -1)
+    }
+
 </script>
 <template>
     <c-card class="elevation-2">
@@ -102,12 +106,11 @@
                 <c-select
                     v-model="form.radius"
                     label="Radius"
-                    validate-on="input"
                     clearable
                     class="form-name mt-4"
                     preset="input.A"
                     :items="radiusItems"
-                    placeholder="введите текст"
+                    placeholder="выберите радиус"
                     :options="{
                         extKey: 'name'
                     }"
@@ -124,6 +127,7 @@
                     clearable
                     :rules="professionRules"
                     multiple
+                    @update:modelValue="onSelect"
                     :options="{
                         extKey: 'title',
                         noItemsMessage: 'Нет совпадений',

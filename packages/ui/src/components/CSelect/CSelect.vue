@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T">
     import { shallowRef, unref } from 'vue'
 
-    import { useInputValue } from '../../composables'
+    import { useSelects } from '../../composables'
     import { IconAliases } from '../../enums'
     import { CField } from '../CField'
     import { CInput } from '../CInput'
@@ -13,30 +13,20 @@
     defineOptions({
         name: 'CSelect',
     })
-
     defineSlots<CSelectSlots<T>>()
+
     const props = defineProps<CSelectProps<T>>()
-
-    const inputRef = shallowRef()
-
     const model = defineModel<T | T[]>({
         get: () => props.modelValue,
         set: val => val
     })
 
-    const inputValue = useInputValue(props)
+    const inputRef = shallowRef()
+
+    const { items: selectedItems, hasValue, select } = useSelects(props)
 
     function closeMenu() {
         unref(inputRef).blur()
-    }
-
-    function onSelect(value: T) {
-        if (props.multiple) {
-            model.value = [...model.value as T[], value]
-            return
-        }
-
-        model.value = value
     }
 
     function onClear() {
@@ -51,45 +41,72 @@
     <c-input
         v-bind="$attrs"
         ref="inputRef"
-        v-model="model"
+        :model-value="model"
         validate-on="blur"
-        @clear="onClear"
     >
-        <template #field="{focus, focused, preset, attrs, uid, activator}">
+        <template #field="field">
             <c-menu
-                :id="`${uid}-menu`"
+                :id="`${field.uid}-menu`"
                 bottom
                 open-on-focus
                 close-on-click-outside
                 :close-on-content-click="!multiple"
                 :offset-y="2"
                 strategy="reverse"
-                :activator
+                :activator="field.activator"
                 @close="closeMenu"
             >
                 <template #activator="{on}">
-                    <div
-                        class="c-select"
-                        :class="preset"
-                    >
-                        <c-field
-                            :id="uid"
-                            class="c-select__field"
-                            v-bind="attrs"
-                            :model-value="inputValue"
-                            :focused
-                            readonly
-                            :aria-controls="`${uid}-menu`"
-                            :aria-expanded="focused"
-                            v-on="on"
-                            @focus="focus"
-                        />
+                    <div class="c-select">
+                        <slot
+                            name="field"
+                            v-bind="field"
+                        >
+                            <c-field
+                                :id="field.uid"
+                                model-value=""
+                                v-bind="field.attrs"
+                                class="c-select__field"
+                                :focused="field.focused"
+                                :label="field.label"
+                                :clearable="field.clearable"
+                                :filled="hasValue"
+                                :preset="field.preset"
+                                readonly
+                                :aria-controls="`${field.uid}-menu`"
+                                :aria-expanded="field.focused"
+                                v-on="on"
+                                @focus="field.focus"
+                                @clear="onClear"
+                            >
+                                <template #before>
+                                    <slot
+                                        name="selects"
+                                        :items="selectedItems"
+                                    >
+                                        <div
+                                            v-for="(it, i) in selectedItems"
+                                            :key="it"
+                                            class="c-selected__item"
+                                        >
+                                            {{ `${it}` + (i + 1 !== selectedItems.length ? ',' : '') }}
+                                        </div>
+                                    </slot>
+                                </template>
+                                <template #append>
+                                    <c-icon
+                                        :name="IconAliases.DROPDOWN"
+                                        size="20"
+                                    />
+                                </template>
+                            </c-field>
+                        </slot>
                     </div>
                 </template>
                 <template #default>
                     <slot
                         name="menu"
-                        :on-select="onSelect"
+                        :on-select="select"
                         :items
                     >
                         <c-items
@@ -103,25 +120,17 @@
                 </template>
             </c-menu>
         </template>
-        <template #append>
-            <c-icon
-                :name="IconAliases.DROPDOWN"
-                size="20"
-            />
-        </template>
+
         <template #details="{errorMessage, details}">
-            <span :key="errorMessage || details">
-                {{ errorMessage || details }}
-            </span>
-        </template>
-        <template
-            v-for="(_, slotName) in $slots"
-            #[slotName]="data"
-        >
             <slot
-                :name="slotName"
-                v-bind="data"
-            />
+                name="details"
+                :error-message
+                :details
+            >
+                <span :key="errorMessage || details">
+                    {{ errorMessage || details }}
+                </span>
+            </slot>
         </template>
     </c-input>
 </template>
