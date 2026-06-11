@@ -13,6 +13,20 @@ export function normalizePresetClasses(value?: string[] | null | false): string[
     return value.filter(Boolean)
 }
 
+export function getPresetValueWithFallback<T, State extends string>(
+    preset: PresetRecord | undefined,
+    zone: string,
+    conditions: PresetCondition<State>[],
+): T | undefined {
+    const state = conditions.find(([, active]) => active)?.[0]
+
+    if (!state) {
+        return preset?.[zone] as T | undefined
+    }
+
+    return (preset?.[state]?.[zone] ?? preset?.[zone]) as T | undefined
+}
+
 export function getPresetOnly<State extends string>(
     preset: PresetRecord | undefined,
     zone: string,

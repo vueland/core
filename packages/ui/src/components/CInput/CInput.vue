@@ -44,7 +44,6 @@
     const preset = useInputPresets({
         props,
         state,
-        slots,
         errors
     })
 
@@ -69,16 +68,16 @@
     }, {}))
 
     const fieldAttrs = computed(() => ({
-        ...unref(normalizedAttrsMap),
         ...(props.label ? { 'aria-labelledby': `${fieldId}-label` } : {}),
         ...(unref(hasDetails) ? { 'aria-describedby': `${fieldId}-details` } : {}),
         ...(errors.hasError ? { 'aria-invalid': 'true' } : {}),
         ...(errors.errorMessage && unref(hasDetails) ? { 'aria-errormessage': `${fieldId}-details` } : {}),
         ...(props.readonly ? { 'aria-readonly': 'true' } : {}),
         ...(props.disabled ? { 'aria-disabled': 'true' } : {}),
-        ...(props.role === 'listbox' ? { 'aria-haspopup': 'listbox' } : {}),
-        ...(props.role === 'listbox' ? { 'aria-controls': `${fieldId}-menu` } : {}),
-        ...(props.role === 'listbox' ? { 'aria-expanded': `${state.focused}` } : {}),
+        ...(props.kind === 'listbox' ? { 'aria-haspopup': 'listbox' } : {}),
+        ...(props.kind === 'listbox' ? { 'aria-controls': `${fieldId}-menu` } : {}),
+        ...(props.kind === 'listbox' ? { 'aria-expanded': `${state.focused}` } : {}),
+        ...unref(normalizedAttrsMap),
     }))
 
     const classes = computed(() => [

@@ -82,7 +82,7 @@
         ref="inputRef"
         :model-value="model"
         v-bind="$attrs"
-        role="listbox"
+        kind="listbox"
     >
         <template #field="field">
             <c-menu

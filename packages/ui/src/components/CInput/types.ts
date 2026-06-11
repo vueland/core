@@ -19,7 +19,7 @@ export type CInputProps<T = any> =
     disabled?: boolean
     focused?: boolean
     readonly?: boolean
-    role?: 'checkbox' | 'radio' | 'field' | 'area' | 'listbox'
+    kind?: 'checkbox' | 'radio' | 'field' | 'area' | 'listbox'
 }
 
 export type CInputEmits<T = any> = {

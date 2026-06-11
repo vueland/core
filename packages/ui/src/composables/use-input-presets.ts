@@ -1,9 +1,9 @@
 import { computed, unref } from 'vue'
 
-import type { CInputProps, CInputSlots, InputState } from '../components'
+import type { CInputProps, InputState } from '../components'
 import {
     getPresetOnly,
-    getPresetValueOnly,
+    getPresetValueWithFallback,
     type PresetCondition,
 } from '../helpers'
 import type { InputPreset } from '../types'
@@ -36,7 +36,6 @@ export function useInputPresets({
     props: CInputProps
     errors: ValidateState
     state: InputState
-    slots: CInputSlots
 }) {
     const presets = usePresets<InputPreset>(props)
 
@@ -66,7 +65,7 @@ export function useInputPresets({
         )
 
         const onlyValue = <T>(zone: InputPresetZone) => (
-            getPresetValueOnly<T, InputPresetState>(preset, zone, interactionState)
+            getPresetValueWithFallback<T, InputPresetState>(preset, zone, interactionState)
         )
 
         return {

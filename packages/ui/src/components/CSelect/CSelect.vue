@@ -49,7 +49,7 @@
         ref="inputRef"
         :model-value="model"
         validate-on="blur"
-        role="listbox"
+        kind="listbox"
     >
         <template #field="field">
             <c-menu
