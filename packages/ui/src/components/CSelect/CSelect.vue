@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T">
     import { shallowRef, unref } from 'vue'
 
-    import { useSelects } from '../../composables'
+    import { useKeyboard, useSelects } from '../../composables'
     import { IconAliases } from '../../enums'
     import { CField } from '../CField'
     import { CInput } from '../CInput'
@@ -10,9 +10,7 @@
 
     import type { CSelectProps, CSelectSlots } from './types'
 
-    defineOptions({
-        name: 'CSelect',
-    })
+    defineOptions({ name: 'CSelect' })
     defineSlots<CSelectSlots<T>>()
 
     const props = defineProps<CSelectProps<T>>()
@@ -22,19 +20,27 @@
     })
 
     const inputRef = shallowRef()
+    const menuRef = shallowRef()
 
     const { items: selectedItems, hasValue, select } = useSelects(props)
 
-    function closeMenu() {
+    const { onKeydown } = useKeyboard({
+        Tab: () => {
+            unref(inputRef).blur()
+            unref(menuRef).close()
+        }
+    })
+
+    function onBlur() {
         unref(inputRef).blur()
     }
 
     function onClear() {
-        if (props.multiple) {
-            model.value = []
-        } else {
-            model.value = undefined
-        }
+        model.value = props.multiple ? [] : undefined
+    }
+
+    function onFocus() {
+        unref(inputRef).focus()
     }
 </script>
 <template>
@@ -43,41 +49,44 @@
         ref="inputRef"
         :model-value="model"
         validate-on="blur"
+        role="listbox"
     >
         <template #field="field">
             <c-menu
                 :id="`${field.uid}-menu`"
+                ref="menuRef"
                 bottom
                 open-on-focus
                 close-on-click-outside
                 :close-on-content-click="!multiple"
                 :offset-y="2"
                 strategy="reverse"
-                :activator="field.activator"
-                @close="closeMenu"
+                @close="onBlur"
             >
-                <template #activator="{on}">
-                    <div class="c-select">
+                <template #activator="{on, activator}">
+                    <div
+                        class="c-select"
+                        v-bind="activator"
+                    >
                         <slot
                             name="field"
                             v-bind="field"
                         >
                             <c-field
                                 :id="field.uid"
-                                model-value=""
                                 v-bind="field.attrs"
-                                class="c-select__field"
                                 :focused="field.focused"
+                                model-value=""
+                                class="c-select__field"
                                 :label="field.label"
                                 :clearable="field.clearable"
                                 :filled="hasValue"
                                 :preset="field.preset"
                                 readonly
-                                :aria-controls="`${field.uid}-menu`"
-                                :aria-expanded="field.focused"
                                 v-on="on"
-                                @focus="field.focus"
+                                @focus="onFocus"
                                 @clear="onClear"
+                                @keydown="onKeydown"
                             >
                                 <template #before>
                                     <slot

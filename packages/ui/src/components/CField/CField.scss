@@ -55,7 +55,7 @@ $self: '.c-field';
     & > #{$self}__core > #{$self}-label {
       top: 0;
       left: 5px;
-      transform: translate(0, -55%);
+      transform: translate(0, -55%) scale(.8);
       background: var(--c-app-surface-color);
     }
   }
@@ -76,7 +76,7 @@ $self: '.c-field';
     & > #{$self}__core > #{$self}-label {
       top: 0;
       left: 5px;
-      transform: translate(0, -55%);
+      transform: translate(0, -55%) scale(.8);
       background: var(--c-app-surface-color);
     }
   }
@@ -85,7 +85,7 @@ $self: '.c-field';
     & > #{$self}__core > #{$self}-label {
       top: 0;
       left: 5px;
-      transform: translate(0, -55%);
+      transform: translate(0, -55%) scale(.8);
       background: var(--c-app-surface-color);
     }
 
