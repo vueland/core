@@ -89,14 +89,6 @@ A Vue 3 UI package focused on composable components, slot-based visual replaceme
 
 A Vite JIT plugin for generating arbitrary utility classes on demand.
 
-### `docs`
-
-Documentation powered by VitePress.
-
-### `playground`
-
-A development playground for testing components, utilities, themes, presets, and platform features.
-
 ## Project status
 
 Vueland is currently in active early development.
@@ -207,14 +199,6 @@ Vue 3 UI-пакет с фокусом на composable-компоненты, за
 ### `@vueland/utils-jit`
 
 Vite JIT plugin для генерации arbitrary utility-классов по мере необходимости.
-
-### `docs`
-
-Документацию на базе VitePress.
-
-### `playground`
-
-Песочницу для разработки и тестирования компонентов, утилит, тем, пресетов и возможностей платформы.
 
 ## Статус проекта
 
