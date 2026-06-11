@@ -21,6 +21,7 @@
     <c-input
         :model-value="model"
         v-bind="$attrs"
+        kind="field"
     >
         <template #field="{focus, input, blur, focused, preset, attrs, uid, label, clearable}">
             <div class="c-text-field">
