@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { computed, onBeforeUnmount, onMounted, provide, shallowRef, unref, watch } from 'vue'
 
-    import { useActivator, useAutoPosition, useDelayedActions, useMenuPresets, } from '../../composables'
+    import { useActivator, useAutoPosition, useDelayedActions, useKeyboard, useMenuPresets, } from '../../composables'
     import { $MENU_API_KEY } from '../../constants'
     import { vClickOutside } from '../../directives'
     import { isDef } from '../../helpers'
@@ -64,15 +64,15 @@
         ...unref(presets).root
     ]))
 
-    const open = async () => {
+    const open = () => {
         mounted.value = true
 
-        openDelay(async () => {
+        openDelay(() => {
             if (!unref(detached)) {
                 model.value = true
             }
 
-            await update()
+            // update()
 
             emit('open')
         })
@@ -107,11 +107,9 @@
         }
     }
 
-    const onKeydown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape' && unref(model)) {
-            close()
-        }
-    }
+    const { onKeydown } = useKeyboard({
+        Escape: () => close()
+    })
 
     const listeners = genListeners({
         open,

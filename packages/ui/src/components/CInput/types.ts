@@ -19,6 +19,7 @@ export type CInputProps<T = any> =
     disabled?: boolean
     focused?: boolean
     readonly?: boolean
+    role?: 'checkbox' | 'radio' | 'field' | 'area' | 'listbox'
 }
 
 export type CInputEmits<T = any> = {
@@ -28,10 +29,7 @@ export type CInputEmits<T = any> = {
 }
 
 export type CInputSlots<T = any> = {
-    label?(props: { uid: string }): VNode | string
-    prepend?(): VNode | string
-    clear?(): VNode | string
-    append?(): VNode | string
+    label?(props: { uid: string }): string
     details?(props: {
         errorMessage: ValidateState['errorMessage']
         hasError: ValidateState['hasError']
@@ -48,7 +46,6 @@ export type CInputSlots<T = any> = {
         focused?: boolean
         disabled?: boolean
         clearable?: boolean
-        activator?: any
         preset?: string
         errorMessage: ValidateState['errorMessage']
         hasError: ValidateState['hasError']

@@ -4,7 +4,6 @@
         onBeforeMount,
         onBeforeUnmount,
         shallowReactive,
-        shallowRef,
         unref,
         useAttrs,
     } from 'vue'
@@ -50,7 +49,6 @@
     })
 
     const fieldId = props.id ?? `input-${unique(6)}`
-    const fieldRef = shallowRef()
 
     const hasDetails = computed(() => !props.noDetails && (
         !!props.details ||
@@ -78,6 +76,9 @@
         ...(errors.errorMessage && unref(hasDetails) ? { 'aria-errormessage': `${fieldId}-details` } : {}),
         ...(props.readonly ? { 'aria-readonly': 'true' } : {}),
         ...(props.disabled ? { 'aria-disabled': 'true' } : {}),
+        ...(props.role === 'listbox' ? { 'aria-haspopup': 'listbox' } : {}),
+        ...(props.role === 'listbox' ? { 'aria-controls': `${fieldId}-menu` } : {}),
+        ...(props.role === 'listbox' ? { 'aria-expanded': `${state.focused}` } : {}),
     }))
 
     const classes = computed(() => [
@@ -88,8 +89,6 @@
             'c-input--disabled': props.disabled,
             'c-input--readonly': props.readonly,
             'c-input--clearable': props.clearable,
-            'c-input--has-prepend': !!slots?.prepend,
-            'c-input--has-append': !!slots?.append,
             [attrs.class as string]: !!attrs.class,
         },
         ...unref(preset).root
@@ -142,10 +141,7 @@
         class="c-input"
         :class="classes"
     >
-        <div
-            ref="fieldRef"
-            class="c-input__field"
-        >
+        <div class="c-input__field">
             <slot
                 name="field"
                 v-bind="errors"
@@ -160,7 +156,6 @@
                 :blur
                 :input
                 :clearable
-                :activator="fieldRef"
                 :reset
                 :attrs="fieldAttrs"
             />

@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T">
     import { shallowRef, unref, watch } from 'vue'
 
-    import { useAutocomplete } from '../../composables'
+    import { useAutocomplete, useKeyboard } from '../../composables'
     import { IconAliases } from '../../enums'
     import { CField } from '../CField'
     import { CInput } from '../CInput'
@@ -22,6 +22,11 @@
 
     defineSlots<CAutocompleteSlots<T>>()
 
+    const model = defineModel<T | T[]>({
+        get: () => props.modelValue,
+        set: val => val
+    })
+
     const {
         inputValue,
         searchItems,
@@ -32,32 +37,30 @@
 
     const inputRef = shallowRef()
     const fieldRef = shallowRef()
+    const menuRef = shallowRef()
 
-    const model = defineModel<T | T[]>({
-        get: () => props.modelValue,
-        set: val => val
+    const { onKeydown } = useKeyboard({
+        Backspace: () => {
+            if (!unref(inputValue)) {
+                const data = unref(model) as T[]
+
+                model.value = props.multiple
+                    ? data.slice(0, -1)
+                    : undefined
+            }
+        },
+        Tab: () => {
+            unref(inputRef).blur()
+            unref(menuRef).close()
+        },
+        Escape: () => {
+            unref(inputRef).blur()
+            unref(fieldRef).$el.blur()
+        }
     })
 
     function clear() {
         model.value = props.multiple ? [] : undefined
-    }
-
-    function onBackspaceDown() {
-        const data = unref(model) as T[]
-
-        model.value = props.multiple
-            ? data.slice(0, -1)
-            : undefined
-    }
-
-    function onKeyDown(e: KeyboardEvent) {
-        if (unref(inputValue)) {
-            return
-        }
-
-        if (e.code === 'Backspace') {
-            onBackspaceDown()
-        }
     }
 
     function focus() {
@@ -79,22 +82,26 @@
         ref="inputRef"
         :model-value="model"
         v-bind="$attrs"
+        role="listbox"
     >
         <template #field="field">
             <c-menu
                 :id="`${field.uid}-menu`"
+                ref="menuRef"
                 bottom
                 open-on-focus
                 close-on-click-outside
                 :close-on-content-click="!multiple"
                 :offset-y="2"
                 strategy="reverse"
-                :activator="field.activator"
                 :preset="options?.menuPreset"
                 @close="blur"
             >
-                <template #activator="{on}">
-                    <div class="c-autocomplete">
+                <template #activator="{on, activator}">
+                    <div
+                        class="c-autocomplete"
+                        v-bind="activator"
+                    >
                         <slot
                             name="field"
                             v-bind="field"
@@ -112,12 +119,10 @@
                                 :preset="field.preset"
                                 :filled="hasValue"
                                 :error="field.hasError"
-                                :aria-controls="`${field.uid}-menu`"
-                                :aria-expanded="field.focused"
                                 v-on="on"
                                 @input="field.input"
                                 @focus="focus"
-                                @keydown="onKeyDown"
+                                @keydown="onKeydown"
                                 @clear="clear"
                             >
                                 <template #prepend>

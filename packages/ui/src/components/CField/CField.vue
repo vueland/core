@@ -21,7 +21,6 @@
     }>()
 
     const value = defineModel<string | number | undefined | null>()
-    const focused = defineModel<boolean>('focused', { default: false })
 
     const inputRef = shallowRef<HTMLElement>()
     const attrs = useAttrs()
@@ -29,11 +28,11 @@
 
     const presets = useFieldPresets({ slots, props, attrs})
     const hasValue = computed(() => props.filled || !!unref(value))
-    const showClearBtn = computed(() => props.clearable && focused.value && unref(hasValue))
+    const showClearBtn = computed(() => props.clearable && props.focused && unref(hasValue))
 
     const classes = computed(() => [
         {
-            'c-field--focused': focused.value,
+            'c-field--focused': props.focused,
             'c-field--filled': unref(hasValue),
             'c-field--has-prepend': !!slots.prepend,
         },
@@ -41,7 +40,7 @@
     ])
 
     const focus = () => {
-        if (attrs.readonly || attrs.disabled) {
+        if (attrs.disabled) {
             return
         }
 
@@ -67,7 +66,7 @@
     }
 
     onMounted(() => {
-        if (focused.value) unref(inputRef)?.focus()
+        if (props.focused) unref(inputRef)?.focus()
     })
 
 </script>
@@ -103,6 +102,7 @@
                 :value="value"
                 @input="input"
                 @blur="blur"
+                @focus="focus"
             />
             <slot name="after" />
         </div>

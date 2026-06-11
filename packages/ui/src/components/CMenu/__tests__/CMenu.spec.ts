@@ -12,10 +12,97 @@ type Rect = {
     height?: number
 }
 
+type Size = {
+    width: number
+    height: number
+}
+
+const elementSizes = new WeakMap<Element, Size>()
+const wrappers: ReturnType<typeof mount>[] = []
+const containers: HTMLElement[] = []
+
+function getObservedSize(el: Element): Size {
+    return elementSizes.get(el) ?? {
+        width: 0,
+        height: 0,
+    }
+}
+
+function createResizeEntry(el: Element): ResizeObserverEntry {
+    const size = getObservedSize(el)
+
+    return {
+        target: el,
+        contentRect: {
+            x: 0,
+            y: 0,
+            top: 0,
+            left: 0,
+            right: size.width,
+            bottom: size.height,
+            width: size.width,
+            height: size.height,
+            toJSON: () => ({}),
+        } as DOMRectReadOnly,
+        borderBoxSize: [{
+            inlineSize: size.width,
+            blockSize: size.height,
+        }] as ResizeObserverSize[],
+        contentBoxSize: [{
+            inlineSize: size.width,
+            blockSize: size.height,
+        }] as ResizeObserverSize[],
+        devicePixelContentBoxSize: [{
+            inlineSize: size.width,
+            blockSize: size.height,
+        }] as ResizeObserverSize[],
+    }
+}
+
 class ResizeObserverMock {
-    observe = vi.fn()
-    unobserve = vi.fn()
-    disconnect = vi.fn()
+    observed = new Set<Element>()
+    timers = new Map<Element, ReturnType<typeof setTimeout>>()
+
+    observe = vi.fn((el: Element) => {
+        this.observed.add(el)
+
+        const timer = setTimeout(() => {
+            this.timers.delete(el)
+
+            if (!this.observed.has(el)) {
+                return
+            }
+
+            if (!el.isConnected) {
+                return
+            }
+
+            this.callback([createResizeEntry(el)], this as unknown as ResizeObserver)
+        }, 0)
+
+        this.timers.set(el, timer)
+    })
+
+    unobserve = vi.fn((el: Element) => {
+        this.observed.delete(el)
+
+        const timer = this.timers.get(el)
+
+        if (timer) {
+            clearTimeout(timer)
+            this.timers.delete(el)
+        }
+    })
+
+    disconnect = vi.fn(() => {
+        this.observed.clear()
+
+        for (const timer of this.timers.values()) {
+            clearTimeout(timer)
+        }
+
+        this.timers.clear()
+    })
 
     constructor(public callback: ResizeObserverCallback) {}
 }
@@ -47,14 +134,26 @@ function mockMenuSize(width = 120, height = 60) {
     vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(function (this: HTMLElement) {
         return this.classList.contains('c-menu') ? width : 0
     })
+
     vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (this: HTMLElement) {
         return this.classList.contains('c-menu') ? height : 0
     })
+
+    const menu = document.body.querySelector('.c-menu')
+
+    if (menu) {
+        elementSizes.set(menu, {
+            width,
+            height,
+        })
+    }
 }
 
 async function flush() {
     await nextTick()
-    await vi.runAllTimersAsync()
+    await vi.runOnlyPendingTimersAsync()
+    await nextTick()
+    await vi.runOnlyPendingTimersAsync()
     await nextTick()
 }
 
@@ -75,7 +174,19 @@ function getMenuOrFail() {
 function isMenuVisible() {
     const menu = getMenu()
 
-    return !!menu && menu.style.display !== 'none'
+    return !!menu
+        && menu.style.display !== 'none'
+        && menu.classList.contains('c-menu--visible')
+        && !menu.className.includes('leave')
+}
+
+function expectMenuOpened() {
+    expect(getMenu()).toBeTruthy()
+    expect(isMenuVisible()).toBe(true)
+}
+
+function expectMenuClosed() {
+    expect(isMenuVisible()).toBe(false)
 }
 
 async function createWrapper(props: Record<string, any> = {}) {
@@ -117,8 +228,12 @@ async function createWrapper(props: Record<string, any> = {}) {
         },
     })
 
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    containers.push(container)
+
     const wrapper = mount(Host, {
-        attachTo: document.body,
+        attachTo: container,
         global: {
             provide: {
                 [$APP_API_KEY]: {
@@ -133,6 +248,8 @@ async function createWrapper(props: Record<string, any> = {}) {
         },
     })
 
+    wrappers.push(wrapper)
+
     await nextTick()
 
     const activator = wrapper.get('[data-test="activator"]').element
@@ -144,24 +261,67 @@ async function createWrapper(props: Record<string, any> = {}) {
         height: 40,
     })
 
+    elementSizes.set(activator, {
+        width: 120,
+        height: 40,
+    })
+
     mockMenuSize()
+
+    const prepareMenuSize = (width = 120, height = 60) => {
+        mockMenuSize(width, height)
+
+        const menu = getMenu()
+
+        if (menu) {
+            elementSizes.set(menu, {
+                width,
+                height,
+            })
+        }
+    }
+
+    const syncMenuSize = (width = 120, height = 60) => {
+        const menu = getMenu()
+
+        if (menu) {
+            elementSizes.set(menu, {
+                width,
+                height,
+            })
+        }
+    }
+
+    const open = async () => {
+        menuRef.value.open()
+        await flush()
+
+        syncMenuSize()
+        await flush()
+    }
+
+    const close = async () => {
+        menuRef.value.close()
+        await flush()
+    }
+
+    const toggle = async () => {
+        menuRef.value.toggle()
+        await flush()
+
+        syncMenuSize()
+        await flush()
+    }
 
     return {
         wrapper,
         menuRef,
         activator,
-        async open() {
-            await menuRef.value.open()
-            await flush()
-        },
-        async close() {
-            menuRef.value.close()
-            await flush()
-        },
-        async toggle() {
-            menuRef.value.toggle()
-            await flush()
-        },
+        open,
+        close,
+        toggle,
+        prepareMenuSize,
+        syncMenuSize,
     }
 }
 
@@ -210,11 +370,22 @@ describe('CMenu', () => {
         })
     })
 
-    afterEach(() => {
+    afterEach(async () => {
+        for (const wrapper of wrappers.splice(0)) {
+            wrapper.unmount()
+        }
+
+        await nextTick()
+        await vi.runOnlyPendingTimersAsync()
+        await nextTick()
+
+        for (const container of containers.splice(0)) {
+            container.remove()
+        }
+
         vi.useRealTimers()
         vi.restoreAllMocks()
         vi.unstubAllGlobals()
-        document.body.innerHTML = ''
     })
 
     it('рендерит activator slot', async () => {
@@ -235,8 +406,7 @@ describe('CMenu', () => {
 
         await open()
 
-        expect(getMenu()).toBeTruthy()
-        expect(isMenuVisible()).toBe(true)
+        expectMenuOpened()
         expect(document.body.textContent).toContain('Menu content')
     })
 
@@ -246,7 +416,7 @@ describe('CMenu', () => {
         await open()
         await close()
 
-        expect(getMenu()).toBeFalsy()
+        expectMenuClosed()
     })
 
     it('переключается через exposed toggle()', async () => {
@@ -254,15 +424,14 @@ describe('CMenu', () => {
 
         await toggle()
 
-        expect(getMenu()).toBeTruthy()
-        expect(isMenuVisible()).toBe(true)
+        expectMenuOpened()
 
         await toggle()
 
-        expect(getMenu()).toBeFalsy()
+        expectMenuClosed()
     })
 
-    it('эмитит update:modelValue при открытии', async () => {
+    it('эмитит update:modelValue и open при открытии', async () => {
         const { wrapper, open } = await createWrapper()
 
         await open()
@@ -270,6 +439,7 @@ describe('CMenu', () => {
         const menu = wrapper.findComponent(CMenu as any)
 
         expect(menu.emitted('update:modelValue')?.at(-1)).toEqual([true])
+        expect(menu.emitted('open')).toBeTruthy()
     })
 
     it('эмитит update:modelValue и close при закрытии', async () => {
@@ -285,48 +455,54 @@ describe('CMenu', () => {
     })
 
     it('открывается по click на activator при openOnClick=true', async () => {
-        const { wrapper } = await createWrapper({
+        const { wrapper, syncMenuSize } = await createWrapper({
             openOnClick: true,
         })
 
         await wrapper.get('[data-test="activator"]').trigger('click')
         await flush()
 
-        expect(getMenu()).toBeTruthy()
-        expect(isMenuVisible()).toBe(true)
+        syncMenuSize()
+        await flush()
+
+        expectMenuOpened()
     })
 
     it('переключается по click на activator при closeOnClick=true', async () => {
-        const { wrapper } = await createWrapper({
+        const { wrapper, syncMenuSize } = await createWrapper({
             closeOnClick: true,
         })
 
         await wrapper.get('[data-test="activator"]').trigger('click')
         await flush()
 
-        expect(getMenu()).toBeTruthy()
-        expect(isMenuVisible()).toBe(true)
+        syncMenuSize()
+        await flush()
+
+        expectMenuOpened()
 
         await wrapper.get('[data-test="activator"]').trigger('click')
         await flush()
 
-        expect(getMenu()).toBeFalsy()
+        expectMenuClosed()
     })
 
     it('открывается по hover при openOnHover=true', async () => {
-        const { wrapper } = await createWrapper({
+        const { wrapper, syncMenuSize } = await createWrapper({
             openOnHover: true,
         })
 
         await wrapper.get('[data-test="activator"]').trigger('mouseenter')
         await flush()
 
-        expect(getMenu()).toBeTruthy()
-        expect(isMenuVisible()).toBe(true)
+        syncMenuSize()
+        await flush()
+
+        expectMenuOpened()
     })
 
     it('закрывается по mouseleave при closeOnLeave=true', async () => {
-        const { wrapper } = await createWrapper({
+        const { wrapper, syncMenuSize } = await createWrapper({
             openOnHover: true,
             closeOnLeave: true,
         })
@@ -334,24 +510,47 @@ describe('CMenu', () => {
         await wrapper.get('[data-test="activator"]').trigger('mouseenter')
         await flush()
 
-        expect(getMenu()).toBeTruthy()
+        syncMenuSize()
+        await flush()
+
+        expectMenuOpened()
 
         await wrapper.get('[data-test="activator"]').trigger('mouseleave')
         await flush()
 
-        expect(getMenu()).toBeFalsy()
+        expectMenuClosed()
     })
 
     it('открывается по focus при openOnFocus=true', async () => {
-        const { wrapper } = await createWrapper({
+        const { wrapper, syncMenuSize } = await createWrapper({
             openOnFocus: true,
         })
 
         await wrapper.get('[data-test="activator"]').trigger('focus')
         await flush()
 
-        expect(getMenu()).toBeTruthy()
-        expect(isMenuVisible()).toBe(true)
+        syncMenuSize()
+        await flush()
+
+        expectMenuOpened()
+    })
+
+    it('закрывается по Escape', async () => {
+        const { open } = await createWrapper()
+
+        await open()
+
+        window.dispatchEvent(new KeyboardEvent('keydown', {
+            key: 'Escape',
+        }))
+
+        await nextTick()
+        await vi.runOnlyPendingTimersAsync()
+        await nextTick()
+        await vi.runOnlyPendingTimersAsync()
+        await nextTick()
+
+        expectMenuClosed()
     })
 
     it('закрывается по click на content при closeOnContentClick=true', async () => {
@@ -366,7 +565,7 @@ describe('CMenu', () => {
 
         const menu = wrapper.findComponent(CMenu as any)
 
-        expect(getMenu()).toBeFalsy()
+        expectMenuClosed()
         expect(menu.emitted('click')).toBeTruthy()
         expect(menu.emitted('close')).toBeTruthy()
     })
@@ -381,20 +580,21 @@ describe('CMenu', () => {
 
         const menu = wrapper.findComponent(CMenu as any)
 
-        expect(getMenu()).toBeTruthy()
-        expect(isMenuVisible()).toBe(true)
+        expectMenuOpened()
         expect(menu.emitted('click')).toBeFalsy()
     })
 
     it('открывается при modelValue=true', async () => {
-        await createWrapper({
+        const { syncMenuSize } = await createWrapper({
             modelValue: true,
         })
 
         await flush()
 
-        expect(getMenu()).toBeTruthy()
-        expect(isMenuVisible()).toBe(true)
+        syncMenuSize()
+        await flush()
+
+        expectMenuOpened()
         expect(document.body.textContent).toContain('Menu content')
     })
 
@@ -490,11 +690,11 @@ describe('CMenu', () => {
     })
 
     it('позиционируется над activator при top=true', async () => {
-        const { open } = await createWrapper({
+        const { prepareMenuSize, open } = await createWrapper({
             top: true,
         })
 
-        mockMenuSize(120, 80)
+        prepareMenuSize(120, 80)
 
         await open()
 
@@ -564,6 +764,11 @@ describe('CMenu', () => {
             height: 40,
         })
 
+        elementSizes.set(activator, {
+            width: 60,
+            height: 40,
+        })
+
         await open()
 
         expect(parseFloat(getMenuOrFail().style.left)).toBe(360)
@@ -575,7 +780,7 @@ describe('CMenu', () => {
             value: 320,
         })
 
-        const { activator, open } = await createWrapper({
+        const { activator, prepareMenuSize, open } = await createWrapper({
             bottom: true,
             strategy: 'reverse',
         })
@@ -587,7 +792,12 @@ describe('CMenu', () => {
             height: 40,
         })
 
-        mockMenuSize(120, 100)
+        elementSizes.set(activator, {
+            width: 120,
+            height: 40,
+        })
+
+        prepareMenuSize(120, 100)
 
         await open()
 
@@ -595,7 +805,7 @@ describe('CMenu', () => {
     })
 
     it('учитывает openDelay', async () => {
-        const { wrapper } = await createWrapper({
+        const { wrapper, syncMenuSize } = await createWrapper({
             openOnClick: true,
             openDelay: 100,
         })
@@ -613,8 +823,10 @@ describe('CMenu', () => {
         await vi.advanceTimersByTimeAsync(1)
         await flush()
 
-        expect(getMenu()).toBeTruthy()
-        expect(isMenuVisible()).toBe(true)
+        syncMenuSize()
+        await flush()
+
+        expectMenuOpened()
     })
 
     it('учитывает closeDelay', async () => {
@@ -627,19 +839,17 @@ describe('CMenu', () => {
         menuRef.value.close()
         await nextTick()
 
-        expect(getMenu()).toBeTruthy()
-        expect(isMenuVisible()).toBe(true)
+        expectMenuOpened()
 
         await vi.advanceTimersByTimeAsync(99)
         await nextTick()
 
-        expect(getMenu()).toBeTruthy()
-        expect(isMenuVisible()).toBe(true)
+        expectMenuOpened()
 
         await vi.advanceTimersByTimeAsync(1)
         await flush()
 
-        expect(getMenu()).toBeFalsy()
+        expectMenuClosed()
     })
 
     it('пересчитывает позицию при resize', async () => {
@@ -653,6 +863,11 @@ describe('CMenu', () => {
         setRect(activator, {
             top: 180,
             left: 320,
+            width: 120,
+            height: 40,
+        })
+
+        elementSizes.set(activator, {
             width: 120,
             height: 40,
         })
@@ -684,6 +899,11 @@ describe('CMenu', () => {
         setRect(activator, {
             top: 100,
             left: 200,
+            width: 120,
+            height: 40,
+        })
+
+        elementSizes.set(activator, {
             width: 120,
             height: 40,
         })

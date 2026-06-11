@@ -2,8 +2,8 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { defineComponent, h, inject, nextTick, ref } from 'vue'
 
-import { $LIST_API_KEY } from '../../constants'
-import { CList } from '../index'
+import { $LIST_API_KEY } from '../../../constants'
+import { CList } from '../../index'
 
 type ListApi<T> = {
     model: { value: T | T[] | null }
