@@ -1,19 +1,59 @@
+$self: '.c-checkbox';
+
 .c-checkbox {
+  flex: 1 1;
   display: flex;
   cursor: pointer;
   user-select: none;
   justify-content: flex-start;
   align-items: center;
+  outline: none;
+
+  &--default {
+    & > #{$self}__label {
+      color: var(--c-app-text-color)
+    }
+  }
+
+  &--focused {
+    & > #{$self}__icon {
+      &::before {
+        opacity: .2;
+      }
+    }
+  }
 
   &__icon {
-    color: currentColor;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: currentColor;
+      border-radius: 8px;
+      opacity: 0;
+      transform: scale(.7);
+    }
   }
 
   &__label {
     color: currentColor;
+    margin-left: 8px;
+    pointer-events: none;
   }
 
   &--error {
     color: var(--c-app-error-color)
+  }
+
+  & > input {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    bottom: 0;
   }
 }

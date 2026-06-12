@@ -2,7 +2,6 @@ import { computed, shallowRef, unref } from 'vue'
 
 import { useSelects } from './use-selects'
 
-
 export function useAutocomplete<T = any>(props: Record<string, any>) {
     const {
         items,

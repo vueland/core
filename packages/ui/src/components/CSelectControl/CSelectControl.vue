@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="T">
-    import { computed, unref } from 'vue'
+    import { computed, provide, unref } from 'vue'
 
+    import { $SELECT_CONTROL_API_KEY } from '../../constants'
     import { isDef } from '../../helpers'
 
     import type { CSelectControlProps, CSelectControlSlots } from './types'
@@ -52,6 +53,19 @@
 
         checkOn()
     }
+
+    provide($SELECT_CONTROL_API_KEY,{
+        checked,
+        toggle,
+        checkOn,
+        checkOff,
+    })
+
+    defineExpose({
+        checkOn,
+        checkOff,
+        toggle,
+    })
 </script>
 <template>
     <slot

@@ -93,9 +93,11 @@
                 <c-text-field
                     v-model="form.name"
                     label="Name"
+                    id="name"
                     :rules="nameRules"
                     validate-on="input"
                     class="form-name"
+                    focused
                     :preset="currentPreset"
                     details="some text"
                     placeholder="введите текст"

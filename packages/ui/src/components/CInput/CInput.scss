@@ -1,13 +1,11 @@
 @use "../../styles/modules/global-vars" as *;
 
 $self: '.c-input';
-$input-field-border-color: #e5e5e5;
 $input-details-height: 24px;
 
 .c-input {
   --c-input-field-border-radius: var(--c-app-border-radius);
   --c-input-details-height: #{$input-details-height};
-  --c-input-field-border-color: #{$input-field-border-color};
   --c-input-clear-action-min-width: 24px;
   --c-input-field-text-color: var(--c-app-text-color);
   --c-input-error-color: var(--c-app-error-color);
@@ -52,17 +50,6 @@ $input-details-height: 24px;
 
   &__field {
     display: flex;
-    border: thin solid var(--c-input-field-border-color);
-    border-radius: var(--c-input-field-border-radius);
-    transition: .2s $primary-transition;
-    transition-property: color, border-color;
-    position: relative;
-
-    & > * > input,
-    & > * > textarea {
-      color: var(--c-input-field-text-color);
-      padding: 4px 8px;
-    }
   }
 
   &__details {
