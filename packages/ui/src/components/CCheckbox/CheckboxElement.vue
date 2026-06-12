@@ -1,7 +1,6 @@
 <script setup lang="ts" generic="T">
     import { computed, unref } from 'vue'
 
-    import { useKeyboard } from '../../composables'
     import { IconAliases } from '../../enums'
     import { CIcon } from '../CIcon'
     import { CLabel } from '../CLabel'
@@ -19,25 +18,22 @@
         readonly?: boolean
     }>()
 
-    const emit = defineEmits<{
+    defineEmits<{
         (e: 'toggle'): void
     }>()
 
     const focused = defineModel<boolean>('focused', { default: false })
+    const isCheckable = computed(() => !props.readonly && !props.disabled)
 
     const { CHECKBOX_ON, CHECKBOX_OFF } = IconAliases
 
     const classes = computed(() => ({
-        'c-checkbox--default': !unref(focused) && !props.error,
+        'c-checkbox--default': !unref(focused) && !props.error && unref(isCheckable),
         'c-checkbox--focused': unref(focused),
         'c-checkbox--disabled': props.disabled,
         'c-checkbox--readonly': props.readonly,
         'c-checkbox--error': props.error,
     }))
-
-    const { onKeydown } = useKeyboard({
-        Enter: () => emit('toggle')
-    })
 
     function focus() {
         focused.value = true
@@ -51,10 +47,11 @@
     <div
         class="c-checkbox"
         :class="classes"
-        @click="$emit('toggle')"
-        @keydown="onKeydown"
     >
-        <div class="c-checkbox__icon">
+        <div
+            class="c-checkbox__icon"
+            aria-hidden="true"
+        >
             <slot
                 name="icon"
                 :checked
@@ -66,10 +63,12 @@
             :id
             type="checkbox"
             :checked
-            role="checkbox"
             v-bind="$attrs"
+            :disabled
+            :readonly
             @focus="focus"
             @blur="blur"
+            @change="$emit('toggle')"
         >
         <c-label
             :id="`${id}-label`"

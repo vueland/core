@@ -97,7 +97,6 @@
                     :rules="nameRules"
                     validate-on="input"
                     class="form-name"
-                    focused
                     :preset="currentPreset"
                     details="some text"
                     placeholder="введите текст"

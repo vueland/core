@@ -30,6 +30,8 @@
     const hasValue = computed(() => props.filled || !!unref(value))
     const showClearBtn = computed(() => props.clearable && props.focused && unref(hasValue))
 
+    console.log(useAttrs())
+
     const classes = computed(() => [
         {
             'c-field--focused': props.focused,
@@ -102,6 +104,8 @@
                 v-model="value"
                 class="c-field-input"
                 :class="presets.input"
+                :disabled="$attrs.disabled"
+                :readonly="$attrs.readonly"
                 :value="value"
                 @input="input"
                 @blur="blur"

@@ -9,11 +9,11 @@
     } from 'vue'
 
     import {
-        useForm, useId,
-        useInputPresets, useSelectControl,
+        useForm,
+        useId,
+        useInputPresets,
         useValidate
     } from '../../composables'
-    import { useTabindex } from '../../composables/use-tabindex'
     import { FIELD_ATTRS } from '../../constants'
 
     import type { CInputEmits, CInputProps, CInputSlots, InputState } from './types'
@@ -39,10 +39,7 @@
     } = useValidate(props, state)
 
     const formApi = useForm()
-    const selectControlApi = useSelectControl()
     const attrs = useAttrs()
-    const { register, unregister } = useTabindex()
-    const tabindex = register()
 
     const preset = useInputPresets({
         props,
@@ -81,7 +78,6 @@
         ...(errors.errorMessage && unref(hasDetails) ? { 'aria-errormessage': `${fieldId}-details` } : {}),
         ...(props.readonly ? { 'aria-readonly': 'true' } : {}),
         ...(props.disabled ? { 'aria-disabled': 'true' } : {}),
-        ...(isCheckBox || isRadio ? { 'aria-checked': unref(selectControlApi.checked) } : {}),
         ...(isLisBox ? { 'aria-haspopup': 'listbox' } : {}),
         ...(isLisBox ? { 'aria-controls': `${fieldId}-menu` } : {}),
         ...(isLisBox ? { 'aria-expanded': `${state.focused}` } : {}),
@@ -91,7 +87,7 @@
     const classes = computed(() => [
         {
             'c-input--has-error': errors.hasError,
-            'c-input--default': !errors.hasError,
+            'c-input--default': !errors.hasError && !props.disabled && !props.readonly,
             'c-input--focused': state.focused,
             'c-input--disabled': props.disabled,
             'c-input--readonly': props.readonly,
@@ -133,7 +129,6 @@
 
     onBeforeUnmount(() => {
         formApi?.remove(validate)
-        unregister()
     })
 
     defineExpose({
@@ -159,7 +154,6 @@
                 :readonly
                 :focused="state.focused"
                 :uid="fieldId"
-                :tabindex
                 :preset="preset.field"
                 :focus
                 :blur

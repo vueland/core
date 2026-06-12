@@ -18,30 +18,29 @@
     <c-select-control
         v-slot="{checked, toggle}"
         v-model="model"
-        :value="$attrs.value"
+        v-bind="$attrs"
     >
         <c-input
             :model-value="model"
             v-bind="$attrs"
             kind="checkbox"
         >
-            <template #field="{uid, label, attrs, hasError}">
+            <template #field="{uid, label, attrs, hasError, readonly, disabled}">
                 <checkbox-element
                     :id="uid"
                     :error="hasError"
                     :label
                     :checked
+                    :readonly
+                    :disabled
                     v-bind="attrs"
                     @toggle="toggle"
                 >
                     <slot />
                 </checkbox-element>
             </template>
-            <template #details="{uid, errorMessage, details}">
-                <span
-                    :id="`${uid}-details`"
-                    :key="errorMessage || details"
-                >
+            <template #details="{errorMessage, details}">
+                <span :key="errorMessage || details">
                     {{ errorMessage || details }}
                 </span>
             </template>

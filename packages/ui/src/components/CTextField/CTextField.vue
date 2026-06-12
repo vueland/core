@@ -23,7 +23,7 @@
         v-bind="$attrs"
         kind="input"
     >
-        <template #field="{focus, input, blur, focused, preset, attrs, uid, label, clearable}">
+        <template #field="{focus, input, blur, focused, preset, attrs, uid, label, clearable, readonly, disabled}">
             <div class="c-text-field">
                 <c-field
                     :id="uid"
@@ -31,6 +31,8 @@
                     :focused
                     :label
                     :preset
+                    :readonly
+                    :disabled
                     :clearable
                     v-bind="attrs"
                     @focus="focus"

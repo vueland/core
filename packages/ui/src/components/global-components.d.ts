@@ -1,10 +1,11 @@
 import type { Component, VNode } from 'vue'
 
 import type {
-    CAutocompleteProps,
+    CAutocompletePublicProps,
     CAutocompleteSlots,
     CCheckboxEvents,
     CCheckboxProps,
+    CCheckboxPublicProps,
     CCheckboxSlots,
     CDialogProps,
     CDialogSlots,
@@ -26,7 +27,7 @@ declare module 'vue' {
     export interface GlobalComponents {
         CApp: typeof import('./CApp').CApp
         CAutocomplete: new <T>() => {
-            $props: CInputProps<T> & CAutocompleteProps<T>
+            $props: CAutocompletePublicProps<T>
             $slots: CInputSlots & CAutocompleteSlots<T>
         }
         CBtn: typeof import('./CBtn/').CBtn
@@ -39,9 +40,9 @@ declare module 'vue' {
             $slots: CSelectControlSlots
         }
         CCheckbox: new <T>() => {
-            $props: CCheckboxProps<T> & CSelectControlProps<T> & CInputProps<T>
+            $props: CCheckboxPublicProps<T>
             $slots: CCheckboxSlots
-            $emit: CCheckboxEvents<T>
+            $emit: CCheckboxEvents<CCheckboxModel<T>>
         }
         CRadio: new <T>() => {
             $props: CCheckboxProps<T> & CSelectControlProps<T>
