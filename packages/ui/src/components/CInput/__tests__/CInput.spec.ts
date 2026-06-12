@@ -187,6 +187,7 @@ describe('CInput', () => {
             const wrapper = createWrapper({
                 props: {
                     id: 'email',
+                    kind: 'input'
                 },
             })
 
@@ -194,7 +195,9 @@ describe('CInput', () => {
         })
 
         it('генерирует uid с префиксом input-, если id не передан', () => {
-            const wrapper = createWrapper()
+            const wrapper = createWrapper({
+                props: { kind: 'input' }
+            })
 
             expect(field(wrapper).attributes('id')).toMatch(/^input-/)
         })

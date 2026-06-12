@@ -9,12 +9,12 @@
     } from 'vue'
 
     import {
-        useForm,
-        useInputPresets,
+        useForm, useId,
+        useInputPresets, useSelectControl,
         useValidate
     } from '../../composables'
+    import { useTabindex } from '../../composables/use-tabindex'
     import { FIELD_ATTRS } from '../../constants'
-    import { unique } from '../../helpers'
 
     import type { CInputEmits, CInputProps, CInputSlots, InputState } from './types'
 
@@ -39,7 +39,10 @@
     } = useValidate(props, state)
 
     const formApi = useForm()
+    const selectControlApi = useSelectControl()
     const attrs = useAttrs()
+    const { register, unregister } = useTabindex()
+    const tabindex = register()
 
     const preset = useInputPresets({
         props,
@@ -47,7 +50,10 @@
         errors
     })
 
-    const fieldId = props.id ?? `input-${unique(6)}`
+    const fieldId = useId(props.id, { prefix: props.kind })
+    const isLisBox = props.kind === 'listbox'
+    const isCheckBox = props.kind === 'checkbox'
+    const isRadio = props.kind === 'radio'
 
     const hasDetails = computed(() => !props.noDetails && (
         !!props.details ||
@@ -68,15 +74,17 @@
     }, {}))
 
     const fieldAttrs = computed(() => ({
-        ...(props.label ? { 'aria-labelledby': `${fieldId}-label` } : {}),
+        ...(props.label || isCheckBox || isRadio ? { 'aria-labelledby': `${fieldId}-label` } : {}),
+        ...(props.label ? { 'aria-label': props.label } : {}),
         ...(unref(hasDetails) ? { 'aria-describedby': `${fieldId}-details` } : {}),
         ...(errors.hasError ? { 'aria-invalid': 'true' } : {}),
         ...(errors.errorMessage && unref(hasDetails) ? { 'aria-errormessage': `${fieldId}-details` } : {}),
         ...(props.readonly ? { 'aria-readonly': 'true' } : {}),
         ...(props.disabled ? { 'aria-disabled': 'true' } : {}),
-        ...(props.kind === 'listbox' ? { 'aria-haspopup': 'listbox' } : {}),
-        ...(props.kind === 'listbox' ? { 'aria-controls': `${fieldId}-menu` } : {}),
-        ...(props.kind === 'listbox' ? { 'aria-expanded': `${state.focused}` } : {}),
+        ...(isCheckBox || isRadio ? { 'aria-checked': unref(selectControlApi.checked) } : {}),
+        ...(isLisBox ? { 'aria-haspopup': 'listbox' } : {}),
+        ...(isLisBox ? { 'aria-controls': `${fieldId}-menu` } : {}),
+        ...(isLisBox ? { 'aria-expanded': `${state.focused}` } : {}),
         ...unref(normalizedAttrsMap),
     }))
 
@@ -125,6 +133,7 @@
 
     onBeforeUnmount(() => {
         formApi?.remove(validate)
+        unregister()
     })
 
     defineExpose({
@@ -150,6 +159,7 @@
                 :readonly
                 :focused="state.focused"
                 :uid="fieldId"
+                :tabindex
                 :preset="preset.field"
                 :focus
                 :blur

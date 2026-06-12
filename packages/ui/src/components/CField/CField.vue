@@ -35,6 +35,7 @@
             'c-field--focused': props.focused,
             'c-field--filled': unref(hasValue),
             'c-field--has-prepend': !!slots.prepend,
+            'c-field--default': !props.focused && !props.error,
         },
         ...unref(presets).root
     ])
@@ -86,6 +87,8 @@
         <div class="c-field__core">
             <c-label
                 :id="`${$attrs.id}-label`"
+                :for="$attrs.id"
+                tag="label"
                 class="c-field-label"
                 :class="presets.label"
             >

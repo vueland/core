@@ -39,7 +39,7 @@ declare module 'vue' {
             $slots: CSelectControlSlots
         }
         CCheckbox: new <T>() => {
-            $props: CCheckboxProps<T> & CSelectControlProps<T>
+            $props: CCheckboxProps<T> & CSelectControlProps<T> & CInputProps<T>
             $slots: CCheckboxSlots
             $emit: CCheckboxEvents<T>
         }

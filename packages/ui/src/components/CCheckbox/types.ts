@@ -1,11 +1,7 @@
 import type { VNode } from 'vue'
 
-import type { ValidateProps } from '../../composables'
-
-export type CCheckboxProps<T> =
-    Omit<ValidateProps, 'validateOn'> & {
+export type CCheckboxProps<T> = {
     modelValue: T | T[] | boolean
-    label?: string
     size?: number
 }
 

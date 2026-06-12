@@ -19,7 +19,7 @@ export type CInputProps<T = any> =
     disabled?: boolean
     focused?: boolean
     readonly?: boolean
-    kind?: 'checkbox' | 'radio' | 'field' | 'area' | 'listbox'
+    kind?: 'checkbox' | 'radio' | 'input' | 'area' | 'listbox'
 }
 
 export type CInputEmits<T = any> = {
@@ -43,7 +43,7 @@ export type CInputSlots<T = any> = {
         reset(): void
         label?: string
         readonly?: boolean
-        focused?: boolean
+        focused: boolean
         disabled?: boolean
         clearable?: boolean
         preset?: string
@@ -51,6 +51,7 @@ export type CInputSlots<T = any> = {
         hasError: ValidateState['hasError']
         attrs: Record<string, any>
         uid: string
+        tabindex: number
         validate(): boolean
     }): VNode
 }
