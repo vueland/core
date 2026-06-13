@@ -2,21 +2,29 @@ import { computed, getCurrentInstance } from 'vue'
 
 import { isNotEmpty } from '../helpers'
 
-export function useSelects<T>(props: Record<string, any>) {
+import type { IterableItemsProps } from './use-normalized-items'
+
+export type SelectableProps<T> = {
+    modelValue: T | T[]
+    multiple?: boolean
+    mandatory?: boolean
+}
+
+export function useSelects<T>(props: IterableItemsProps<T> & SelectableProps<T>) {
     const instance = getCurrentInstance()!
-    const { extKey } = props.options ?? {}
+    const { titleKey = '' } = props ?? {}
 
     const hasValue = computed(() => props.multiple
         ? (props.modelValue as T[])?.length > 0
         : isNotEmpty(props.modelValue)
     )
 
-    const items = computed(() => {
+    const selectedItems = computed(() => {
         if (props.multiple) {
-            return props.modelValue.map((it: T) => it[extKey] ?? it)
+            return (props.modelValue as T[]).map((it: T) => it[titleKey] ?? it)
         }
 
-        return [props.modelValue ? `${props.modelValue[extKey] ?? props.modelValue}` : '']
+        return [props.modelValue ? `${props.modelValue[titleKey] ?? props.modelValue}` : '']
     })
 
     function select(value: T) {
@@ -25,8 +33,7 @@ export function useSelects<T>(props: Record<string, any>) {
 
     return {
         hasValue,
-        extKey,
-        items,
+        selectedItems,
         select
     }
 }

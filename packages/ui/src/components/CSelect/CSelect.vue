@@ -1,11 +1,10 @@
 <script setup lang="ts" generic="T">
     import { shallowRef, unref } from 'vue'
 
-    import { useKeyboard, useSelects } from '../../composables'
+    import { useKeyboard, useNormalizedItems, useSelects } from '../../composables'
     import { IconAliases } from '../../enums'
     import { CField } from '../CField'
     import { CInput } from '../CInput'
-    import { CItems } from '../CItems'
     import { CMenu } from '../CMenu'
 
     import type { CSelectProps, CSelectSlots } from './types'
@@ -22,7 +21,8 @@
     const inputRef = shallowRef()
     const menuRef = shallowRef()
 
-    const { items: selectedItems, hasValue, select } = useSelects(props)
+    const normalizedItems = useNormalizedItems(props)
+    const { selectedItems, hasValue, select } = useSelects(props)
 
     const { onKeydown } = useKeyboard({
         Tab: () => {
@@ -116,20 +116,30 @@
                     <slot
                         name="menu"
                         :on-select="select"
-                        :items
+                        :items="normalizedItems"
                     >
-                        <c-items
+                        <c-list
+                            ref="menuListRef"
                             v-model="model"
-                            :items
-                            :options
+                            role="listbox"
+                            selectable
                             :multiple
-                            mandatory
-                        />
+                            :mandatory
+                        >
+                            <c-list-item
+                                v-for="item of normalizedItems"
+                                :key="item.key"
+                                :value="item.value ?? item.raw"
+                            >
+                                <c-list-item-title>
+                                    {{ item.title }}
+                                </c-list-item-title>
+                            </c-list-item>
+                        </c-list>
                     </slot>
                 </template>
             </c-menu>
         </template>
-
         <template #details="{errorMessage, details}">
             <slot
                 name="details"

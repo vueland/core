@@ -5,14 +5,14 @@
 
     const core = useCore()
 
-    const professions = shallowRef([
+    const professions: { title: string }[] = [
         { title: 'Frontend' },
         { title: 'Backend' },
         { title: 'DevOPS' },
         { title: 'Security' },
-    ])
+    ]
 
-    const levels = [
+    const levels: { title: string }[] = [
         { title: 'Junior' },
         { title: 'Middle' },
         { title: 'Senior' },
@@ -56,15 +56,15 @@
 
 
     const radiusItems = [
-        {name: '2px', value: 'radius-[2px]'},
-        {name: '4px', value: 'radius-[4px]'},
-        {name: '6px', value: 'radius-[6px]'},
-        {name: '8px', value: 'radius-[8px]'},
-        {name: '10px', value: 'radius-[10px]'},
-        {name: '12px', value: 'radius-[12px]'},
-        {name: '14px', value: 'radius-[14px]'},
-        {name: '16px', value: 'radius-[16px]'},
-        {name: '18px', value: 'radius-[18px]'},
+        { name: '2px', value: 'radius-[2px]' },
+        { name: '4px', value: 'radius-[4px]' },
+        { name: '6px', value: 'radius-[6px]' },
+        { name: '8px', value: 'radius-[8px]' },
+        { name: '10px', value: 'radius-[10px]' },
+        { name: '12px', value: 'radius-[12px]' },
+        { name: '14px', value: 'radius-[14px]' },
+        { name: '16px', value: 'radius-[16px]' },
+        { name: '18px', value: 'radius-[18px]' },
     ]
 
     const currentPreset = shallowRef('input.A')
@@ -112,9 +112,7 @@
                     preset="input.A"
                     :items="radiusItems"
                     placeholder="выберите радиус"
-                    :options="{
-                        extKey: 'name'
-                    }"
+                    title-key="name"
                     min="3"
                     max="5"
                 />
@@ -129,8 +127,8 @@
                     :rules="professionRules"
                     multiple
                     @update:modelValue="onSelect"
+                    title-key="title"
                     :options="{
-                        extKey: 'title',
                         noItemsMessage: 'Нет совпадений',
                         menuPreset: 'menu.A',
                     }"
@@ -147,9 +145,7 @@
                     :items="levels"
                     placeholder="выберите пункт"
                     class="mt-4"
-                    :options="{
-                        extKey: 'title',
-                    }"
+                    title-key="title"
                     label="Select"
                 />
                 <c-checkbox v-model="checkbox" :rules="checkboxRules">

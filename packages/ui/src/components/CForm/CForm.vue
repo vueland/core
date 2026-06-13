@@ -3,7 +3,7 @@
 
     import { $FORM_API_KEY } from '../../constants'
 
-    import type { FormApi, ValidatorFn } from './types'
+    import type { ValidatorFn } from './types'
 
     defineOptions({
         name: 'CForm',
@@ -30,7 +30,7 @@
     provide($FORM_API_KEY, {
         add,
         remove
-    } as FormApi)
+    })
 
 </script>
 <template>

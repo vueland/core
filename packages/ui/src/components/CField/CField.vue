@@ -30,8 +30,6 @@
     const hasValue = computed(() => props.filled || !!unref(value))
     const showClearBtn = computed(() => props.clearable && props.focused && unref(hasValue))
 
-    console.log(useAttrs())
-
     const classes = computed(() => [
         {
             'c-field--focused': props.focused,
@@ -50,11 +48,6 @@
         emit('focus')
     }
 
-    const onClick = () => {
-        focus()
-        unref(inputRef)!.focus()
-    }
-
     const blur = () => {
         emit('blur')
     }
@@ -66,6 +59,10 @@
 
     const input = (e: InputEvent) => {
         value.value = (e.target as HTMLInputElement).value
+    }
+
+    const onClick = () => {
+        unref(inputRef)!.focus()
     }
 
     onMounted(() => {
@@ -104,12 +101,11 @@
                 v-model="value"
                 class="c-field-input"
                 :class="presets.input"
-                :disabled="$attrs.disabled"
-                :readonly="$attrs.readonly"
                 :value="value"
                 @input="input"
                 @blur="blur"
                 @focus="focus"
+                @click.stop
             />
             <slot name="after" />
         </div>

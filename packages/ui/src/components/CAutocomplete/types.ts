@@ -1,20 +1,20 @@
 import type { VNode } from 'vue'
 
+import type { IterableItemsProps, NormalizedItem, SelectableProps } from '../../composables'
 import type { CInputProps, CInputSlots } from '../CInput'
 
-export type CAutocompleteProps<T> = {
-    modelValue: T | T[]
-    items: T[],
-    multiple?: boolean
+export type CAutocompleteProps<T> =
+    IterableItemsProps<T>
+    & SelectableProps<T>
+    & {
     options?: {
-        extKey?: string
         noItemsMessage?: string
         menuPreset?: string
     },
 }
 
 export type CAutocompleteSlots<T> = {
-    menu(props: { items: T[], onSelect(val: T): void }): void
+    menu(props: { items: NormalizedItem<T>[], onSelect(val: T): void }): void
     field: CInputSlots['field']
     prepend(): VNode
     append(): VNode

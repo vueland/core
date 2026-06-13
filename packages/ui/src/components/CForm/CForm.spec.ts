@@ -5,7 +5,7 @@ import { defineComponent, h, inject, nextTick, ref } from 'vue'
 import { $FORM_API_KEY } from '../../constants'
 import { CForm } from '../index'
 
-type FormApi = {
+type FormAPI = {
     add: (fn: () => boolean) => void
     remove: (fn: () => boolean) => void
 }
@@ -19,7 +19,7 @@ const RegisteringField = defineComponent({
         },
     },
     setup(props) {
-        const formApi = inject<FormApi | undefined>($FORM_API_KEY)
+        const formApi = inject<FormAPI | undefined>($FORM_API_KEY)
         const validate = props.validateFn as () => boolean
 
         formApi?.add(validate)
@@ -27,7 +27,7 @@ const RegisteringField = defineComponent({
         return () => h('div', { class: 'registering-field' })
     },
     beforeUnmount() {
-        const formApi = inject<FormApi | undefined>($FORM_API_KEY)
+        const formApi = inject<FormAPI | undefined>($FORM_API_KEY)
         formApi?.remove(this.validateFn as () => boolean)
     },
 })

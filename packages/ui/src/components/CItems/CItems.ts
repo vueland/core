@@ -53,7 +53,7 @@ export const CItems = defineComponent<CItemsProps>({
         })
 
         const genItem = (item: any) => h(CListItem, {
-            value: item
+            value: item,
         }, {
             default: () => [
                 genItemTitle(extKey ? item[extKey] : item)
@@ -68,6 +68,8 @@ export const CItems = defineComponent<CItemsProps>({
             modelValue: props.modelValue,
             items: props.items,
             multiple: props.multiple,
+            active: true,
+            selectable: true,
             mandatory: props.mandatory,
             ['onUpdate:modelValue']: <T>(val: T[] | T | null) => {
                 emit('update:modelValue', val)

@@ -5,7 +5,6 @@
     import { IconAliases } from '../../enums'
     import { CField } from '../CField'
     import { CInput } from '../CInput'
-    import { CItems } from '../CItems'
     import { CMenu } from '../CMenu'
 
     import type { CAutocompleteProps, CAutocompleteSlots } from './types'
@@ -30,14 +29,16 @@
     const {
         inputValue,
         searchItems,
+        selectedItems,
         hasValue,
-        items: selectedItems,
+        normalizedItems,
         select
     } = useAutocomplete(props)
 
     const inputRef = shallowRef()
     const fieldRef = shallowRef()
     const menuRef = shallowRef()
+    const menuListRef = shallowRef()
 
     const { onKeydown } = useKeyboard({
         Backspace: () => {
@@ -56,6 +57,9 @@
         Escape: () => {
             unref(inputRef).blur()
             unref(fieldRef).$el.blur()
+        },
+        ArrowDown: () => {
+            menuListRef.value.focus()
         }
     })
 
@@ -65,7 +69,6 @@
 
     function focus() {
         unref(inputRef).focus()
-        unref(fieldRef).$el.focus()
     }
 
     function blur() {
@@ -114,6 +117,7 @@
                                 class="c-autocomplete__field"
                                 :label="field.label"
                                 :clearable="field.clearable"
+                                :disabled="field.disabled"
                                 :focused="field.focused"
                                 :readonly="field.readonly"
                                 :preset="field.preset"
@@ -160,19 +164,24 @@
                         :on-select="select"
                         :items="searchItems"
                     >
-                        <c-items
+                        <c-list
+                            ref="menuListRef"
                             v-model="model"
-                            :options="options"
-                            :items="searchItems"
+                            role="listbox"
+                            selectable
                             :multiple
-                            mandatory
+                            :mandatory
                         >
-                            <template #no-items-message>
-                                <slot name="no-items-message">
-                                    {{ options?.noItemsMessage ?? 'Нет совпадений' }}
-                                </slot>
-                            </template>
-                        </c-items>
+                            <c-list-item
+                                v-for="item of searchItems"
+                                :key="item.key"
+                                :value="item.value ?? item.raw"
+                            >
+                                <c-list-item-title>
+                                    {{ item.title }}
+                                </c-list-item-title>
+                            </c-list-item>
+                        </c-list>
                     </slot>
                 </template>
             </c-menu>
